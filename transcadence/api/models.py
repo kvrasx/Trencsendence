@@ -6,7 +6,7 @@ class Chats(models.Model):
     user2_ID = models.IntegerField()
 
 class Message(models.Model):
-    chatId = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name="messages")
+    chatId = models.ForeignKey(Chats, on_delete=models.CASCADE, related_name="messages")
     senderId = models.IntegerField()
     msg = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True) 
