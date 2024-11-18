@@ -29,6 +29,7 @@ def addFriend(request,param1=None,param2=None):
         return res(serializer.data, status=status.HTTP_201_CREATED)
     return res(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api(['GET'])
 def getChats(request, param1=None):
     chats = Chats.objects.filter(Q(user1_ID=param1) | Q(user2_ID=param1))
@@ -48,3 +49,6 @@ def getMessages(request, param1=None):
     Messages = Message.objects.filter(chatId=param1)
     serializer = MessageSerializer(Messages, many=True)
     return res(serializer.data, status=status.HTTP_200_OK)
+
+def index(request):
+    return render(request, 'index.html')

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #chat {
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 400px;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        #messageInput, #userIdInput {
+            width: 300px;
+            padding: 5px;
+        }
+        #sendButton, #startButton {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chat Room</h1>
+    <div>
+        <input type="text" id="userIdInput" placeholder="Enter your User ID">
+        <button id="startButton">Start Chat</button>
+    </div>
+    <div id="chat" style="display:none;"></div>
+    <input type="text" id="messageInput" placeholder="Type your message..." style="display:none;">
+    <button id="sendButton" style="display:none;">Send</button>
+
+    <script>
+        let chatSocket;
+        let chatBox = document.getElementById("chat");
+        let messageInput = document.getElementById("messageInput");
+        let sendButton = document.getElementById("sendButton");
+        let startButton = document.getElementById("startButton");
+        let userIdInput = document.getElementById("userIdInput");
+
+        startButton.onclick = async function () {
+            const userId = userIdInput.value.trim();
+
+            if (!userId) {
+                alert("Please enter your User ID.");
+                return;
+            }
+
+            try {
+                // Call the API to get the chatId
+                const response = await fetch(`/getChats/${userId}/`);
+                if (!response.ok) throw new Error("Failed to fetch chat ID.");
+                
+                const data = await response.json();
+                const chatId = data.chatId; // Ensure the API returns `chatId`
+
+                if (!chatId) throw new Error("Invalid chat ID received.");
+
+                // Initialize WebSocket connection
+                chatSocket = new WebSocket(
+                    `ws://${window.location.host}/ws/chat/${userId}/${chatId}/`
+                );
+
+                chatSocket.onopen = function () {
+                    alert("WebSocket connection established.");
+                    chatBox.style.display = "block";
+                    messageInput.style.display = "inline-block";
+                    sendButton.style.display = "inline-block";
+                };
+
+                chatSocket.onmessage = function (event) {
+                    const data = JSON.parse(event.data);
+                    const newMessage = document.createElement("div");
+                    newMessage.textContent = data.message;
+                    chatBox.appendChild(newMessage);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                };
+
+                chatSocket.onclose = function () {
+                    alert("WebSocket connection closed.");
+                };
+            } catch (error) {
+                alert(error.message);
+            }
+        };
+
+        sendButton.onclick = function () {
+            const message = messageInput.value;
+            if (message) {
+                chatSocket.send(JSON.stringify({ message: message }));
+                messageInput.value = "";
+            }
+        };
+
+        messageInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                sendButton.click();
+            }
+        });
+    </script>
+</body>
+</html>
