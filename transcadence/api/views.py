@@ -35,6 +35,15 @@ def acceptFriend(request):
         return Response("detail: Invitation accepted successfuly", status=status.HTTP_200_OK)        
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['POST'])
+def declineFriend(request, user1=None, user2=None):
+    try:
+        query = Invitations.objects.get(user2=user1,user1=user2,status="pending")
+        query.delete()
+    except:
+        return Response("Detail: Invitation Not found", status=status.HTTP_400_BAD_REQUEST)
+    return Response("Detail: Declined successfully",status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def blockFriend(request, user1=None, user2=None):
