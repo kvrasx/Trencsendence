@@ -14,4 +14,5 @@ class InvitationSerializer(serializers.ModelSerializer):
 class ChatsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitations
-        fields = ['friendship_id', 'user1', 'user2', 'status']
+        fields = ['friendship_id', 'user1', 'user2']
+
