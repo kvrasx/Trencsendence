@@ -18,10 +18,10 @@ class Invitations(models.Model):
     type = models.CharField(max_length=6, choices=InvitationType.choices)
     
     
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user1', 'user2'], name='unique_user_pair')
-        ]
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(fields=['user1', 'user2'], name='unique_user_pair')
+    #     ]
 
 
 class Message(models.Model):

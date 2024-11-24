@@ -6,7 +6,7 @@ urlpatterns = [
     path('inviteFriend/', inviteFriend),
     path('getNotifications/<int:user_id>', getNotifications),
     path('acceptFriend', acceptFriend),
-    path('declineFriend/<int:user1>/<int:user2>', declineFriend),
+    path('declineFriend', declineFriend),
     path('blockFriend/<int:user1>/<int:user2>', blockFriend),
     path('deblockFriend/<int:user1>/<int:user2>', deblockFriend),
     path('getMessages/<int:chat>', getMessages),
