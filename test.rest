@@ -4,9 +4,9 @@ POST http://127.0.0.1:8000/api/user/create
 Content-Type: application/json
 
 {
-    "username": "zodf1e",
-    "password": "tefdsssdsft123",
-    "email": "jaija.sdimil@gmail.com1"
+    "username": "test2",
+    "password": "test2test2",
+    "email": "jaija.sddimil@gmail.com1"
 }
 
 ###
@@ -15,8 +15,8 @@ POST http://127.0.0.1:8000/api/user/create
 Content-Type: application/json
 
 {
-    "username": "zod2",
-    "password": "t345est123",
+    "username": "test1",
+    "password": "test1test1",
     "email": "jaija.ismail@gmail.com"
 }
 
