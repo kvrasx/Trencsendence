@@ -43,7 +43,6 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     'daphne',
     'channels',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,13 +53,14 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'user_management.apps.UserManagementConfig',
     'chat.apps.ChatConfig',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -193,3 +193,16 @@ CHANNEL_LAYERS = {
     },
 }
 CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_HEADERS = [
+    'authorization',
+    'content-type',
+    'x-requested-with',
+    'accept',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'accept-language',
+]
+
+CORS_ALLOW_CREDENTIALS = True

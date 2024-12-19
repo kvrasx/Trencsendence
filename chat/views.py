@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def inviteFriend(request):
     serializer = InvitationSerializer(data=request.data)
     if serializer.is_valid():
@@ -44,6 +45,7 @@ def acceptFriend(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def declineFriend(request):
     serializer= InvitationSerializer(data=request.data)
     if (serializer.is_valid()):
@@ -58,6 +60,7 @@ def declineFriend(request):
     return Response("Detail: Declined successfully",status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def blockFriend(request, user1=None, user2=None):
     try:
         query = Invitations.objects.get((Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)) & Q(status='accepted'))
@@ -68,6 +71,7 @@ def blockFriend(request, user1=None, user2=None):
     return Response("Detail: Blocked successfully", status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def deblockFriend(request, user1=None, user2=None):
     try:
         query = Invitations.objects.get((Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)) & Q(status='blocked'))
@@ -78,6 +82,7 @@ def deblockFriend(request, user1=None, user2=None):
     return Response("Detail: Deblocked successfully", status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def getChats(request,user_id=None):
     chats = Invitations.objects.filter((Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="friend"))
     serializer = ChatsSerializer(chats, many=True)
@@ -86,12 +91,14 @@ def getChats(request,user_id=None):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def getMessages(request, chat=None):
     Messages = Message.objects.filter(chat_id=chat)
     serializer = MessageSerializer(Messages, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def getNotifications(request, user_id=None):
     notifs = Invitations.objects.filter(Q(user2=user_id) & Q(status="pending"))
     serializer = InvitationSerializer(notifs, many=True)
