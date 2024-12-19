@@ -95,10 +95,14 @@ def generate_login_response(user):
     # refresh_token_expiry = datetime.now() + settings.JWT_REFRESH_EXPIRATION_TIME
 
     response.set_cookie(
-        key="access_token",
-        value=accessToken,
-        expires=access_token_expiry,
-    )
+    key="access_token",  # The name of the cookie
+    value=accessToken,   # The JWT token value
+    expires=access_token_expiry,  # Or max_age=3600 if you prefer that
+    httponly=True,        # Ensures the cookie is not accessible via JavaScript
+    secure=True,          # Set to True for HTTPS (False for HTTP in dev only)
+    samesite='Strict',    # Optional: Restrict cross-site cookie sending (can be 'Lax', 'Strict', or None)
+    path='/',             # Path where the cookie is available, set to '/' to make it available across the site
+)
     # response.set_cookie(
     #     key="refresh_token",
     #     value=refreshToken,

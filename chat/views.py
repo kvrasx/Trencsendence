@@ -100,6 +100,7 @@ def getMessages(request, chat=None):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getNotifications(request, user_id=None):
+    print("hadaaa "+request.user)
     notifs = Invitations.objects.filter(Q(user2=user_id) & Q(status="pending"))
     serializer = InvitationSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
