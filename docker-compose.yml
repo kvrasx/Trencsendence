@@ -1,0 +1,76 @@
+volumes:
+    elastic:
+        driver: local
+    postgres_data:
+        driver: local
+     logs:
+        driver: local
+
+services:
+    backend:
+        container_name: backend
+        image: 
+        restart: unless-stopped
+        volumes:
+          
+        depends_on:
+          - nginx
+          - postgres
+
+    PostgreSQL:
+        container_name: PostgreSQL
+        image: postgres:latest
+        restart: unless-stopped
+        # env:
+        #   - POSTGRES_PASSWORD = $DB_PASS
+        volumes:
+           - postgres_data:/var/lib/postgresql/data
+
+    nginx:
+        container_name: nginx
+        image: nginx:latest
+        restart: unless-stopped
+        volumes:
+          - conf/nginx.conf:/etc/nginx/nginx.conf
+          - logs:/var/log/nginx/
+        depends_on:
+          - filebeat
+  
+    filebeat:
+        container_name: filebeat
+        image: docker.elastic.co/beats/filebeat:8.17.0
+        restart: unless-stopped
+        volumes:
+          - conf/filebeat.yml:/usr/share/filebeat/filebeat.yml
+          - logs:/var/log/nginx/
+        command: filebeat -e
+        depends_on:
+          - logstash
+    
+    logstash:
+        container_name: logstash
+        image: docker.elastic.co/logstash/logstash:8.17.0
+        restart: unless-stopped
+        volumes:
+        - conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+        depends_on:
+          - elasticsearch
+
+    elasticsearch:
+        container_name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+        volumes:
+          - elastic:/usr/share/elasticsearch/data
+          - conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+        restart: unless-stopped
+
+    kibana:
+        image: docker.elastic.co/kibana/kibana:8.17.0
+        container_name: kibana
+        environment:
+          - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        ports:
+          - "5601:5601"
+        depends_on:
+          - elasticsearch
+        restart: unless-stopped
