@@ -1,0 +1,24 @@
+# Cluster settings
+cluster.name: my-cluster
+node.name: node-1
+node.roles: [master, data, ingest]  # Single-node requires all roles
+
+# Networking
+network.host: 0.0.0.0  # Bind to all IPs (useful for Docker or testing)
+http.port: 9200         # Default HTTP port for Elasticsearch
+
+# Discovery
+discovery.type: single-node  # Simplifies discovery for single-node setup
+
+# Security (optional, for Elasticsearch 8.x+)
+xpack.security.enabled: false         # Disables authentication (useful for dev/testing)
+xpack.security.http.ssl.enabled: false  # Disables HTTPS (reduces overhead in non-secure environments)
+
+# Performance tuning
+bootstrap.memory_lock: true           # Prevents memory swapping
+indices.memory.index_buffer_size: 10% # Limits memory for indexing (default is 10%)
+thread_pool.write.queue_size: 50      # Adjust thread pool for indexing load
+
+# Shard and index settings
+indices.fielddata.cache.size: 20%     # Limits memory for field data
+
