@@ -3,22 +3,36 @@ volumes:
         driver: local
     postgres_data:
         driver: local
-     logs:
+    logs:
         driver: local
 
 services:
-    backend:
-        container_name: backend
-        image: 
+
+    frontend:
+        container_name: frontend
+        build:
+          context: ./Deployment/React/
         restart: unless-stopped
         volumes:
-          
+          - ./Frontend:/app
+        ports:
+          - "3000:3000"
+        depends_on:
+          - backend
+
+    backend:
+        container_name: backend
+        build:
+          context: ./Deployment/Django/
+        restart: unless-stopped
+        volumes:
+          - ./Backend:/app
         depends_on:
           - nginx
-          - postgres
+          - postgresql
 
-    PostgreSQL:
-        container_name: PostgreSQL
+    postgresql:
+        container_name: postgresql
         image: postgres:latest
         restart: unless-stopped
         # env:
@@ -31,7 +45,7 @@ services:
         image: nginx:latest
         restart: unless-stopped
         volumes:
-          - conf/nginx.conf:/etc/nginx/nginx.conf
+          - ./Deployment/conf/nginx.conf:/etc/nginx/nginx.conf
           - logs:/var/log/nginx/
         depends_on:
           - filebeat
@@ -41,7 +55,7 @@ services:
         image: docker.elastic.co/beats/filebeat:8.17.0
         restart: unless-stopped
         volumes:
-          - conf/filebeat.yml:/usr/share/filebeat/filebeat.yml
+          - ./Deployment/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml
           - logs:/var/log/nginx/
         command: filebeat -e
         depends_on:
@@ -52,7 +66,7 @@ services:
         image: docker.elastic.co/logstash/logstash:8.17.0
         restart: unless-stopped
         volumes:
-        - conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+        - ./Deployment/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
         depends_on:
           - elasticsearch
 
@@ -61,7 +75,7 @@ services:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
         volumes:
           - elastic:/usr/share/elasticsearch/data
-          - conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+          - ./Deployment/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
         restart: unless-stopped
 
     kibana:
