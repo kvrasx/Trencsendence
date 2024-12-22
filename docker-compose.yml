@@ -14,7 +14,7 @@ services:
           context: ./Deployment/React/
         restart: unless-stopped
         volumes:
-          - ./Frontend:/app
+          - ./Frontend:/app:ro
         ports:
           - "3000:3000"
         depends_on:
@@ -26,7 +26,7 @@ services:
           context: ./Deployment/Django/
         restart: unless-stopped
         volumes:
-          - ./Backend:/app
+          - ./Backend:/app:ro
         depends_on:
           - nginx
           - postgresql
