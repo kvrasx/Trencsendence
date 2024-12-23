@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from django.http import HttpResponse
 from rest_framework.views import APIView
-from .serializer import ChatsSerializer, MessageSerializer,InvitationSerializer
+from .serializer import ChatsSerializer, MessageSerializer,GlobalFriendSerializer,InviteFriendSerializer
 from .models import Message,Invitations
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
@@ -14,7 +14,7 @@ from user_management.models import User
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def inviteFriend(request):
-    serializer = InvitationSerializer(data=request.data)
+    serializer = InviteFriendSerializer(data=request.data)
     if (serializer.is_valid()):
         validated_data = serializer.validated_data
         user: User = request.user
@@ -39,18 +39,15 @@ def inviteFriend(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def acceptFriend(request):
-    serializer = InvitationSerializer(data=request.data)
+    serializer = GlobalFriendSerializer(data=request.data)
     if (serializer.is_valid()):
         validated_data = serializer.validated_data
         user: User = request.user
-        jwt_user = user.id
-        user1 = validated_data.get('user1')
+        user1 = user.id
         user2 = validated_data.get('user2')
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if user1 != jwt_user:
-            return Response("Detail: Not authorized", status=status.HTTP_401_UNAUTHORIZED)
     if (user1 == user2):
         return Response("Detail: Cant block", status=status.HTTP_400_BAD_REQUEST)
     try:
@@ -64,18 +61,15 @@ def acceptFriend(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def declineFriend(request):
-    serializer = InvitationSerializer(data=request.data)
+    serializer = GlobalFriendSerializer(data=request.data)
     if (serializer.is_valid()):
         validated_data = serializer.validated_data
         user: User = request.user
-        jwt_user = user.id
-        user1 = validated_data.get('user1')
+        user1 = user.id
         user2 = validated_data.get('user2')
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    if user1 != jwt_user:
-            return Response("Detail: Not authorized", status=status.HTTP_401_UNAUTHORIZED)
     if (user1 == user2):
         return Response("Detail: Cant Decline ", status=status.HTTP_400_BAD_REQUEST)
 
@@ -92,18 +86,15 @@ def declineFriend(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def blockFriend(request):
-    serializer = InvitationSerializer(data=request.data)
+    serializer = GlobalFriendSerializer(data=request.data)
     if (serializer.is_valid()):
         validated_data = serializer.validated_data
         user: User = request.user
-        jwt_user = user.id
-        user1 = validated_data.get('user1')
+        user1 = user.id
         user2 = validated_data.get('user2')
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    if user1 != jwt_user:
-        return Response("Detail: Not authorized", status=status.HTTP_401_UNAUTHORIZED)
+
     if (user1 == user2):
         return Response("Detail: Cant block", status=status.HTTP_400_BAD_REQUEST)
 
@@ -118,18 +109,15 @@ def blockFriend(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def deblockFriend(request):
-    serializer = InvitationSerializer(data=request.data)
+    serializer = GlobalFriendSerializer(data=request.data)
     if (serializer.is_valid()):
         validated_data = serializer.validated_data
         user: User = request.user
-        jwt_user = user.id
-        user1 = validated_data.get('user1')
+        user1 = user.id
         user2 = validated_data.get('user2')
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    if user1 != jwt_user:
-            return Response("Detail: Not authorized", status=status.HTTP_401_UNAUTHORIZED)
     if (user1 == user2):
         return Response("Detail: Cant Deblock", status=status.HTTP_400_BAD_REQUEST)
     try:
@@ -148,7 +136,6 @@ def getChats(request):
     chats = Invitations.objects.filter((Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="friend"))
     serializer = ChatsSerializer(chats, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
- 
 
 
 @api_view(['GET'])
@@ -169,7 +156,7 @@ def getNotifications(request):
     user: User = request.user
     user_id = user.id
     notifs = Invitations.objects.filter(Q(user2=user_id) & Q(status="pending"))
-    serializer = InvitationSerializer(notifs, many=True)
+    serializer = GlobalFriendSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
 
 

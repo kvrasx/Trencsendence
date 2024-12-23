@@ -6,10 +6,15 @@ class MessageSerializer(serializers.ModelSerializer):
         model = Message
         fields = ['chat_id', 'sender_id', 'msg', 'sent_at']
 
-class InvitationSerializer(serializers.ModelSerializer):
+class InviteFriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitations
         fields = ['user1', 'user2', 'type']
+
+class GlobalFriendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invitations
+        fields = ['user2', 'type']
 
 class ChatsSerializer(serializers.ModelSerializer):
     class Meta:
