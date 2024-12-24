@@ -10,10 +10,11 @@ from user_management.models import User
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         user: User = self.scope["user"]
-        # if user.is_anonymous:
+        if user.is_anonymous:
         #     # self.accept()
         #     # self.close(code=4001, reason='Unauthorized')
-        #     return
+            return
+        print(user)
         self.accept()
         self.user_name = self.scope["url_route"]["kwargs"]["user"]
         self.room_group_name = self.scope["url_route"]["kwargs"]["room"]

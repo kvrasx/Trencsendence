@@ -4,19 +4,18 @@ from django.contrib.auth import get_user_model
 from channels.middleware import BaseMiddleware
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
+from urllib.parse import parse_qs
 
 User = get_user_model()
 
 class JWTAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
-        # Try to get the access token from the Authorization header
-        headers = dict(scope['headers'])
-        authorization = headers.get(b'authorization', b'').decode('utf-8')
-
-        # Extract access token from the Authorization header (format: "Bearer <token>")
-        access_token = None
-        if authorization.startswith("Bearer "):
-            access_token = authorization.split("Bearer ")[1]
+        # Parse the query string
+        query_string = scope['query_string'].decode('utf-8')
+        query_params = parse_qs(query_string)
+        
+        # Extract access token from the query string (parameter: "token")
+        access_token = query_params.get('token', [None])[0]
         
         # If no token found, continue with anonymous user
         if not access_token:
