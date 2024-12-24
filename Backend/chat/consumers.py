@@ -10,10 +10,10 @@ from user_management.models import User
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         user: User = self.scope["user"]
-        if user.is_anonymous:
-            # self.accept()
-            # self.close(code=4001, reason='Unauthorized')
-            return
+        # if user.is_anonymous:
+        #     # self.accept()
+        #     # self.close(code=4001, reason='Unauthorized')
+        #     return
         self.accept()
         self.user_name = self.scope["url_route"]["kwargs"]["user"]
         self.room_group_name = self.scope["url_route"]["kwargs"]["room"]
@@ -39,6 +39,8 @@ class ChatConsumer(WebsocketConsumer):
             serializer = MessageSerializer(data=message)
             if serializer.is_valid():
                 serializer.save()
+            else:
+                print(message)
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
@@ -47,7 +49,6 @@ class ChatConsumer(WebsocketConsumer):
                     "sender_channel_name": self.channel_name
                 }
             )
-            print("yppp")
         except:
             return
 
