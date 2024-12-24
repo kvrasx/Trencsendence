@@ -9,16 +9,14 @@ User = get_user_model()
 
 class JWTAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
-        # Try to get the access token from cookies
+        # Try to get the access token from the Authorization header
         headers = dict(scope['headers'])
-        cookies = headers.get(b'cookie', b'').decode('utf-8')
-        
-        # Extract access token from cookies
+        authorization = headers.get(b'authorization', b'').decode('utf-8')
+
+        # Extract access token from the Authorization header (format: "Bearer <token>")
         access_token = None
-        for cookie in cookies.split('; '):
-            if cookie.startswith('access_token='):
-                access_token = cookie.split('=')[1]
-                break
+        if authorization.startswith("Bearer "):
+            access_token = authorization.split("Bearer ")[1]
         
         # If no token found, continue with anonymous user
         if not access_token:

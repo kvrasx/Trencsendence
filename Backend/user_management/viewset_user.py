@@ -22,7 +22,7 @@ class UserTableViewSet:
     ######################
 
     @api_view(['GET'])
-    @permission_classes([IsAuthenticated])
+    # @permission_classes([IsAuthenticated])
     def getAllUsers(request):
         allUsers = User.objects.all()
         serializer = UserSerializer(instance=allUsers, many=True)
