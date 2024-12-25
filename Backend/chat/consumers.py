@@ -37,24 +37,27 @@ class ChatConsumer(WebsocketConsumer):
             text_data_json = json.loads(text_data)
             message = text_data_json["message"]
             full_data = {
-            "message": message,
-            "chat_id": self.room_group_name,
-            "sender_id": self.user_name,
+                "msg": message,
+                "chat_id": self.room_group_name,
+                "sender_id": self.user_name,
             }
-            serializer = MessageSerializer(data=message)
-            if serializer.is_valid():
+            serializer = MessageSerializer(data=full_data)
+            print(message)
+            if serializer.is_valid(raise_exception=True):
+                print("saved :)")
                 serializer.save()
             else:
-                print("------------->")
+                return
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
-                    "type": "chat.message", 
+                    "type": "chat.message",
                     "message": message,
                     "sender_channel_name": self.channel_name
                 }
             )
-        except:
+        except Exception as e:
+            print(f"debug: {e}")
             return
 
     def chat_message(self, event):
