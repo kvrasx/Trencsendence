@@ -133,8 +133,8 @@ def deblockFriend(request):
 def getChats(request):
     user: User = request.user
     user_id = user.id
-    chats = Invitations.objects.filter((Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="friend"))
-    serializer = ChatsSerializer(chats, many=True)
+    chats: Invitations = Invitations.objects.filter((Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="friend"))
+    serializer = ChatsSerializer(chats, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 

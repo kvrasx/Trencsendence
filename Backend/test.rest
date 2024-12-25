@@ -110,7 +110,7 @@ Content-Type: application/json
 
 {
     "user1": "1",
-      "type": "friend",
+    "type": "friend",
 }
 
 
