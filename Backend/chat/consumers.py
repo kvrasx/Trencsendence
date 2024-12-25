@@ -11,12 +11,11 @@ class ChatConsumer(WebsocketConsumer):
     def connect(self):
         user: User = self.scope["user"]
         if user.is_anonymous:
-        #     # self.accept()
-        #     # self.close(code=4001, reason='Unauthorized')
+            self.accept()
+            self.close(code=4001, reason='Unauthorized')
             return
-        print(user)
         self.accept()
-        self.user_name = self.scope["url_route"]["kwargs"]["user"]
+        self.user_name = user.id
         self.room_group_name = self.scope["url_route"]["kwargs"]["room"]
         try:
             Invitations.objects.get(Q(friendship_id=int(self.room_group_name)) & (Q(user1=self.user_name) | Q(user2=self.user_name)))
@@ -37,11 +36,16 @@ class ChatConsumer(WebsocketConsumer):
         try:
             text_data_json = json.loads(text_data)
             message = text_data_json["message"]
+            full_data = {
+            "message": message,
+            "chat_id": self.room_group_name,
+            "sender_id": self.user_name,
+            }
             serializer = MessageSerializer(data=message)
             if serializer.is_valid():
                 serializer.save()
             else:
-                print(message)
+                print("------------->")
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
