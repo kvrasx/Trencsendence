@@ -7,6 +7,7 @@ urlpatterns = [
     path('user/create', UserTableViewSet.createUser),
     path('user/update', UserTableViewSet.updateUser),
     path('user/get-all', UserTableViewSet.getAllUsers),
+    path('user/getInfo', UserTableViewSet.getInfo),
 
 
     # Auth endpoints

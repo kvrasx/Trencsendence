@@ -39,3 +39,12 @@ class UserTableViewSet:
         serializer.save()
         return Response(serializer.data)
 
+    ########################
+
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated])
+    def getInfo(request):
+        user = request.user
+        serializer = UserSerializer(instance=user)
+        return Response(serializer.data)
+

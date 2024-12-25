@@ -14,7 +14,7 @@ def generate_avatar_path(instance, filename):
 
 class User(AbstractUser):
     id = models.AutoField(primary_key=True, unique=True)
-    display_name = models.CharField(max_length=32, null=True, blank=True)
+    display_name = models.CharField(max_length=32, null=True, unique=True, blank=True) # Must be unique
     avatar = models.ImageField(upload_to=generate_avatar_path, null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)
     online = models.BooleanField(default=True)
