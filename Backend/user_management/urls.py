@@ -7,12 +7,13 @@ urlpatterns = [
     path('user/create', UserTableViewSet.createUser),
     path('user/update', UserTableViewSet.updateUser),
     path('user/get-all', UserTableViewSet.getAllUsers),
+    path('user/getInfo', UserTableViewSet.getInfo),
 
 
     # Auth endpoints
     path('auth/login', authViewSet.userLogin),
     path('auth/logout', authViewSet.userLogout),
-    # path('auth/refresh', authViewSet.refreshToken),
+    path('auth/refresh', authViewSet.tokenRefresh),
     path('auth/OAuth', authViewSet.OAuth),
 
 
