@@ -14,7 +14,7 @@ class InviteFriendSerializer(serializers.ModelSerializer):
 class GlobalFriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitations
-        fields = ['user2', 'type']
+        fields = ['user1', 'type']
 
 # class ChatsSerializer(serializers.ModelSerializer):
 #     class Meta:
