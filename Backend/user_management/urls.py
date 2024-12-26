@@ -13,7 +13,7 @@ urlpatterns = [
     # Auth endpoints
     path('auth/login', authViewSet.userLogin),
     path('auth/logout', authViewSet.userLogout),
-    # path('auth/refresh', authViewSet.refreshToken),
+    path('auth/refresh', authViewSet.tokenRefresh),
     path('auth/OAuth', authViewSet.OAuth),
 
 

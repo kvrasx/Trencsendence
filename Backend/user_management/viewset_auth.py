@@ -11,6 +11,10 @@ from django.conf import settings
 import requests
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from .serializers import UserSerializer
+
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+
 
 
 class authViewSet:
@@ -86,27 +90,53 @@ class authViewSet:
 
 #########################
 
+    @api_view(['GET'])
+    def tokenRefresh(request):
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Refresh token not found in cookies."})
+        serializer = TokenRefreshSerializer(data={'refresh': refresh_token})
+        serializer.is_valid(raise_exception=True)
+        accessToken = serializer.validated_data.get("access")
+        access_token_expiry = datetime.now() + settings.JWT_ACCESS_EXPIRATION_TIME
+        response = Response(status=status.HTTP_200_OK, data={"success": "Access token successfully refreshed."})
+        response.set_cookie(
+            key="access_token",
+            value=accessToken,
+            expires=access_token_expiry,
+            httponly=False,  
+            samesite='Strict',
+            path='/',
+        )
+        return response
+
+################################################# END OF VIEWSETS
+
 def generate_login_response(user):
-    # refreshToken = RefreshToken.for_user(user)
-    accessToken = RefreshToken.for_user(user).access_token
-    response = Response(status=status.HTTP_200_OK, data={"success": "You logged in successfully."})
+    refreshToken = RefreshToken.for_user(user)
+    accessToken = refreshToken.access_token
+    response = Response(status=status.HTTP_200_OK, data={
+        "success": "You logged in successfully.",
+        "user": UserSerializer(instance=user).data,
+    })
     
     access_token_expiry = datetime.now() + settings.JWT_ACCESS_EXPIRATION_TIME
-    # refresh_token_expiry = datetime.now() + settings.JWT_REFRESH_EXPIRATION_TIME
+    refresh_token_expiry = datetime.now() + settings.JWT_REFRESH_EXPIRATION_TIME
 
     response.set_cookie(
-    key="access_token",  # The name of the cookie
-    value=accessToken,   # The JWT token value
-    expires=access_token_expiry,  # Or max_age=3600 if you prefer that
-    httponly=True,        # Ensures the cookie is not accessible via JavaScript
-    secure=True,          # Set to True for HTTPS (False for HTTP in dev only)
-    samesite='Strict',    # Optional: Restrict cross-site cookie sending (can be 'Lax', 'Strict', or None)
-    path='/',             # Path where the cookie is available, set to '/' to make it available across the site
-)
-    # response.set_cookie(
-    #     key="refresh_token",
-    #     value=refreshToken,
-    #     httponly=True,
-    #     expires=refresh_token_expiry,
-    # )
+        key="access_token",
+        value=accessToken,
+        expires=access_token_expiry,
+        httponly=False,  
+        samesite='Strict',
+        path='/',
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refreshToken,
+        httponly=True,
+        expires=refresh_token_expiry,
+        samesite='Strict',
+        path='/',
+    )
     return response

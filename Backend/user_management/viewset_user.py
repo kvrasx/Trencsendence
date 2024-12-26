@@ -22,7 +22,7 @@ class UserTableViewSet:
     ######################
 
     @api_view(['GET'])
-    # @permission_classes([IsAuthenticated])
+    @permission_classes([IsAuthenticated])
     def getAllUsers(request):
         allUsers = User.objects.all()
         serializer = UserSerializer(instance=allUsers, many=True)
@@ -44,7 +44,10 @@ class UserTableViewSet:
     @api_view(['GET'])
     @permission_classes([IsAuthenticated])
     def getInfo(request):
-        user = request.user
+        userId = request.GET.get('user_id')
+        if userId is None:
+            return Response({"error": "the user id field is missing."}, status=400)
+        user = get_object_or_404(User, id=userId)
         serializer = UserSerializer(instance=user)
         return Response(serializer.data)
 
