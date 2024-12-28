@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
+
 
 
 # for User table
@@ -36,17 +38,20 @@ class UserTableViewSet:
         user = request.user
         serializer = UserSerializer(instance=user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+        for field in request.data:
+            if field not in serializer.fields:
+                return Response({'error': "User have no such field."}, status=400)
         serializer.save()
-        return Response(serializer.data)
-
+        return Response({'user': serializer.data})
+    
     ########################
 
     @api_view(['GET'])
     @permission_classes([IsAuthenticated])
     def getInfo(request):
-        userId = request.GET.get('user_id')
+        userId = request.GET.get('user_id', None)
         if userId is None:
-            return Response({"error": "the user id field is missing."}, status=400)
+            return Response(UserSerializer(instance=request.user).data)
         user = get_object_or_404(User, id=userId)
         serializer = UserSerializer(instance=user)
         return Response(serializer.data)

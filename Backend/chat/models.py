@@ -29,3 +29,6 @@ class Message(models.Model):
     sender_id = models.IntegerField()
     msg = models.TextField()
     sent_at = models.DateTimeField(auto_now_add=True)
+    
+    def formatted_sent_at(self):
+        return self.sent_at.strftime('%Y-%m-%d %H:%M:%S')

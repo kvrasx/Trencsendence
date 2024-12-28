@@ -4,7 +4,7 @@ from .models import Invitations,Message
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ['chat_id', 'sender_id', 'msg', 'sent_at']
+        fields = ['id', 'chat_id', 'sender_id', 'msg', 'sent_at']
 
 class InviteFriendSerializer(serializers.ModelSerializer):
     class Meta:
