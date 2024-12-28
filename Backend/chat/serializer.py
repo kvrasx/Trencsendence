@@ -32,7 +32,7 @@ class ChatsSerializer(serializers.ModelSerializer):
         fields = ['chat_id', 'user2']
 
     def get_user2(self, obj):
-        user = self.context['request'].user
+        user = self.context['request'].user.id
         other_user = obj.user2 if obj.user1 == user else obj.user1
         return other_user
 
