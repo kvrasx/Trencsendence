@@ -40,12 +40,12 @@ class authViewSet:
 
 ########################
 
-    @api_view(['GET']) ## This could be handled in the frontend only
-    @permission_classes([IsAuthenticated])
+    # @permission_classes([IsAuthenticated])
+    @api_view(['GET'])
     def userLogout(request):
         response = Response(status=status.HTTP_200_OK, data={"success": "You logged out successfully."})
-        response.delete_cookie('access_token')
-        response.delete_cookie('refresh_token')
+        response.set_cookie('access_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
+        response.set_cookie('refresh_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
         return response
 
 ########################
@@ -56,8 +56,8 @@ class authViewSet:
         if not code:
             return Response({'error': 'Authorization code is not provided.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        TOKEN_URL = 'https://user_management.intra.42.fr/oauth/token'
-        USER_INFO_URL = 'https://user_management.intra.42.fr/v2/me'
+        TOKEN_URL = 'https://api.intra.42.fr/oauth/token'
+        USER_INFO_URL = 'https://api.intra.42.fr/v2/me'
 
         reqBody = {
             'client_id': settings.OAUTH_CLIENT_ID,
@@ -84,9 +84,16 @@ class authViewSet:
 
         login = clientInfo.get('login')
         email = clientInfo.get('email')
-
+        avatar = clientInfo.get('image').get('link')
+        print(avatar)
         user, isCreated = User.objects.get_or_create(username=login, email=email, password=None)
-        return generate_login_response(user)
+        if isCreated and avatar:
+            user.avatar = avatar
+            user.save()
+        response = generate_login_response(user)
+        response.status_code = 302
+        response['Location'] = 'http://localhost:5173/oauth-callback'
+        return response
 
 #########################
 
@@ -95,6 +102,15 @@ class authViewSet:
         refresh_token = request.COOKIES.get('refresh_token')
         if not refresh_token:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Refresh token not found in cookies."})
+        try:
+            token = RefreshToken(refresh_token)
+            user_id = token['user_id']
+            user = User.objects.filter(id=user_id).first()
+            if not user:
+                return Response(status=status.HTTP_404_NOT_FOUND, data={"error": "User does not exist."})
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
+        
         serializer = TokenRefreshSerializer(data={'refresh': refresh_token})
         serializer.is_valid(raise_exception=True)
         accessToken = serializer.validated_data.get("access")

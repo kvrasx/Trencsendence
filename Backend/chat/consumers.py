@@ -52,7 +52,7 @@ class ChatConsumer(WebsocketConsumer):
                 self.room_group_name,
                 {
                     "type": "chat.message",
-                    "message": message,
+                    "message": serializer.data,
                     "sender_channel_name": self.channel_name
                 }
             )
