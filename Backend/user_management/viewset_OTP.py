@@ -12,8 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 
 class OTPViewSet:
 
+    # @permission_classes([IsAuthenticated])
     @api_view(['POST'])
-    @permission_classes([IsAuthenticated])
     def verifyOTP(request):
         OTPCode = request.data.get("code")
         username = request.data.get("username")
@@ -26,15 +26,16 @@ class OTPViewSet:
         totp = pyotp.TOTP(user.two_factor_secret)
         if totp.verify(OTPCode) == False:
             return Response({"error": "invalid OTP code"}, status=status.HTTP_401_UNAUTHORIZED)
-
+        print(user)
         return generate_login_response(user)
 
 
-    @api_view(['POST'])
+    @api_view(['GET'])
+    @permission_classes([IsAuthenticated])
     def getOrCreateOTP(request):
-        print(request.user_data)
-        print(request.user)
         user = request.user
+        if user.two_factor_status == False:
+            return Response({"error": "2FA is not enabled for this account"}, status=status.HTTP_400_BAD_REQUEST)
         if not user.two_factor_secret:
             user.two_factor_secret = pyotp.random_base32()
             user.save()

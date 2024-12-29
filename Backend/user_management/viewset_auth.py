@@ -30,7 +30,7 @@ class authViewSet:
         if not check_password(encoded=user.password, password=request.data["password"]):
             return Response({"error": "wrong account credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user.two_factor_secret != None:
+        if user.two_factor_status == True and user.two_factor_secret != None:
             user.pass_to_2fa = True
             user.save()
             return Response({"success": "verify OTP."}, status=status.HTTP_301_MOVED_PERMANENTLY)
@@ -79,6 +79,7 @@ class authViewSet:
             }
         )
         clientInfo = res.json()
+        print(clientInfo)
         if res.status_code != 200:
             return Response({'error': 'Failed to fetch client data from 42.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
