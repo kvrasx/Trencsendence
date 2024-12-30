@@ -26,7 +26,11 @@ class UserTableViewSet:
     @api_view(['GET'])
     @permission_classes([IsAuthenticated])
     def getAllUsers(request):
-        allUsers = User.objects.all()
+        search_query = request.query_params.get('search', '')
+        if search_query:
+            allUsers = User.objects.filter(username__icontains=search_query)
+        else:
+            allUsers = User.objects.all()
         serializer = UserSerializer(instance=allUsers, many=True)
         return Response(serializer.data)
 
