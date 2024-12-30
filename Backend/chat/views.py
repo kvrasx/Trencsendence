@@ -24,7 +24,7 @@ def inviteFriend(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     if user1 != jwt_user:
-            return Response("Detail: Not authorized", status=status.HTTP_401_UNAUTHORIZED)
+            return Response("Detail: Not authorized ", status=status.HTTP_401_UNAUTHORIZED)
     if user1 == user2:
         return Response("Detail: Cant Invite", status=status.HTTP_400_BAD_REQUEST)
     try: 
@@ -44,7 +44,7 @@ def acceptFriend(request):
         validated_data = serializer.validated_data
         user: User = request.user
         user1 = user.id
-        user2 = validated_data.get('user2')
+        user2 = validated_data.get('user1')
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -66,7 +66,7 @@ def declineFriend(request):
         validated_data = serializer.validated_data
         user: User = request.user
         user1 = user.id
-        user2 = validated_data.get('user2')
+        user2 = validated_data.get('user1')
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -74,8 +74,6 @@ def declineFriend(request):
         return Response("Detail: Cant Decline ", status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        if user != user1:
-            return Response("Detail: Not authorized", status=status.HTTP_401_UNAUTHORIZED)
         query = Invitations.objects.get(user2=user1,user1=user2,status="pending")
         query.delete()
     except:
@@ -155,6 +153,7 @@ def getMessages(request, chat=None):
 def getNotifications(request):
     user: User = request.user
     user_id = user.id
+    print("heeeee ->  " + str(user_id))
     notifs = Invitations.objects.filter(Q(user2=user_id) & Q(status="pending"))
     serializer = GlobalFriendSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
