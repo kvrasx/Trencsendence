@@ -2,9 +2,9 @@ FROM python:3.11-slim
 
 RUN mkdir app
 
-EXPOSE 8000
-
 COPY script.sh /
+
+EXPOSE 8000
 
 CMD ["sh", "script.sh"]
 
