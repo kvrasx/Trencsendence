@@ -101,7 +101,7 @@ DATABASES = {
         'PORT': '5432'
     }
 }
-.
+
 
 
 # Password validation
@@ -171,7 +171,8 @@ SIMPLE_JWT = {
 
 OAUTH_CLIENT_ID="u-s4t2ud-130a1202541bd6319e459cf8ad6a3b5974e3e6390afce2a70f081a497e7f8bbe"
 OAUTH_CLIENT_SECRET="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"
-OAUTH_REDIRECT_URI="http://localhost:8000/api/auth/OAuth"
+# OAUTH_REDIRECT_URI="http://localhost:8000/api/auth/OAuth"
+OAUTH_REDIRECT_URI="http://167.99.138.209:80/api/auth/OAuth"
 
 PUBLIC_PATHS = [
     '/api/auth/login',
