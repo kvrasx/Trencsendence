@@ -39,9 +39,13 @@ services:
         restart: unless-stopped
         environment:
           - POSTGRES_PASSWORD=PASS
+          - POSTGRES_DB=my_db
         volumes:
            - postgres_data:/var/lib/postgresql/data
-
+    redis:
+        container_name: redis
+        build: ./Deployment/redis/
+        restart: unless-stopped
     nginx:
         container_name: nginx
         image: nginx:latest
