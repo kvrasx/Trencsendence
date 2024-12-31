@@ -31,11 +31,6 @@ JWT_REFRESH_EXPIRATION_TIME = datetime.timedelta(days=7)  # Refresh Token expira
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "jidev.xyz",
-    "localhost",
-    "127.0.0.1",
-]
 
 
 # Application definition
@@ -57,8 +52,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',

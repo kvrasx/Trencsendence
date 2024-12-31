@@ -14,7 +14,7 @@ services:
           context: ./Deployment/React/
         restart: unless-stopped
         volumes:
-          - ./Frontend:/app:ro
+          - ./Frontend:/app
         ports:
           - "3000:3000"
         depends_on:
@@ -26,17 +26,19 @@ services:
           context: ./Deployment/Django/
         restart: unless-stopped
         volumes:
-          - ./Backend:/app:ro
+          - ./Backend:/app
         depends_on:
           - nginx
           - postgresql
+        ports:
+          - 8000:8000
 
     postgresql:
         container_name: postgresql
         image: postgres:latest
         restart: unless-stopped
-        # env:
-        #   - POSTGRES_PASSWORD = $DB_PASS
+        environment:
+          - POSTGRES_PASSWORD=PASS
         volumes:
            - postgres_data:/var/lib/postgresql/data
 
@@ -49,6 +51,8 @@ services:
           - logs:/var/log/nginx/
         depends_on:
           - filebeat
+        ports:
+          - "80:80"
   
     filebeat:
         container_name: filebeat
