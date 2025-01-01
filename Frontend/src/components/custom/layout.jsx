@@ -14,7 +14,7 @@ export const Layout = ({ children }) => {
           </div>
         </main>
       </div>
-      <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose="2000" />
+      {/* <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose="2000" /> */}
     </div>
   );
 };

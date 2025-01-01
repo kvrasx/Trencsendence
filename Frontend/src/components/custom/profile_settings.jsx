@@ -17,7 +17,7 @@ import { toast } from "react-toastify"
 import { get } from "@/lib/ft_axios"
 import Spinner from "@/components/ui/spinner";
 
-export default function CreateTournament({ updateProfile, user }) {
+export default function ProfileSettings({ updateProfile, user }) {
 
   const [two_factor_status, setTwoFactorStatus] = useState(user.two_factor_status ?? false);
   const [two_factor_secret, setTwoFactorSecret] = useState(null);
@@ -34,7 +34,7 @@ export default function CreateTournament({ updateProfile, user }) {
       }
     };
     getTwoFactorSecret();
-  }, [])
+  }, [user])
 
   const [profile, setProfile] = useState({
     displayName: user.display_name ?? '',
@@ -66,7 +66,7 @@ export default function CreateTournament({ updateProfile, user }) {
       if (profile.password !== '') updatedProfile.password = profile.password;
       if (two_factor_status !== user.two_factor_status) updatedProfile.two_factor_status = two_factor_status;
 
-      await updateProfile(updatedProfile, "Profile has been updated successfully!");
+      await updateProfile(updatedProfile, "Profile has been updated successfully!");      
     } catch (e) {
       // console.log(e);
       toast.error(e?.response?.data?.password?.[0] ?? e?.response?.data?.display_name?.[0] ?? e?.response?.data?.email?.[0] ?? "Failed to update profile. Please try again.");
@@ -95,12 +95,6 @@ export default function CreateTournament({ updateProfile, user }) {
             </Label>
             <Input name="displayName" value={profile.displayName} minLength="5" maxLength="24" placeholder="flitox" onChange={handleChange} className="col-span-3" />
           </div>
-          {/* <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-            <Input name="username" value={profile.username} onChange={handleChange} className="col-span-3" />
-          </div> */}
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="username" className="text-right">
               Email

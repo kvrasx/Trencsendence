@@ -23,9 +23,6 @@ export default function SearchBar() {
   const searchContainerRef = useRef(null);
   const [showNotifications, setShowNotifications] = useState(false);
 
-console.log(showNotifications);
-
-
   const handleSearch = async (query) => {
     if (!query) {
       setUsers([]);
@@ -121,10 +118,10 @@ console.log(showNotifications);
             )}
           </div>
           {/* <Link to="/notifications"> */}
-          <Button variant="ghost" size="icon" className="relative" onClick={() => { setShowNotifications(true) }} >
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative hover:bg-secondary" onClick={() => { setShowNotifications(true) }} >
+            <Bell className="" />
             <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-xs flex items-center justify-center">
-              3
+              {3}
             </span>
           </Button>
           {/* </Link> */}

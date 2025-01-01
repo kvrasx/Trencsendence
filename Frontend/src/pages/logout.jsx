@@ -16,14 +16,11 @@ export default function Logout({ setUser }) {
           toast.success("You've logged out! See you 👋");
           document.cookie = 'access_token=; Max-Age=0; path=/; domain=yourdomain.com';
           document.cookie = 'refresh_token=; Max-Age=0; path=/; domain=yourdomain.com';
-          setTimeout(() => setNavigateTo('/'), 800);
-        } else {
-          setNavigateTo('/');
         }
       } catch (e) {
         toast.error("You're already logged out.")
-        setNavigateTo('/');
       }
+      setNavigateTo('/');
     };
     localStorage.removeItem('user');
     setUser(null);
@@ -31,7 +28,7 @@ export default function Logout({ setUser }) {
   }, []);
   return (
     <>
-      <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={800} />
+      {/* <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={800} /> */}
       {navigateTo && <Navigate to={navigateTo} />}
     </>
   );

@@ -27,7 +27,7 @@ export default function OAuthHandle() {
             <div className="flex justify-center items-center h-screen">
                 <Spinner h="16" w="16" />
             </div>
-            <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={1000} />
+            {/* <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={1000} /> */}
         </>
     );
 }

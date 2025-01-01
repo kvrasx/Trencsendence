@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch"
 import { Settings } from "lucide-react"
 import { useState } from "react"
 
-export default function ProfileSettings() {
+export default function CreateTournament() {
   
   const [twoFactor, setTwoFactor] = useState(true)
 

@@ -29,9 +29,7 @@ export default function OtherProfile({myId}) {
                     setError404(true);
                 } else {
                     toast.error("Failed to get user info. Please try again.");
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 1000);
+                    window.location.href = '/';
                 }
             }
         }
@@ -51,7 +49,7 @@ export default function OtherProfile({myId}) {
                     <Spinner w="16" h="16" />
                 </div>
             )}
-            <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={1000} />
+            {/* <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={1000} /> */}
         </>
     )
 }

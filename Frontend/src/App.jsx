@@ -15,6 +15,7 @@ import Cookies from 'js-cookie';
 import { get } from '@/lib/ft_axios';
 import OAuthHandle from './pages/oauth';
 import OtherProfile from './pages/other-profile';
+import { ToastContainer } from 'react-toastify';
 
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
         </div>
 
       )}
+      <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={1500} />
     </>
   )
 }

@@ -1,5 +1,5 @@
 import BigInput from "@/components/ui/biginput"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Logo42 from "@/assets/42.svg"
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
@@ -12,6 +12,16 @@ export default function Auth({ setUser }) {
   const [isOtp, setIsOtp] = useState(false);
   const [username, setUsername] = useState("");
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const qs = queryParams.get('otp');
+    const otpTarget = queryParams.get('username');
+    if (qs === "true" && otpTarget) {
+      setUsername(otpTarget);
+      setIsOtp(true);
+    }
+  }, [location.search]);
+
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
@@ -22,10 +32,8 @@ export default function Auth({ setUser }) {
       if (res.status === 200) {
         toast.success("You've logged in successfully!");
         if (res.data.user) {
-          setTimeout(() => {
-            localStorage.setItem('user', JSON.stringify(res.data.user));
-            setUser(res.data.user);
-          }, 1000);
+          localStorage.setItem('user', JSON.stringify(res.data.user));
+          setUser(res.data.user);
         }
       }
     } catch (e) {
@@ -61,10 +69,8 @@ export default function Auth({ setUser }) {
       setIsSignup(false);
 
       if (response.data.user) {
-        setTimeout(() => {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-          setUser(response.data.user);
-        }, 1000);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        setUser(response.data.user);
       }
     } catch (err) {
       console.log(err);
@@ -157,8 +163,8 @@ export default function Auth({ setUser }) {
             </form>
           ) : (
 
-            <div className="flex flex-col">
-              <form onSubmit={handleOTP}>
+            <div>
+              <form onSubmit={handleOTP} className="flex flex-col">
                 <h1 className="text-3xl md:text-4xl font-semibold">OTP Verification</h1>
                 <p className="text-base font-small">Check your OTP authenticator app to get your code!</p>
                 <BigInput
@@ -188,7 +194,7 @@ export default function Auth({ setUser }) {
           />
         </div>
       </div>
-      <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={1000} />
+      {/* <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={1000} /> */}
     </div>
   );
 }
