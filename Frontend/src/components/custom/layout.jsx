@@ -8,7 +8,7 @@ export const Layout = ({ children }) => {
       <SearchBar />
       <div className="flex flex-1">
         <Navbar />
-        <main className="pl-16 w-full h-full pt-16 overflow-auto">
+        <main className="md:container pl-16 w-full h-full pt-16 overflow-auto">
           <div className="p-8 mx-5 flex-1 h-full py-8 animate-fade-in scrollbar">
             {children}
           </div>

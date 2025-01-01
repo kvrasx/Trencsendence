@@ -1,14 +1,13 @@
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Edit, Camera, UserPlus, Swords } from 'lucide-react';
+import { Camera, UserPlus, Swords } from 'lucide-react';
 import ProfileSettings from '@/components/custom/profile_settings';
 import CreateTournament from '@/components/custom/create_tournament';
 import defaultAvatar from '@/assets/profile.jpg';
 import { post } from '@/lib/ft_axios';
-import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { useParams } from 'react-router-dom';
+import banner from '@/assets/banner.jpeg';
 
 export default function Profile({ user, setUser }) {
 
@@ -40,16 +39,15 @@ export default function Profile({ user, setUser }) {
 
     return (
 
-        <div className="space-y-6">
-            <Card className="glass p-6">
-                <div className="flex gap-6 items-start justify-center flex-wrap text-center md:text-left">
-                    <div className="flex-initial relative">
-                        <Avatar className="w-24 h-24">
-                            <AvatarImage src={(user?.avatar) ?? defaultAvatar} />
-                            <AvatarFallback>{"no avatar"}</AvatarFallback>
-                        </Avatar>
+        <div className="space-y-6 h-full">
+            <div className="h-2/6 relative">
+                <img src={banner} className="rounded-lg h-full w-full flex flex-col justify-end items-center bg-cover bg-center bg-no-repeat" />
+                <div className="absolute bottom-0 z-50 left-1/2 transform -translate-x-1/2 translate-y-1/2">
+                    <Avatar className="w-32 h-32">
+                        <AvatarImage src={(user?.avatar) ?? defaultAvatar} className="" />
+                        <AvatarFallback>{"no avatar"}</AvatarFallback>
                         {setUser &&
-                            <div className="absolute bottom-0 right-0 cursor-pointer">
+                            <div className="w-32 h-32 opacity-0 hover:opacity-100 rounded-full absolute items-center flex justify-center top-0 right-0 cursor-pointer hover:backdrop-blur-md">
                                 <input
                                     type="file"
                                     accept="image/png, image/jpeg, image/jpg"
@@ -59,40 +57,45 @@ export default function Profile({ user, setUser }) {
                                 />
                                 <Button
                                     size="icon"
-                                    variant="secondary"
+                                    variant="ghost"
                                     className="pointer-events-none cursor-pointer"
                                 >
                                     <Camera className="h-4 w-4 cursor-pointer" />
                                 </Button>
                             </div>
                         }
-                    </div>
-
-                    <div className="flex-1 flex-col flex space-y-4">
-                        <span>
-                            <h1 className="text-2xl font-bold">{user.username}</h1>
-                            <p className="text-muted-foreground">online</p>
-                        </span>
-
-                        <div className="">
-                            {setUser ? (
-                                <>
-                                    <ProfileSettings updateProfile={updateProfile} user={user} />
-                                    <CreateTournament />
-                                </>
-                            ) : (
-                                <>
-                                    <Button variant="outline" className="mr-2 mb-2"> <UserPlus /> Add Friend</Button>
-                                    <Button variant="outline" className="mr-2 mb-2"> <Swords /> Challenge to Match</Button>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
+                    </Avatar>
                 </div>
-            </Card>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <span className='mt-16 flex flex-col items-center'>
+                    <h1 className="text-2xl font-bold">{user.username}</h1>
+                    <p className="text-muted-foreground">online</p>
+                </span>
+            </div>
+
+            <div className="mx-auto flex items-center -translate-y-12 justify-center content-center">
+
+                <div className="flex justify-between space-x-40">
+                    {/* <div className="text-center flex space-y-4 mt-12"> */}
+
+                    {setUser ? (
+                        <>
+                            <ProfileSettings updateProfile={updateProfile} user={user} />
+                            <CreateTournament />
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="outline" className="p-6 w-64 border-accent"> <UserPlus /> Add Friend</Button>
+                            <Button variant="outline" className="p-6 w-64 border-accent"> <Swords /> Challenge to Match</Button>
+                        </>
+                    )}
+                    {/* </div> */}
+                </div>
+
+            </div>
+
+
+            <div className="grid grid-cols-1 md:grid-cols-2 pt-2 md:gap-24 gap-6">
                 <Card className="glass p-6">
                     <h2 className="text-xl font-semibold mb-4">Stats</h2>
                     <div className="grid grid-cols-2 gap-4">
