@@ -31,11 +31,6 @@ JWT_REFRESH_EXPIRATION_TIME = datetime.timedelta(days=7)  # Refresh Token expira
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "jidev.xyz",
-    "localhost",
-    "127.0.0.1",
-]
 
 
 # Application definition
@@ -57,8 +52,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
@@ -98,10 +93,15 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'my_db',
+        'USER': 'postgres',
+        'PASSWORD': 'PASS',
+        'HOST': 'postgresql',
+        'PORT': '5432'
     }
 }
+
 
 
 # Password validation
@@ -171,7 +171,8 @@ SIMPLE_JWT = {
 
 OAUTH_CLIENT_ID="u-s4t2ud-130a1202541bd6319e459cf8ad6a3b5974e3e6390afce2a70f081a497e7f8bbe"
 OAUTH_CLIENT_SECRET="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"
-OAUTH_REDIRECT_URI="http://localhost:8000/api/auth/OAuth"
+# OAUTH_REDIRECT_URI="http://localhost:8000/api/auth/OAuth"
+OAUTH_REDIRECT_URI="http://167.99.138.209:80/api/auth/OAuth"
 
 PUBLIC_PATHS = [
     '/api/auth/login',
