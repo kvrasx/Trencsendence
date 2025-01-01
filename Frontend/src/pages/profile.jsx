@@ -1,33 +1,41 @@
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Edit, Camera } from 'lucide-react';
+import { Edit, Camera, UserPlus, Swords } from 'lucide-react';
 import ProfileSettings from '@/components/custom/profile_settings';
 import CreateTournament from '@/components/custom/create_tournament';
 import defaultAvatar from '@/assets/profile.png';
 import { post } from '@/lib/ft_axios';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useParams } from 'react-router-dom';
 
 export default function Profile({ user, setUser }) {
 
+    const updateProfile = async (data, successMsg) => {
+        let res = await post('/api/user/update', data, {
+            'Content-Type': 'multipart/form-data',
+        })
+        if (res?.user) {
+            toast.success(successMsg);
+            localStorage.setItem('user', JSON.stringify(res.user));
+            setUser(res.user);
+        }
+    }
+
     const handleAvatarChange = async (event) => {
         const file = event.target.files[0];
+        if (!file) {
+            toast.error("No file selected. Please choose a file.");
+            return;
+        }
         let formData = new FormData();
         formData.append("avatar", file);
         try {
-            let res = await post('/api/user/update', formData, {
-                'Content-Type': 'multipart/form-data',
-            })
-            if (res?.user) {
-                toast.success("Avatar has been changed successfully!");
-                localStorage.setItem('user', JSON.stringify(res.user));
-                setUser(res.user);
-            }
+            await updateProfile(formData, "Avatar has been changed successfully!");
         } catch (e) {
-            toast.error("Failed to update avatar. Please try again.")
+            toast.error("Failed to change avatar. Please try again.")
         }
-
     };
 
     return (
@@ -40,33 +48,44 @@ export default function Profile({ user, setUser }) {
                             <AvatarImage src={(user?.avatar) ?? defaultAvatar} />
                             <AvatarFallback>{"no avatar"}</AvatarFallback>
                         </Avatar>
-                        <div className="absolute bottom-0 right-0 cursor-pointer">
-                            <input
-                                type="file"
-                                accept="image/png"
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                id="avatar-upload"
-                                onChange={handleAvatarChange}
-                            />
-                            <Button
-                                size="icon"
-                                variant="secondary"
-                                className="pointer-events-none cursor-pointer"
-                            >
-                                <Camera className="h-4 w-4 cursor-pointer" />
-                            </Button>
-                        </div>
+                        {setUser &&
+                            <div className="absolute bottom-0 right-0 cursor-pointer">
+                                <input
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/jpg"
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                    id="avatar-upload"
+                                    onChange={handleAvatarChange}
+                                />
+                                <Button
+                                    size="icon"
+                                    variant="secondary"
+                                    className="pointer-events-none cursor-pointer"
+                                >
+                                    <Camera className="h-4 w-4 cursor-pointer" />
+                                </Button>
+                            </div>
+                        }
                     </div>
 
                     <div className="flex-1 flex-col flex space-y-4">
                         <span>
                             <h1 className="text-2xl font-bold">{user.username}</h1>
-                            <p className="text-muted-foreground">{(user.online) ? "online" : "offline"}</p>
+                            <p className="text-muted-foreground">online</p>
                         </span>
 
                         <div className="">
-                            <ProfileSettings />
-                            <CreateTournament />
+                            {setUser ? (
+                                <>
+                                    <ProfileSettings updateProfile={updateProfile} user={user} />
+                                    <CreateTournament />
+                                </>
+                            ) : (
+                                <>
+                                    <Button variant="outline" className="mr-2 mb-2"> <UserPlus /> Add Friend</Button>
+                                    <Button variant="outline" className="mr-2 mb-2"> <Swords /> Challenge to Match</Button>
+                                </>
+                            )}
                         </div>
                     </div>
 

@@ -18,7 +18,7 @@ export default function BigInput({ label, type = "text", ...props}) {
           {...props}
         />
         {type === "password" && (
-          <span onClick={() => setShowPassword(!showPassword)} >
+          <span className="cursor-pointer" onClick={() => setShowPassword(!showPassword)} >
             {showPassword ? <EyeOff /> : <Eye />}
           </span>
         )}

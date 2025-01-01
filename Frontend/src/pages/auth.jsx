@@ -9,6 +9,33 @@ const intraApiUrl = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-
 
 export default function Auth({ setUser }) {
   const [isSignup, setIsSignup] = useState(false);
+  const [isOtp, setIsOtp] = useState(false);
+  const [username, setUsername] = useState("");
+
+  const handleOTP = async (e) => {
+    e.preventDefault();
+    try {
+      let res = await axios.post('http://localhost:8000/api/OTP/verify', {
+        username: username,
+        code: e.target.otp.value
+      }, {withCredentials: true});
+      if (res.status === 200) {
+        toast.success("You've logged in successfully!");
+        if (res.data.user) {
+          setTimeout(() => {
+            localStorage.setItem('user', JSON.stringify(res.data.user));
+            setUser(res.data.user);
+          }, 1000);
+        }
+      }
+    } catch (e) {
+      if (e.response?.data?.error) {
+        toast.error(e.response?.data?.error);
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +68,11 @@ export default function Auth({ setUser }) {
       }
     } catch (err) {
       console.log(err);
-      if (err.response && err.response.status === 400) {
+      if (err.response && err.response.status === 301) {
+        setUsername(username);
+        setIsOtp(true);
+        console.log("should verify OTP here");
+      } else if (err.response && err.response.status === 400) {
         toast.error(`Invalid ${isSignup ? "registration" : "login"} form data.`);
       } else if (err.response && err.response.status === 404) {
         toast.error("Invalid username or password.");
@@ -52,82 +83,105 @@ export default function Auth({ setUser }) {
   };
 
   return (
-    <div className="min-h-screen bg-dark-image bg-cover bg-no-repeat bg-center relative flex items-center justify-center p-4">
+    <div className="h-screen bg-dark-image bg-cover bg-no-repeat bg-center relative flex items-center justify-center p-24">
       <div className="relative flex justify-center">
         <div className="flex flex-col items-center justify-center w-full md:w-[60%] rounded-lg md:rounded-l-lg md:rounded-r-none p-6 shadow-sm backdrop-blur-[26.5px] border border-solid border-accent">
-          <form onSubmit={handleSubmit} className="w-full max-w-md">
-            <div className="flex flex-col">
-              {!isSignup ? (
-                <>
-                  <h1 className="text-3xl md:text-4xl font-semibold">Welcome Back</h1>
-                  <p className="text-base font-small">Glad to see you again!</p>
-                </>
-              ) : ""}
-              <BigInput
-                label="username"
-                name="username"
-                minLength="5"
-                required
-              />
-              {isSignup ? <BigInput
-                label="email"
-                name="email"
-                type="email"
-                required
-              /> : ""}
-              <BigInput
-                label="password"
-                type="password"
-                name="password"
-                minLength="8"
-                required
-              />
-              {isSignup ? <BigInput
-                label="confirm password"
-                type="password"
-                name="confirmPassword"
-                required
-              /> : ""}
-
-              <button className="mt-3.5 py-3 md:py-4 font-semibold bg-gradient-to-r from-[#628EFF] via-[#8566FF] to-[#8566FF] rounded-lg auth-btn-hover">
-                {isSignup ? "Create an Account" : "Login"}
-              </button>
-
-              <div className="flex gap-5 mt-4 items-center justify-center">
-                <div className="shrink-0 self-stretch max-w-36 my-auto h-0.5 border-2 border-solid border-stone-50 w-[170px]" />
-                <div className="self-stretch my-auto">Or</div>
-                <div className="shrink-0 self-stretch max-w-36 my-auto h-0.5 border-2 border-solid border-stone-50 w-[170px]" />
-              </div>
-
-              <a
-                href={intraApiUrl}
-                className="flex auth-42btn-hover justify-center items-center px-2.5 py-3 md:py-4 mt-3.5 text-lg md:text-xl font-semibold text-black rounded-xl bg-gradient-to-r from-[#FFFFFF] via-[#DEDEDE] to-[#BFBFBF] hover:from-[#BFBFBF] hover:via-[#DEDEDE] hover:to-[#FFFFFF] transition-all duration-300 w-full"
-              >
-                <div className="flex gap-2 items-center justify-center">
-                  <img
-                    loading="lazy"
-                    src={Logo42}
-                    alt=""
-                    className="object-contain w-8 md:w-10 aspect-[1.5]"
-                  />
-                  <div>Sign in with 42 intra</div>
-                </div>
-              </a>
-
-              <div className="text-center mt-3 text-sm md:text-base font-medium text-white">
+          {!isOtp ? (
+            <form onSubmit={handleSubmit} className="w-full max-w-md">
+              <div className="flex flex-col">
                 {!isSignup ? (
-                  <span className="cursor-pointer" onClick={() => setIsSignup(true)}>Don't have an account? Signup</span>
-                ) : (
-                  <span className="cursor-pointer" onClick={() => setIsSignup(false)}>Already have an account? Login</span>
-                )}
+                  <>
+                    <h1 className="text-3xl md:text-4xl font-semibold">Welcome Back</h1>
+                    <p className="text-base font-small">Glad to see you again!</p>
+                  </>
+                ) : ""}
+                <BigInput
+                  label="username"
+                  name="username"
+                  minLength="5"
+                  required
+                />
+                {isSignup ? <BigInput
+                  label="email"
+                  name="email"
+                  type="email"
+                  required
+                /> : ""}
+                <BigInput
+                  label="password"
+                  type="password"
+                  name="password"
+                  minLength="8"
+                  required
+                />
+                {isSignup ? <BigInput
+                  label="confirm password"
+                  type="password"
+                  name="confirmPassword"
+                  required
+                /> : ""}
+
+                <button className="mt-3.5 py-3 md:py-4 font-semibold bg-gradient-to-r from-[#628EFF] via-[#8566FF] to-[#8566FF] rounded-lg auth-btn-hover">
+                  {isSignup ? "Create an Account" : "Login"}
+                </button>
+
+                <div className="flex gap-5 mt-4 items-center justify-center">
+                  <div className="shrink-0 self-stretch max-w-36 my-auto h-0.5 border-2 border-solid border-stone-50 w-[170px]" />
+                  <div className="self-stretch my-auto">Or</div>
+                  <div className="shrink-0 self-stretch max-w-36 my-auto h-0.5 border-2 border-solid border-stone-50 w-[170px]" />
+                </div>
+
+                <a
+                  href={intraApiUrl}
+                  className="flex auth-42btn-hover justify-center items-center px-2.5 py-3 md:py-4 mt-3.5 text-lg md:text-xl font-semibold text-black rounded-xl bg-gradient-to-r from-[#FFFFFF] via-[#DEDEDE] to-[#BFBFBF] hover:from-[#BFBFBF] hover:via-[#DEDEDE] hover:to-[#FFFFFF] transition-all duration-300 w-full"
+                >
+                  <div className="flex gap-2 items-center justify-center">
+                    <img
+                      loading="lazy"
+                      src={Logo42}
+                      alt=""
+                      className="object-contain w-8 md:w-10 aspect-[1.5]"
+                    />
+                    <div>Sign in with 42 intra</div>
+                  </div>
+                </a>
+
+                <div className="text-center mt-3 text-sm md:text-base font-medium text-white">
+                  {!isSignup ? (
+                    <span className="cursor-pointer" onClick={() => setIsSignup(true)}>Don't have an account? Signup</span>
+                  ) : (
+                    <span className="cursor-pointer" onClick={() => setIsSignup(false)}>Already have an account? Login</span>
+                  )}
+                </div>
               </div>
+            </form>
+          ) : (
+
+            <div className="flex flex-col">
+              <form onSubmit={handleOTP}>
+                <h1 className="text-3xl md:text-4xl font-semibold">OTP Verification</h1>
+                <p className="text-base font-small">Check your OTP authenticator app to get your code!</p>
+                <BigInput
+                  label="xxx xxx"
+                  name="otp"
+                  minLength="6"
+                  maxLength="6"
+                  required
+                />
+
+                <button className="mt-3.5 py-3 md:py-4 font-semibold bg-gradient-to-r from-[#628EFF] via-[#8566FF] to-[#8566FF] rounded-lg auth-btn-hover">
+                  Verify OTP
+                </button>
+              </form>
             </div>
-          </form>
+
+          )
+          }
         </div>
 
         <div className="hidden md:flex flex-col w-[44%]">
           <img
-            loading="lazy"
+            // loading="lazy"
             src="https://cdn.builder.io/api/v1/image/assets/6cf02da4bad24179a51f8a7eecbdc347/22567e203d7fccc709b8fdb4363ed7dd90b445c3bdff983c0814e065fd27302f?apiKey=6cf02da4bad24179a51f8a7eecbdc347&"
             alt=""
             className="object-contain grow w-full rounded-none aspect-[0.84]"

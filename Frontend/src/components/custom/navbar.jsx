@@ -10,9 +10,11 @@ const navItems = [
   { icon: Bell, label: "Notifications", path: "/notifications" },
 ];
 
-export const Navbar = () => {
+const normalizePath = (path) => path.replace(/\/+$/, '');
 
+export const Navbar = () => {
   const location = useLocation();
+  const currentPath = normalizePath(location.pathname);
 
   return (
     <div className="fixed left-0 top-0 h-screen w-16 glass py-8">
@@ -22,8 +24,7 @@ export const Navbar = () => {
             <Link
               key={path}
               to={path}
-              className={`relative p-3 rounded-lg hover-glass group ${location.pathname === path ? "bg-primary/20" : ""
-                }`}
+              className={`relative p-3 rounded-lg hover-glass group ${currentPath === normalizePath(path) ? "bg-primary/20" : ""}`}
             >
               <Icon className="h-6 w-6" />
               <span className="absolute left-14 rounded-md px-2 py-1 glass invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200">
@@ -36,8 +37,7 @@ export const Navbar = () => {
         <Link
           key="/logout"
           to="/logout"
-          className={`relative p-3 rounded-lg hover-glass group ${location.pathname === "/logout" ? "bg-primary/20" : ""
-            }`}
+          className={`relative p-3 rounded-lg hover-glass group ${currentPath === normalizePath("/logout") ? "bg-primary/20" : ""}`}
         >
           <LogOut className="h-6 w-6" />
           <span className="absolute left-14 rounded-md px-2 py-1 glass invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200">

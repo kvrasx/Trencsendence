@@ -3,14 +3,22 @@ import { get } from "@/lib/ft_axios";
 import Message from "@/components/ui/message";
 import Cookies from 'js-cookie';
 
-export default function NewMessages({ currentChat, user, socket, setSocket, isWsOpened }) {
+export default function NewMessages({ currentChat, user, socket, setSocket, isWsOpened, messagesEndRef }) {
     const formatDate = (timestamp) => {
         const date = new Date(timestamp);
         return date.toLocaleString();
     };
     
-    const [newMessages, setNewMessages] = useState([]); // should start with the messages from the database
+    const [newMessages, setNewMessages] = useState(null); // should start with the messages from the database
     
+    useEffect(() => {
+        const scrollToBottom = () => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        };
+        
+        scrollToBottom();
+    }, [newMessages]);
+
     useEffect(() => {
         if ((isWsOpened.current && socket) || !currentChat)
             return;
@@ -31,7 +39,7 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
             const receivedMessage = JSON.parse(event.data);
             console.log('Received message:', receivedMessage);
 
-            setNewMessages((prevMessages) => [receivedMessage.message, ...prevMessages]);
+            setNewMessages((prevMessages) => [...prevMessages, receivedMessage.message]);
         };
 
         newsocket.onerror = (_) => {

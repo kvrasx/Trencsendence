@@ -57,16 +57,7 @@ export default function ProfileSettings() {
             </Label>
             <Input id="username" value="@peduarte" className="col-span-3" />
           </div>
-          <hr />
-        <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="2fa" className="text-right">
-                Enable 2FA
-            </Label>
-            <Switch checked={twoFactor} />
-        </div>
-        <div className="flex justify-center ">
-            <img className="text-center bg-white" src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="qr code exemple" />
-        </div>
+        
 
 
         </div>

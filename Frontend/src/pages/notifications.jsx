@@ -35,7 +35,7 @@ export function Notifications() {
         let res = await get('/getNotifications/');  // Fetch notifications
         let chatPromises = res.map(async (d) => {
           // Fetch user info for each notification
-          let userRes = await get(`/api/user/getInfo?user_id=${d.user1}`);
+          let userRes = await get(`/api/user/get-info?user_id=${d.user1}`);
           d.user2 = userRes;  // Attach user info to the notification object
           return d;  // Return the updated notification
         });

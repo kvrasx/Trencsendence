@@ -48,22 +48,21 @@ async function ft_axios(method, url, data = null, headers = null) {
         ...headers,
       },
     });
-    console.log(response);
     
-    return response?.data;
+    return response?.data; // successful status code 2xx
   } catch (error) {
-    if (error.response) {
-      if (error.response.status === 401) {
+    if (error.response) { // server responded with an error status code
+      if (error.response.status === 401) { // handling unauthorized error
         console.log("Caught unauthorized error, refreshing token...");
         await refreshAuthToken();
         return ft_axios(method, url, data, headers);
-      } else {
-        console.log("API Error:", error.response.data);
-        throw error.response.data;
+      } else { // throwing other errors to be handled by case 
+        // console.log("API Error:", error?.message);
+        throw error;
       }
-    } else {
-      console.log("Internal Error:", error.message);
-      throw error.response.data;
+    } else { // either request was made but got no response, or setting up the request has failed
+      // console.log("Internal Error:", error?.message);
+      throw Error("Internal Error");
     }
   }
 }

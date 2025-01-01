@@ -9,16 +9,14 @@ export default function OAuthHandle() {
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const user = await get('/api/user/getInfo');
-                if (user) {
-                    localStorage.setItem('user', JSON.stringify(user));
-                }
-                
+                const user = await get('/api/user/get-info');
+                localStorage.setItem('user', JSON.stringify(user));
             } catch (e) {
                 toast.error("Something went wrong. Please try again.");
                 console.log(e);
+            } finally {
+                window.location.href = "/";
             }
-            window.location.href = "/";
         };
 
         fetchUserInfo();
