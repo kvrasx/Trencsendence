@@ -30,10 +30,9 @@ class authViewSet:
         if not check_password(encoded=user.password, password=request.data["password"]):
             return Response({"error": "wrong account credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user.two_factor_status == True and user.two_factor_secret != None:
-            user.pass_to_2fa = True
-            user.save()
-            return Response({"success": "verify OTP."}, status=status.HTTP_301_MOVED_PERMANENTLY)
+        r = handle_2fa(user)
+        if r:
+            return r
 
         return generate_login_response(user)
 
@@ -91,6 +90,13 @@ class authViewSet:
         if isCreated and avatar:
             user.avatar = avatar
             user.save()
+
+        r = handle_2fa(user)
+        if r:
+            r.status_code = 302
+            r['Location'] = 'http://localhost:5173/?otp=true&username=' + user.username
+            return r
+
         response = generate_login_response(user)
         response.status_code = 302
         response['Location'] = 'http://localhost:5173/oauth-callback'
@@ -157,3 +163,11 @@ def generate_login_response(user):
         path='/',
     )
     return response
+
+def handle_2fa(user):
+    if user.two_factor_status == True and user.two_factor_secret != None:
+        user.pass_to_2fa = True
+        user.save()
+        return Response({"success": "verify OTP."}, status=status.HTTP_301_MOVED_PERMANENTLY)
+    else:
+        return None
