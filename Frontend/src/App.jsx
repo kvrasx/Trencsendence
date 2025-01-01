@@ -47,8 +47,6 @@ function App() {
                 <Route path="/profile" element={<Layout><Profile user={user} setUser={setUser} /></Layout>} />
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/notifications" element={<Layout><Notifications /></Layout>} />
-                <Route path="/logout" element={<Layout><Logout setUser={setUser} /></Layout>} />
-                <Route path="/oauth-callback" element={<OAuthHandle />} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>
@@ -56,8 +54,10 @@ function App() {
               <>
                 <Route path="/" element={<Auth setUser={setUser} />} />
                 <Route path="*" element={<Navigate to="/" />} />
+                <Route path="/oauth-callback" element={<OAuthHandle />} />
               </>
             )}
+            <Route path="/logout" element={<Layout><Logout setUser={setUser} /></Layout>} />
           </Routes>
         </UserContext.Provider>
       ) : (

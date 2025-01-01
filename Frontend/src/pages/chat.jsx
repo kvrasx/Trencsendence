@@ -111,7 +111,7 @@ export function Chat() {
                     <form action="">
                         <div className="flex w-full space-x-2">
                             <Input className="bg-background" type="text" placeholder="Type a message..." disabled={loading ? true : false} />
-                            <Button onClick={sendHandler}>
+                            <Button onClick={sendHandler} disabled={loading ? true : false}>
                                 <Send />
                             </Button>
                         </div>
