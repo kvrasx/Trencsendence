@@ -3,13 +3,14 @@ from .views import getMessages,getChats,inviteFriend,index,getNotifications,acce
 from .consumers import ChatConsumer
 
 urlpatterns = [
-    path('inviteFriend/', inviteFriend),
-    path('getNotifications/<int:user_id>', getNotifications),
-    path('acceptFriend', acceptFriend),
-    path('declineFriend', declineFriend),
-    path('blockFriend/<int:user1>/<int:user2>', blockFriend),
-    path('deblockFriend/<int:user1>/<int:user2>', deblockFriend),
+    path('invite/', inviteFriend),
+    path('accept/', acceptFriend),
+    path('decline/', declineFriend),
+    path('blockFriend/', blockFriend),
+    path('deblockFriend/', deblockFriend),
+
+    path('getNotifications/', getNotifications),
+    path('getChats/', getChats),
     path('getMessages/<int:chat>', getMessages),
-    path('getchats/<int:user_id>', getChats),
     path('', index),
 ]

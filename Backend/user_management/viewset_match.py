@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes # for the api_view decorators (eg: @api_view(['GET']))
 from rest_framework import status
 from rest_framework.response import Response # for the response class
-from .models import Match
+from .models import Match, User
 from .serializers import MatchSerializer
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
@@ -15,6 +15,17 @@ class MatchTableViewSet:
         serializer = MatchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+    
+        f = serializer.validated_data.get('score')
+        n, m = map(int, f.split(":"))
+        match_score = abs(n - m)
+        matches_won = Match.objects.get(winner=request.user)
+        matches_lost = Match.objects.get(loser=request.user)
+        # gain_factor = 1
+        # loss_factor = 0.5
+    
+        # User.score += (matches_won * match_score * gain_factor) - (matches_lost * match_score * loss_factor)
+        # User.save()
         return Response(serializer.data)
     
     ########################

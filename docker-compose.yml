@@ -30,16 +30,22 @@ services:
         depends_on:
           - nginx
           - postgresql
+        ports:
+          - 8000:8000
 
     postgresql:
         container_name: postgresql
         image: postgres:latest
         restart: unless-stopped
         environment:
-          POSTGRES_HOST_AUTH_METHOD: trust
+          - POSTGRES_PASSWORD=PASS
+          - POSTGRES_DB=my_db
         volumes:
            - postgres_data:/var/lib/postgresql/data
-
+    redis:
+        container_name: redis
+        build: ./Deployment/redis/
+        restart: unless-stopped
     nginx:
         container_name: nginx
         image: nginx:latest
@@ -49,6 +55,8 @@ services:
           - logs:/var/log/nginx/
         depends_on:
           - filebeat
+        ports:
+          - "80:80"
   
     filebeat:
         container_name: filebeat

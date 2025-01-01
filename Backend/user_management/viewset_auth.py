@@ -11,6 +11,10 @@ from django.conf import settings
 import requests
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from .serializers import UserSerializer
+
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+
 
 
 class authViewSet:
@@ -26,22 +30,21 @@ class authViewSet:
         if not check_password(encoded=user.password, password=request.data["password"]):
             return Response({"error": "wrong account credentials."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user.two_factor_secret != None:
-            user.pass_to_2fa = True
-            user.save()
-            return Response({"success": "verify OTP."}, status=status.HTTP_301_MOVED_PERMANENTLY)
+        r = handle_2fa(user)
+        if r:
+            return r
 
         return generate_login_response(user)
 
 
 ########################
 
-    @api_view(['GET']) ## This could be handled in the frontend only
-    @permission_classes([IsAuthenticated])
+    # @permission_classes([IsAuthenticated])
+    @api_view(['GET'])
     def userLogout(request):
         response = Response(status=status.HTTP_200_OK, data={"success": "You logged out successfully."})
-        response.delete_cookie('access_token')
-        response.delete_cookie('refresh_token')
+        response.set_cookie('access_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
+        response.set_cookie('refresh_token', '', expires='Thu, 01 Jan 1970 00:00:00 GMT')
         return response
 
 ########################
@@ -52,8 +55,8 @@ class authViewSet:
         if not code:
             return Response({'error': 'Authorization code is not provided.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        TOKEN_URL = 'https://user_management.intra.42.fr/oauth/token'
-        USER_INFO_URL = 'https://user_management.intra.42.fr/v2/me'
+        TOKEN_URL = 'https://api.intra.42.fr/oauth/token'
+        USER_INFO_URL = 'https://api.intra.42.fr/v2/me'
 
         reqBody = {
             'client_id': settings.OAUTH_CLIENT_ID,
@@ -75,38 +78,96 @@ class authViewSet:
             }
         )
         clientInfo = res.json()
+        print(clientInfo)
         if res.status_code != 200:
             return Response({'error': 'Failed to fetch client data from 42.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         login = clientInfo.get('login')
         email = clientInfo.get('email')
-
+        avatar = clientInfo.get('image').get('link')
+        print(avatar)
         user, isCreated = User.objects.get_or_create(username=login, email=email, password=None)
-        return generate_login_response(user)
+        if isCreated and avatar:
+            user.avatar = avatar
+            user.save()
+
+        r = handle_2fa(user)
+        if r:
+            r.status_code = 302
+            r['Location'] = 'http://localhost:5173/?otp=true&username=' + user.username
+            return r
+
+        response = generate_login_response(user)
+        response.status_code = 302
+        response['Location'] = 'http://localhost:5173/oauth-callback'
+        return response
 
 #########################
 
+    @api_view(['GET'])
+    def tokenRefresh(request):
+        refresh_token = request.COOKIES.get('refresh_token')
+        if not refresh_token:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": "Refresh token not found in cookies."})
+        try:
+            token = RefreshToken(refresh_token)
+            user_id = token['user_id']
+            user = User.objects.filter(id=user_id).first()
+            if not user:
+                return Response(status=status.HTTP_404_NOT_FOUND, data={"error": "User does not exist."})
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})
+        
+        serializer = TokenRefreshSerializer(data={'refresh': refresh_token})
+        serializer.is_valid(raise_exception=True)
+        accessToken = serializer.validated_data.get("access")
+        access_token_expiry = datetime.now() + settings.JWT_ACCESS_EXPIRATION_TIME
+        response = Response(status=status.HTTP_200_OK, data={"success": "Access token successfully refreshed."})
+        response.set_cookie(
+            key="access_token",
+            value=accessToken,
+            expires=access_token_expiry,
+            httponly=False,  
+            samesite='Strict',
+            path='/',
+        )
+        return response
+
+################################################# END OF VIEWSETS
+
 def generate_login_response(user):
-    # refreshToken = RefreshToken.for_user(user)
-    accessToken = RefreshToken.for_user(user).access_token
-    response = Response(status=status.HTTP_200_OK, data={"success": "You logged in successfully."})
+    refreshToken = RefreshToken.for_user(user)
+    accessToken = refreshToken.access_token
+    response = Response(status=status.HTTP_200_OK, data={
+        "success": "You logged in successfully.",
+        "user": UserSerializer(instance=user).data,
+    })
     
     access_token_expiry = datetime.now() + settings.JWT_ACCESS_EXPIRATION_TIME
-    # refresh_token_expiry = datetime.now() + settings.JWT_REFRESH_EXPIRATION_TIME
+    refresh_token_expiry = datetime.now() + settings.JWT_REFRESH_EXPIRATION_TIME
 
     response.set_cookie(
-    key="access_token",  # The name of the cookie
-    value=accessToken,   # The JWT token value
-    expires=access_token_expiry,  # Or max_age=3600 if you prefer that
-    httponly=True,        # Ensures the cookie is not accessible via JavaScript
-    secure=True,          # Set to True for HTTPS (False for HTTP in dev only)
-    samesite='Strict',    # Optional: Restrict cross-site cookie sending (can be 'Lax', 'Strict', or None)
-    path='/',             # Path where the cookie is available, set to '/' to make it available across the site
-)
-    # response.set_cookie(
-    #     key="refresh_token",
-    #     value=refreshToken,
-    #     httponly=True,
-    #     expires=refresh_token_expiry,
-    # )
+        key="access_token",
+        value=accessToken,
+        expires=access_token_expiry,
+        httponly=False,  
+        samesite='Strict',
+        path='/',
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refreshToken,
+        httponly=True,
+        expires=refresh_token_expiry,
+        samesite='Strict',
+        path='/',
+    )
     return response
+
+def handle_2fa(user):
+    if user.two_factor_status == True and user.two_factor_secret != None:
+        user.pass_to_2fa = True
+        user.save()
+        return Response({"success": "verify OTP."}, status=status.HTTP_301_MOVED_PERMANENTLY)
+    else:
+        return None

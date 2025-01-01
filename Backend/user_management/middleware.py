@@ -4,21 +4,18 @@ from django.contrib.auth import get_user_model
 from channels.middleware import BaseMiddleware
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
+from urllib.parse import parse_qs
 
 User = get_user_model()
 
 class JWTAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
-        # Try to get the access token from cookies
-        headers = dict(scope['headers'])
-        cookies = headers.get(b'cookie', b'').decode('utf-8')
+        # Parse the query string
+        query_string = scope['query_string'].decode('utf-8')
+        query_params = parse_qs(query_string)
         
-        # Extract access token from cookies
-        access_token = None
-        for cookie in cookies.split('; '):
-            if cookie.startswith('access_token='):
-                access_token = cookie.split('=')[1]
-                break
+        # Extract access token from the query string (parameter: "token")
+        access_token = query_params.get('token', [None])[0]
         
         # If no token found, continue with anonymous user
         if not access_token:

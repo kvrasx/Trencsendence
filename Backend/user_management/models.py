@@ -14,15 +14,28 @@ def generate_avatar_path(instance, filename):
 
 class User(AbstractUser):
     id = models.AutoField(primary_key=True, unique=True)
-    display_name = models.CharField(max_length=32, null=True, blank=True)
+    display_name = models.CharField(
+        max_length=24, 
+        null=True, 
+        unique=True, 
+        blank=True, 
+        validators=[RegexValidator(
+            regex=r'^.{5,}$', 
+            message='Display name must be at least 5 characters long'
+        )]
+    ) # Must be unique
     avatar = models.ImageField(upload_to=generate_avatar_path, null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)
     online = models.BooleanField(default=True)
 
+    two_factor_status = models.BooleanField(default=False)
     two_factor_secret = models.CharField(max_length=254, unique=True, null=True, default=None)
     pass_to_2fa = models.BooleanField(default=False)
 
     # Override email to make it unique
+
+    score = models.IntegerField(default=0)
+
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=144, null=True) # will be hashed
 
@@ -49,4 +62,5 @@ class Match(models.Model):
             message='Score must be in format nn:nn'
         )]
     )
+    # scoreboard = models.IntegerField()
     match_date = models.DateField(auto_now_add=True)

@@ -2,26 +2,93 @@
 @tailwind components;
 @tailwind utilities;
 
-.board {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    width: 200px;
-    margin: auto;
+@layer base {
+  :root {
+    --background: 230 25% 14%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 230 25% 14%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 230 25% 14%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 252 100% 70%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 230 25% 24%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 230 25% 24%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 252 100% 70%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 230 25% 24%;
+    --input: 230 25% 24%;
+    --ring: 252 100% 70%;
+ 
+    --radius: 0.5rem;
+
+
+    --theme-color: #628EFF; /* Example theme color */
+    --theme-bg-color: #8566FF; /* Example background color */
+    --theme-text-color: #8566FF; /* Example text color */
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 .cell {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    font-size: 24px;
-    font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .cell--selected {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
+}
+
+
+
+.glass {
+  @apply bg-secondary/30 backdrop-blur-md border border-white/10;
+}
+
+.hover-glass {
+  @apply hover:bg-secondary/50 transition-colors duration-200;
+}
+
+
+.auth-btn-hover:hover {
+  background: linear-gradient(to right, #8566FF, #628EFF);
+  transform: scale(1.01);
+  transition: all 0.3s ease-in-out;
+}
+
+.auth-btn-hover {
+  transition: all 0.5s ease-in-out;
+}
+
+.auth-42btn-hover:hover {
+  transform: scale(1.01);
+  transition: all 0.3s ease-in-out;
+}
+
+.auth-42btn-hover {
+  transition: all 0.5s ease-in-out;
 }

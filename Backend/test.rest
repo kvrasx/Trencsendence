@@ -56,7 +56,7 @@ Content-Type: application/json
 {
     "winner": 2,
     "loser": 1,
-    "game": 1,
+    "game_type": 1,
     "score": "10:50"
 }
 
@@ -89,31 +89,38 @@ Content-Type: application/json
 }
 
 
-### GET http://localhost:8000/getchats/23
+
 
 ###
+GET http://localhost:8000/getNotifications/
 
-POST http://localhost:8000/inviteFriend/ Content-Type: application/json
+
+###
+GET http://localhost:8000/getChats/
+
+
+###
+// << after getting chat_id  from API above request it heere >>
+GET http://localhost:8000/getMessages/56
+
+
+###
+POST http://localhost:8000/invite/
+Content-Type: application/json
 
 {
-"user1": "1", "user2": "6", "type": "friend", "status": "pending"
+    "user1": "1",
+    "type": "friend",
 }
 
-### GET http://localhost:8000/getMessages/3
 
 ###
-
-GET http://localhost:8000/getNotifications/1
-
-###
-
-POST http://localhost:8000/acceptFriend Content-Type: application/json
+//                 << valid for /accept/decline/deblockFriend/BlockFriend/   Api's >>
+POST http://localhost:8000/accept/   
+Content-Type: application/json
 
 {
-"user1": "1", "user2": "3", "type": "friend"
+    "user2": "6",       // invitation sender u will get it with every notif 
+    "type": "friend",   // <-- (friend / game)   game doesnt have a behaviour in block/deblock friend Api's
 }
-POST http://localhost:8000/declineFriend/1/3
-
-### POST http://localhost:8000/blockFriend/1/3
-
-### POST http://localhost:8000/deblockFriend/1/3
+###
