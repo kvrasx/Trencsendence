@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Notifications } from "../../pages/notifications";
+import defaultAvatar from "@/assets/profile.jpg";
 
 function debounce(func, delay) {
   let timeoutId;
@@ -96,7 +97,7 @@ export default function SearchBar() {
                           <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center">
                             <Avatar className="w-10 h-10">
                               <AvatarImage src={user?.avatar} />
-                              <AvatarFallback><User className="h-4 w-4 text-muted-foreground" /></AvatarFallback>
+                              <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                             </Avatar>
                           </div>
                           <div className="flex flex-col">

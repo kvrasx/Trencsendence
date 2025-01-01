@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Edit, Camera, UserPlus, Swords } from 'lucide-react';
 import ProfileSettings from '@/components/custom/profile_settings';
 import CreateTournament from '@/components/custom/create_tournament';
-import defaultAvatar from '@/assets/profile.png';
+import defaultAvatar from '@/assets/profile.jpg';
 import { post } from '@/lib/ft_axios';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';

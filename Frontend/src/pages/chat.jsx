@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, X, UserPlus, Swords, Ban } from "lucide-react";
+import { Send, X, UserPlus, Swords, Ban, User } from "lucide-react";
 import Message from "@/components/ui/message";
 import { useEffect, useState, useRef, useContext } from "react";
 import axios from "axios";
@@ -13,6 +13,7 @@ import OldMessages from "../components/custom/old_messages";
 import NewMessages from "../components/custom/new_messages";
 import Spinner from "@/components/ui/spinner"
 import { Link } from "react-router-dom";
+import defaultAvatar from "@/assets/profile.jpg";
 
 export function Chat() {
     const user = useContext(UserContext);
@@ -77,7 +78,7 @@ export function Chat() {
                                 >
                                     <Avatar className="flex-none">
                                         <AvatarImage src={chat.user2.avatar} alt="@shadcn" />
-                                        <AvatarFallback><img src="https://github.com/shacn.png" alt="user" /></AvatarFallback>
+                                        <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                     </Avatar>
                                     <span>{chat.user2.username}</span>
                                 </div>
@@ -140,7 +141,7 @@ export function Chat() {
                                 <Avatar className="w-20 h-20 mx-auto cursor-pointer">
                                     <Link to={`/profile/${currentChat?.user2?.id}`}>
                                         <AvatarImage src={currentChat?.user2?.avatar} alt="avatar" />
-                                        <AvatarFallback><img src="https://github.com/shacn.png" alt="user" /></AvatarFallback>
+                                        <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                     </Link>
                                 </Avatar>
                                 <h3 className="text-xl mt-4 font-semibold">

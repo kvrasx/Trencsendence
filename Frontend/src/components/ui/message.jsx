@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from "./avatar"; // Adjust the import according to your library
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from "react-router-dom";
+import defaultAvatar from "@/assets/profile.jpg";
 
 const Message = ({ message, messageId, isMine, user, avatar, time, userId }) => {
     const timeAgo = formatDistanceToNow(new Date(time), { addSuffix: true });
@@ -12,7 +13,7 @@ const Message = ({ message, messageId, isMine, user, avatar, time, userId }) => 
             <Avatar>
                 <Link to={`/profile/${userId}`}>
                     <AvatarImage src={avatar} />
-                    <AvatarFallback>{user}</AvatarFallback>
+                    <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                 </Link>
             </Avatar>
             <div className="">
