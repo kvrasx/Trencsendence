@@ -46,7 +46,7 @@ function App() {
                 <Route path="/profile/:id" element={<Layout><OtherProfile myId={user.id} /></Layout>} />
                 <Route path="/profile" element={<Layout><Profile user={user} setUser={setUser} /></Layout>} />
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
-                <Route path="/notifications" element={<Layout><Notifications /></Layout>} />
+                {/* <Route path="/notifications" element={<Layout><Notifications /><Leaderboard /></Layout>} /> */}
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>

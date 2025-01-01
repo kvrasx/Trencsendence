@@ -7,7 +7,7 @@ const navItems = [
   { icon: Gamepad2, label: "Game", path: "/game" },
   { icon: Trophy, label: "Tournament", path: "/tournament" },
   { icon: MessageSquare, label: "Chat", path: "/chat" },
-  { icon: Bell, label: "Notifications", path: "/notifications" },
+  // { icon: Bell, label: "Notifications", path: "/notifications" },
 ];
 
 const normalizePath = (path) => path.replace(/\/+$/, '');

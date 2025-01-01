@@ -8,25 +8,17 @@ import { get } from '@/lib/ft_axios';
 import { post } from '@/lib/ft_axios';
 import { Layout } from '@/components/custom/layout'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet"
 
-export function Notifications() {
+export function Notifications({setShowNotifications}) {
   const [isSheetOpen, setIsSheetOpen] = useState(true);
   const [notifications, setNotifications] = useState([])
   useEffect(() => {
@@ -52,6 +44,7 @@ export function Notifications() {
 
     };
     fetchNotifications();
+
   }, []);
   const toggleSheet = () => {
     setIsSheetOpen(!isSheetOpen);
@@ -61,6 +54,7 @@ export function Notifications() {
   const handleSheetChange = (open) => {
     if (!open) {
       console.log("Sheet closed by the user");  // Handle the close action
+      setShowNotifications(false);
       // You can perform additional actions here when the sheet is closed
     }
     setIsSheetOpen(open);  // Update the state to reflect the sheet's state
@@ -69,11 +63,12 @@ export function Notifications() {
     <div>
       <Sheet open={isSheetOpen} onOpenChange={handleSheetChange}>
         <SheetContent
-          side="left"
+          side="right"
           className="w-[90%] sm:w-[380px] md:w-[440px] lg:w-[600px] xl:w-[700px] min-h-[80vh] ml-16"
         >
           <SheetHeader>
             <SheetTitle className="text-4xl font-bold text-primary">Notifications</SheetTitle>
+            <SheetDescription />
           </SheetHeader>
           <div className="grid gap-4">
             {notifications.length === 0 ? (
