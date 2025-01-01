@@ -24,7 +24,7 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
             return;
         const token = Cookies.get('access_token');
         console.log(token);
-
+process.en
         const newsocket = new WebSocket(`ws://localhost:8000/ws/chat/${currentChat.chat_id}/?token=${token}`);
 
 
