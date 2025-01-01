@@ -119,48 +119,28 @@ export default function Profile({ user, setUser }) {
                 </Card>
 
                 <Card className="glass p-6">
-                    <h2 className="text-xl font-semibold mb-4">Recent Matches</h2>
+                    <h2 className="text-xl font-semibold mb-4">Suggested Profiles</h2>
                     <div className="space-y-4">
 
-                        <div
-                            key={1}
-                            className="flex items-center justify-between p-4 rounded-lg glass"
-                        >
-                            <div>
-                                <div className="font-medium">vs {"Opponent"}</div>
-                                <div className="text-sm text-muted-foreground">
-                                    {"10-4"}
-                                </div>
+                        <div className="flex justify-between items-center p-4 rounded-lg glass hover:shadow-lg transition-shadow duration-300">
+                            <div className="flex items-center gap-3 cursor-pointer">
+                                <Avatar className="flex-none w-12 h-12">
+                                    <AvatarImage src={null} alt="@shadcn" />
+                                    <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
+                                </Avatar>
+                                <span className="text-md font-medium">{"test"}</span>
                             </div>
-                            <span
-                                className={`px-3 py-1 rounded-full text-sm font-medium ${true
-                                    ? "bg-green-500/20 text-green-500"
-                                    : "bg-red-500/20 text-red-500"
-                                    }`}
-                            >
-                                {"Win"}
-                            </span>
-                        </div>
-                        <div
-                            key={2}
-                            className="flex items-center justify-between p-4 rounded-lg glass"
-                        >
-                            <div>
-                                <div className="font-medium">vs {"Opponent"}</div>
-                                <div className="text-sm text-muted-foreground">
-                                    {"10-4"}
-                                </div>
+                            <div className="flex gap-4">
+                                <Button variant="ghost" className="border border-white hover:bg-secondary p-3" size="lg">
+                                    <UserPlus className="w-6 h-6 mr-2" />
+                                    Add Friend
+                                </Button>
+                                <Button variant="ghost" className="border border-white hover:bg-secondary p-3" size="lg">
+                                    <Swords className="w-6 h-6 mr-2" />
+                                    Challenge
+                                </Button>
                             </div>
-                            <span
-                                className={`px-3 py-1 rounded-full text-sm font-medium ${false
-                                    ? "bg-green-500/20 text-green-500"
-                                    : "bg-red-500/20 text-red-500"
-                                    }`}
-                            >
-                                {"Loss"}
-                            </span>
                         </div>
-
                     </div>
                 </Card>
 
