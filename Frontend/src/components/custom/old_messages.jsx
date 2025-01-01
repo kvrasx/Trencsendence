@@ -48,6 +48,7 @@ export default function OldMessages({ currentChat, user, messagesEndRef, setLoad
                     user={msg.sender_id === user.id ? user.username : currentChat.user2.username}
                     avatar={msg.sender_id === user.id ? user.avatar : currentChat.user2.avatar}
                     time={msg.sent_at}
+                    userId={msg.sender_id}
                 />;
             }) : (
                 <div className="flex justify-center items-center h-48">

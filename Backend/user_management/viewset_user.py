@@ -53,7 +53,10 @@ class UserTableViewSet:
     @api_view(['GET'])
     @permission_classes([IsAuthenticated])
     def getInfo(request):
-        userId = request.GET.get('user_id', None)
+        try:
+            userId = int(request.GET.get('user_id', None))
+        except:
+            raise ValidationError({'error': 'Invalid user_id.'})
         if userId is None:
             return Response(UserSerializer(instance=request.user).data)
         user = get_object_or_404(User, id=userId)

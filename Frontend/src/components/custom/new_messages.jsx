@@ -8,14 +8,14 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
         const date = new Date(timestamp);
         return date.toLocaleString();
     };
-    
+
     const [newMessages, setNewMessages] = useState(null); // should start with the messages from the database
-    
+
     useEffect(() => {
         const scrollToBottom = () => {
             messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
         };
-        
+
         scrollToBottom();
     }, [newMessages]);
 
@@ -23,9 +23,7 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
         if ((isWsOpened.current && socket) || !currentChat)
             return;
         const token = Cookies.get('access_token');
-        console.log(token);
         const newsocket = new WebSocket(`ws://localhost:8000/ws/chat/${currentChat.chat_id}/?token=${token}`);
-
 
         newsocket.onopen = () => {
             setNewMessages([]);
@@ -71,6 +69,7 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
                         user={msg.sender_id === user.id ? user.username : currentChat.user2.username}
                         avatar={msg.sender_id === user.id ? user.avatar : currentChat.user2.avatar}
                         time={formatDate(msg.sent_at)}
+                        userId={msg.sender_id}
                     />;
                 })
             }
