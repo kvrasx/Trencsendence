@@ -4,7 +4,7 @@ import SearchBar from "./searchbar";
 
 export const Layout = ({ children }) => {
   return (
-    <div className="h-screen bg-dark-image bg-cover bg-no-repeat bg-center relative flex flex-col">
+    <div className="min-h-screen bg-dark-image bg-cover bg-no-repeat bg-center relative flex flex-col">
       <SearchBar />
       <div className="flex flex-1">
         <Navbar />
