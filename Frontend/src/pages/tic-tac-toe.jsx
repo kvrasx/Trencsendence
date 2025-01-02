@@ -1,15 +1,6 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+import local from '@/assets'
 
 
 export function TicTacToe() {
@@ -119,20 +110,35 @@ export function TicTacToe() {
             <div className="flex gap-6">
 
                 <div className="p-5 flex-1 glass flex flex-row justify-center items-center h-[50vh]">
-                    
-                    <Card className="p-5 bg-transparent border-gray-500">
-                        <div className="grid grid-cols-3 gap-5 m-auto w-full">{renderBoard()}</div>
-                    </Card>
+                    {started ? (
+
+                        <Card className="p-5 bg-transparent border-gray-500">
+                            <div className="grid grid-cols-3 gap-5 m-auto w-full">{renderBoard()}</div>
+                        </Card>
+                    ) : (
+                        <>
+                        <div className="grid grid-cols-2 gap-3">
+
+                            
+
+                            <Card className="glass p-6 space-y-6">
+                                <h2 className="text-center">Matchmaking Mode</h2>
+                                <button className="btn btn-primary w-full" onClick>Play Online</button>
+                            </Card>
+
+                        </div>
+                        </>
+                    )}
 
                 </div>
-               
+
 
                 <Card className="glass w-1/4 p-6 space-y-6">
                     user info
                 </Card>
 
             </div>
-            
+
         </>
 
     );
