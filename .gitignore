@@ -5,5 +5,9 @@ Backend/.env/
 venv/
 env/
 
+Backend/db.sqlite3
+Backend/*/__pycache__/
+Backend/*/migrations/
+
 x_o/node_modules/
 Frontend/node_modules

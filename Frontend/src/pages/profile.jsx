@@ -14,15 +14,6 @@ import { FaTableTennis, FaGamepad } from 'react-icons/fa';
 
 export default function Profile({ user, setUser }) {
 
-    const data = [
-        { name: 'Jan', pingPong: 30, ticTacToe: 20 },
-        { name: 'Feb', pingPong: 20, ticTacToe: 25 },
-        { name: 'Mar', pingPong: 27, ticTacToe: 22 },
-        { name: 'Apr', pingPong: 18, ticTacToe: 28 },
-        { name: 'May', pingPong: 23, ticTacToe: 20 },
-        { name: 'Jun', pingPong: 34, ticTacToe: 30 },
-    ];
-
     const updateProfile = async (data, successMsg) => {
         let res = await post('/api/user/update', data, {
             'Content-Type': 'multipart/form-data',
@@ -155,7 +146,7 @@ export default function Profile({ user, setUser }) {
                                         <span className="text-md font-medium">{"test"}</span>
                                     </div>
                                     <div className="flex gap-3">
-                                        <Button variant="ghost" di className="rounded-xl border border-gray-500 hover:bg-secondary px-2" size="lg">
+                                        <Button variant="ghost" className="rounded-xl border border-gray-500 hover:bg-secondary px-2" size="lg">
                                             <MessageSquare className="" />
                                             {/* <span className='hidden md:block'>Message</span> */}
                                         </Button>
@@ -175,7 +166,7 @@ export default function Profile({ user, setUser }) {
                         <div className="space-y-3 overflow-y-auto themed-scrollbar ">
                             {Array.from({ length: 10 }).map((_, index) => (
                                 <div
-                                    key={2}
+                                    key={index}
                                     className="flex items-center justify-between p-4 rounded-lg glass"
                                 >
                                     <div>

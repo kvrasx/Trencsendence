@@ -14,7 +14,6 @@ export function Leaderboard() {
                 console.log(res);
                 setPlayers(res);
             } catch (e) { console.log("Failed to fetch"); }
-
         };
         fetchPlayers();
     }, []);
@@ -27,6 +26,7 @@ export function Leaderboard() {
                     <Showplayer
                         index={key + 1}
                         Player={Player}
+                        key={key}
                     />
 
                 ))}
