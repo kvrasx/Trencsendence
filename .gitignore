@@ -1,3 +1,9 @@
 Backend/.venv/
-/.venv
-Frontend/node_modules/
+Backend/.env/
+.venv/
+.env/
+venv/
+env/
+
+x_o/node_modules/
+Frontend/node_modules
