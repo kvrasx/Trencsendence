@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import local from "@/assets/local.jpg"
 import remote from "@/assets/remote.jpg"
 import Spinner from "@/components/ui/spinner";
+import Cookies from 'js-cookie';
 
 export function TicTacToe() {
 
@@ -17,7 +18,9 @@ export function TicTacToe() {
     useEffect(() => {
         if (!waiting)
             return;
-        const newSocket = new WebSocket('ws://localhost:8000/ws/game/lobby/');
+
+        const token = Cookies.get('access_token');
+        const newSocket = new WebSocket(`ws://localhost:8000/ws/game/lobby/?token=${token}`);
         newSocket.onopen = () => {
             console.log('WebSocket connection established');
             setSocket(newSocket);
@@ -52,9 +55,9 @@ export function TicTacToe() {
 
                 case "game_over":
                     // Trigger game end dialog
-                    setWinner(data.winner);
+                    data.status === "finished" && setWinner(data.winner);
                     console.log(data.winner);
-                    
+
                     document.getElementById("winner-dialog")?.click();
                     break;
 
@@ -102,12 +105,12 @@ export function TicTacToe() {
         for (let i = 0; i < 9; i++) {
             cells.push(
                 <div
-                    className="cell min-w-20 min-h-20 flex justify-center"
+                    className="border border-white min-w-20 min-h-20 flex justify-center"
                     id={`${i}`}
                     key={i}
                     onClick={handleCellClick}
                 >
-                    {board[i]}
+                    <span className="text-center flex justify-center items-center text-3xl">{board[i]}</span>
                 </div>
             );
         }
@@ -119,27 +122,35 @@ export function TicTacToe() {
             <div className="flex gap-6">
 
                 <div className="p-5 flex-1 glass flex flex-row justify-center items-center h-[50vh]">
-                    {waiting ? (
-                        started ? (
-                            <Card className="p-5 bg-transparent border-gray-500">
-                                <div className="grid grid-cols-3 gap-5 m-auto w-full">{renderBoard()}</div>
-                            </Card>
+                    {!winner ? (
+                        waiting ? (
+                            started ? (
+                                <Card className="p-5 bg-transparent border-gray-500">
+                                    <div className="grid grid-cols-3 gap-5 m-auto w-full">{renderBoard()}</div>
+                                </Card>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center">
+                                    <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...</div>
+                                    <Spinner />
+                                </div>
+                            )
                         ) : (
-                            <div className="flex flex-col items-center justify-center">
-                                <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...</div>
-                                <Spinner />
-                            </div>
+                            <>
+                                <div onClick={(prev) => { setWaiting(true) }} className="cursor-pointer relative border-2 border-secondary rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105">
+                                    <img src={remote} alt="Remote Matchmaking Mode" className="h-[600px] w-[250px] object-cover shadow-lg" />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-gray-300 text-3xl text-center font-bold" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                                        <span className="px-6">Join a Game</span>
+                                    </div>
+                                </div>
+                            </>
                         )
                     ) : (
-                        <>
-                            <div onClick={(prev) => { setWaiting(true) }} className="cursor-pointer relative border-2 border-secondary rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105">
-                                <img src={remote} alt="Remote Matchmaking Mode" className="h-[600px] w-[250px] object-cover shadow-lg" />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-gray-300 text-3xl text-center font-bold" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                                    <span className="px-6">Join a Game</span>
-                                </div>
-                            </div>
-                        </>
-                    )}
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
+                            <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner === "TIE" ? "It's a tie!" : `Winner: ${winner}`}</div>
+                            <button id="winner-dialog" className="hidden" data-bs-toggle="modal" data-bs-target="#winnerModal"></button>
+                        </div>
+                )}
                 </div>
 
 
