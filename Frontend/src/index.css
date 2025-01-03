@@ -73,6 +73,13 @@
   @apply hover:bg-secondary/50 transition-colors duration-200;
 }
 
+<<<<<<< HEAD
+=======
+.themed-scrollbar {
+  @apply [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-background;
+}
+
+>>>>>>> master
 
 .auth-btn-hover:hover {
   background: linear-gradient(to right, #8566FF, #628EFF);
@@ -92,3 +99,21 @@
 .auth-42btn-hover {
   transition: all 0.5s ease-in-out;
 }
+<<<<<<< HEAD
+=======
+
+
+.uniform-size1 {
+  height: 290px; /* Adjust this value to your desired height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.uniform-size {
+  height: 400px; /* Adjust this value to your desired height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+>>>>>>> master

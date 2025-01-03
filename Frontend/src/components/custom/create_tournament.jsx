@@ -11,7 +11,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
+<<<<<<< HEAD
 import { Settings } from "lucide-react"
+=======
+import { Edit } from "lucide-react"
+>>>>>>> master
 import { useState } from "react"
 
 export default function CreateTournament() {
@@ -22,7 +26,11 @@ export default function CreateTournament() {
     <Dialog>
 
       <DialogTrigger asChild>
+<<<<<<< HEAD
         <Button variant="outline" className="mr-2 mb-2"> <Settings />Create Tournament</Button>
+=======
+        <Button variant="outline" className="p-6 w-64 border-accent"> <Edit />Create Tournament</Button>
+>>>>>>> master
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[500px]">

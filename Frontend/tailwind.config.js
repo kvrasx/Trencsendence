@@ -6,12 +6,22 @@ export default {
   	extend: {
 		backgroundImage: {
 			'dark-image': "url('@/assets/background.png')",
+<<<<<<< HEAD
 		},
 		container: {
 			center: true,
 			padding: "2rem",
 			screens: {
 			  "2xl": "1400px",
+=======
+			'banner-image': "url('@/assets/banner.jpeg')",
+		},
+		container: {
+			center: true,
+			// padding: "2rem",
+			screens: {
+			  "2xl": "2048px",
+>>>>>>> master
 			},
 		},
   		borderRadius: {

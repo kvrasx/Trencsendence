@@ -78,7 +78,11 @@ export default function ProfileSettings({ updateProfile, user }) {
     <Dialog>
 
       <DialogTrigger asChild>
+<<<<<<< HEAD
         <Button variant="outline" className="mr-2 mb-2"> <Settings /> Edit Profile</Button>
+=======
+        <Button variant="outline" className="p-6 w-64 border border-accent"> <Settings /> Edit Profile</Button>
+>>>>>>> master
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[540px]">

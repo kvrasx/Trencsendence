@@ -1,6 +1,10 @@
 import { Layout } from '@/components/custom/layout'
 import { Routes, Route, Navigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { XOGame } from './pages/x_o'
+=======
+import { TicTacToe } from './pages/tic-tac-toe'
+>>>>>>> master
 import { Chat } from './pages/chat'
 import { Notifications } from './pages/notifications'
 import { Leaderboard } from './pages/leaderboard'
@@ -47,8 +51,13 @@ function App() {
                 <Route path="/profile/:id" element={<Layout><OtherProfile myId={user.id} /></Layout>} />
                 <Route path="/profile" element={<Layout><Profile user={user} setUser={setUser} /></Layout>} />
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
+<<<<<<< HEAD
                 {/* <Route path="/notifications" element={<Layout><Notifications /><Leaderboard /></Layout>} /> */}
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
+=======
+                <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
+                <Route path="/tic-tac-toe" element={<Layout><TicTacToe /></Layout>} />
+>>>>>>> master
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>
             ) : (

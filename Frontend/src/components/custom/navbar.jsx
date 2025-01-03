@@ -1,10 +1,23 @@
+<<<<<<< HEAD
 import { Home, Trophy, MessageSquare, Bell, User, Award, Gamepad2, LogOut } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+=======
+import { Trophy, MessageSquare, Bell, User, Award, Gamepad2, LogOut } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import xo from "@/assets/xo.svg";
+import { FaTableTennis } from "react-icons/fa";
+import { TbTicTac } from "react-icons/tb";
+>>>>>>> master
 
 const navItems = [
   { icon: User, label: "Profile", path: "/profile" },
   { icon: Award, label: "Leaderboard", path: "/leaderboard" },
+<<<<<<< HEAD
   { icon: Gamepad2, label: "Game", path: "/game" },
+=======
+  { icon: FaTableTennis, label: "Game", path: "/game" },
+  { icon: TbTicTac, label: "TicTacToe", path: "/tic-tac-toe" },
+>>>>>>> master
   { icon: Trophy, label: "Tournament", path: "/tournament" },
   { icon: MessageSquare, label: "Chat", path: "/chat" },
 ];
@@ -25,6 +38,10 @@ export const Navbar = () => {
               to={path}
               className={`relative p-3 rounded-lg hover-glass group ${currentPath === normalizePath(path) ? "bg-primary/20" : ""}`}
             >
+<<<<<<< HEAD
+=======
+              
+>>>>>>> master
               <Icon className="h-6 w-6" />
               <span className="absolute left-14 rounded-md px-2 py-1 glass invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200">
                 {label}
