@@ -3,7 +3,7 @@ import Profile from "./profile";
 import { get } from '@/lib/ft_axios';
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import Error404 from "./error404";
+import Error404 from "./waiting-and-choice";
 import Spinner from '@/components/ui/spinner';
 import {Layout} from "@/components/custom/layout";
 

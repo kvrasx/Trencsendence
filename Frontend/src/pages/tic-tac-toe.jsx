@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import local from '@/assets'
+// import local from '@/assets'
 
 
 export function TicTacToe() {
