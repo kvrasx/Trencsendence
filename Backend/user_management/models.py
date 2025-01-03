@@ -33,6 +33,9 @@ class User(AbstractUser):
     pass_to_2fa = models.BooleanField(default=False)
 
     # Override email to make it unique
+
+    score = models.IntegerField(default=0)
+
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=144, null=True) # will be hashed
 
@@ -59,4 +62,5 @@ class Match(models.Model):
             message='Score must be in format nn:nn'
         )]
     )
+    # scoreboard = models.IntegerField()
     match_date = models.DateField(auto_now_add=True)
