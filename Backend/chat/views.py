@@ -153,7 +153,6 @@ def getMessages(request, chat=None):
 def getNotifications(request):
     user: User = request.user
     user_id = user.id
-    print("heeeee ->  " + str(user_id))
     notifs = Invitations.objects.filter(Q(user2=user_id) & Q(status="pending"))
     serializer = GlobalFriendSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
