@@ -4,6 +4,9 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from datetime import date
 from user_management.models import User
+from chat.models import Invitations
+from user_management.viewset_match import MatchTableViewSet
+from django.shortcuts import get_object_or_404
 
 winningCombinations = [
     [0, 1, 2],
@@ -29,7 +32,7 @@ class MatchXO:
         self.finished = False
         
 
-current_players = []
+current_players = set() # I used set to prevent duplicate user ids
 
 class GameConsumer(AsyncWebsocketConsumer):
     connected_users = []
@@ -44,14 +47,17 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def add_player_to_lobby(self):
         if len(self.connected_users) == 0:
-            self.room_group_name = f"xo_{self.scope['url_route']['kwargs']['room_name']}_{self.player_username}"
-            self.connected_users.append(self.player_username)
+            self.room_group_name = f"xo_{self.scope['url_route']['kwargs']['room_name']}_{self.user_id}"
+            self.connected_users.append(self.user_id)
             await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         else:
             player1 = self.connected_users.pop(0)
+            if player1 == self.user_id:
+                self.connected_users.append(player1)
+                return
             self.room_group_name = f"xo_{self.scope['url_route']['kwargs']['room_name']}_{player1}"
             await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-            self.matchs[ self.room_group_name ] = MatchXO(player1, self.player_username)
+            self.matchs[ self.room_group_name ] = MatchXO(player1, self.user_id)
             await self.game_started()
 
 
@@ -64,19 +70,42 @@ class GameConsumer(AsyncWebsocketConsumer):
         
         self.user_id = user.id
         
-        if user.id in current_players:
+        if user.id in current_players or user.username in self.connected_users:
             await self.accept()
             await self.close(code=4009)
             return
         self.player_username = user.username
 
-        if self.scope['url_route']['kwargs']['room_name'] == 'lobby':
+        if self.scope['url_route']['kwargs']['room_name'] == 'random':
             print(self.scope['url_route']['kwargs']['room_name'])
             await self.add_player_to_lobby()
-    
-        # else: Check if the player is part of the match invitation
-    
-        current_players.append(user.id)
+        else:
+            try:
+                inviteId = self.scope['url_route']['kwargs']['room_name']
+            except:
+                await self.accept()
+                await self.close(code=4007)
+                return
+            invite = get_object_or_404(Invitations, id=inviteId)
+            if invite.user1.id != user.id or invite.user2.id != user.id or invite.status != "accepted":
+                await self.accept()
+                await self.close(code=4006)
+                return
+            self.room_group_name = f"xo_{inviteId}"
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+
+            if self.room_group_name not in self.matchs:
+                self.matchs[ self.room_group_name ].append(self.user_id)
+            else:
+                self.matchs[ self.room_group_name ] = [ self.user_id ]
+
+            if (len(self.matchs[ self.room_group_name ]) == 2):
+                await self.game_started()
+
+        current_players.add(user.id)
         await self.accept()
         
 
@@ -104,6 +133,12 @@ class GameConsumer(AsyncWebsocketConsumer):
             )
             if self.check_winner():
                 self.match.finished = True
+                MatchTableViewSet.createMatchEntry({
+                    "game_type": 2,
+                    "winner": self.user_id if self.match.turn == self.player_username else self.match.player1,
+                    "loser": self.match.player1 if self.match.player2 == self.match.turn else self.match.player2,
+                    "score": f"01:00"
+                })
                 await self.channel_layer.group_send(
                     self.room_group_name,
                     {

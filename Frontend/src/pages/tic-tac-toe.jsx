@@ -30,6 +30,7 @@ export function TicTacToe() {
             console.log('WebSocket error:', error);
         };
         newSocket.onclose = (event) => {
+            console.log('WebSocket connection closed', event.code);
             if (event.code == 4008)
                 console.log('Not authorized.');
             else if (event.code == 4009) {
@@ -155,12 +156,9 @@ export function TicTacToe() {
                         <div className="flex flex-col items-center justify-center">
                             <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
                             <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner}</div>
-                            <div className="grid grid-cols-2 gap-12">
-                                <Button>Home</Button>
-                                <Button onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket.close(); setBoard({}) }}>
-                                    Rematch
+                                <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket.close(); setBoard({}) }}>
+                                    New Game
                                 </Button>
-                            </div>
                         </div>
                     )}
                 </div>
