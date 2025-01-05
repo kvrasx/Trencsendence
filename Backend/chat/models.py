@@ -10,12 +10,13 @@ class Invitations(models.Model):
     class InvitationType(models.TextChoices):
         GAME = "game"
         FRIEND = "friend"
+        TOURNAMENT = "tournament"
     
     friendship_id = models.AutoField(primary_key=True)
     user1 = models.IntegerField()
     user2 = models.IntegerField()
     status = models.CharField(max_length=8, choices=TypeClass.choices, default=TypeClass.PENDING)
-    type = models.CharField(max_length=6, choices=InvitationType.choices)
+    type = models.CharField(max_length=10, choices=InvitationType.choices)
     
     
     # class Meta:
