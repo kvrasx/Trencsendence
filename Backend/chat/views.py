@@ -9,6 +9,7 @@ from .models import Message,Invitations
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 from user_management.models import User
+import json
 
 
 @api_view(['POST'])
@@ -157,6 +158,29 @@ def getNotifications(request):
     serializer = GlobalFriendSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
 
+# method    endpoint/route      protocol/version
+# POST      /getNotifications/ HTTP/1.1
+# Host: localhost
+# Content-Type: application/json
+
+# {'userid1': 1, 'userid2': 2, 'userid3': 3, 'tournamentCreator': 4}
+
+
+class CreateTournament(APIView):
+    def post(self, request):
+        try:
+            # tournamentOwnerid = request.user.id
+            data = json.loads(request.body.decode("utf-8"))
+            userid1 = data.get('userid1')
+            userid2 = data.get('userid2')
+            userid3 = data.get('userid3')
+            if (not userid1 or not userid2 or not userid3):
+                return Response({'message': 'some userids are missing'}) #response as json
+            return Response({'message': 'Success'})
+        except json.JSONDecodeError:
+            return Response({'message': 'Error exp'})
+        # logic here
+        
 
 def index(request):
-    return render(request, 'index.html')
+    return Response({'Test': 'Test'})
