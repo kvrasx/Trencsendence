@@ -1,5 +1,5 @@
-from django.urls import path, include
-from .views import getMessages,getChats,inviteFriend,index,getNotifications,acceptFriend,blockFriend,deblockFriend,declineFriend
+from django.urls import path
+from .views import getMessages,getChats,inviteFriend,getNotifications,acceptFriend,blockFriend,deblockFriend,declineFriend
 from .consumers import ChatConsumer
 
 urlpatterns = [
@@ -12,5 +12,4 @@ urlpatterns = [
     path('getNotifications/', getNotifications),
     path('getChats/', getChats),
     path('getMessages/<int:chat>', getMessages),
-    path('', index),
 ]

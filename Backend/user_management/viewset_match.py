@@ -9,10 +9,10 @@ from rest_framework.permissions import IsAuthenticated
 # for Match table
 class MatchTableViewSet:
 
-    @api_view(['POST'])
-    @permission_classes([IsAuthenticated])
-    def createMatchEntry(request):
-        serializer = MatchSerializer(data=request.data)
+    # @api_view(['POST'])
+    # @permission_classes([IsAuthenticated])
+    def createMatchEntry(matchData):
+        serializer = MatchSerializer(data=matchData)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         gain_factor = 2
@@ -22,14 +22,10 @@ class MatchTableViewSet:
         n, m = map(int, f.split(":"))
         match_score = abs(n - m)
         
-        loser = User.objects.get(id=int(request.POST.get('loser')))
-        winner = User.objects.get(id=int(request.POST.get('winner')))
+        loser = serializer.validated_data.get('loser')
+        winner = serializer.validated_data.get('winner')
     
-
         score_diff = winner.score - loser.score
-
-
-
 
         difference_factor = abs(score_diff) / 1000  
         max_gain = 50
