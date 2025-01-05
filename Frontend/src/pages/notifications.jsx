@@ -143,6 +143,7 @@ const NotificationItem = ({ notifications, notification, index, setNotifications
 
   const acceptClick = async (id) => {
     let res = await post(`/accept/`, { "user1": id, "type": "friend" });
+
     setNotifications(prevNotifications =>
       prevNotifications.filter((_, i) => i !== index)
     );
@@ -234,9 +235,11 @@ const GameItem = ({ notifications, notification, index, setNotifications }) => {
       prevNotifications.filter((_, i) => i !== index)
     )
   }
-
+  
   const acceptClick = async (id) => {
     let res = await post(`/accept/`, { "user1": id, "type": "game" });
+    console.log("game groop name ->");
+    console.log(res);
     setNotifications(prevNotifications =>
       prevNotifications.filter((_, i) => i !== index)
     );
