@@ -167,6 +167,7 @@ def getNotifications(request):
 
 
 class CreateTournament(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request):
         try:
             # tournamentOwnerid = request.user.id
@@ -174,13 +175,18 @@ class CreateTournament(APIView):
             userid1 = data.get('userid1')
             userid2 = data.get('userid2')
             userid3 = data.get('userid3')
+            mainUser = request.user.id
+            print (mainUser)
             if (not userid1 or not userid2 or not userid3):
                 return Response({'message': 'some userids are missing'}) #response as json
+            # for i in range(3):
+                # inviteFriend()
             return Response({'message': 'Success'})
         except json.JSONDecodeError:
             return Response({'message': 'Error exp'})
         # logic here
         
 
-def index(request):
-    return Response({'Test': 'Test'})
+
+# def index(request):
+#     return Response({'Test': 'Test'})
