@@ -22,7 +22,7 @@ function App() {
 
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState(null);
-
+  // console.log(process.env.HOST_IP)
   useEffect(() => {
     const starting = () => {
       let storedUser = localStorage.getItem('user');

@@ -40,7 +40,7 @@ export function Chat() {
     useEffect(() => {
         const fetchChats = async () => {
             try {
-                const res = await get('/getChats/');
+                const res = await get('api/getChats/');
                 const chatPromises = res.map(async (chat) => {
                     const userRes = await get(`/api/user/get-info?user_id=${chat.user2}`);
                     chat.user2 = userRes;

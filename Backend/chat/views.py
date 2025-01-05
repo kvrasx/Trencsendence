@@ -14,27 +14,30 @@ from user_management.models import User
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def inviteFriend(request):
-    serializer = InviteFriendSerializer(data=request.data)
+    serializer = GlobalFriendSerializer(data=request.data)
+    jwt_user = request.user.id
     if (serializer.is_valid()):
-        validated_data = serializer.validated_data
-        user: User = request.user
-        jwt_user = user.id
-        user1 = validated_data.get('user1')
-        user2 = validated_data.get('user2')
+        user1 = serializer.validated_data.get('user1')
+        _type = serializer.validated_data.get('type')
+        if jwt_user == user1:
+            return Response("Detail: Cant Invite it self", status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    if user1 != jwt_user:
-            return Response("Detail: Not authorized ", status=status.HTTP_401_UNAUTHORIZED)
-    if user1 == user2:
-        return Response("Detail: Cant Invite", status=status.HTTP_400_BAD_REQUEST)
     try: 
         o = Invitations.objects.get(Q(user1=user1,user2=user2) | Q(user1=user2,user2=user1))
-        #q = User2 <---- mn 3end sma3il
-        # return Response("cant invite the player", status=status.HTTP_400_BAD_REQUEST)
+        #q = user1 <---- mn 3end sma3il
+            # return Response("cant invite the player doesnt existe", status=status.HTTP_400_BAD_REQUEST)
     except:
+        mydata = {
+            "user1": jwt_user,
+            "user2": user1,
+            "type": _type
+        }
+        newRecord= GlobalFriendSerializer(data=mydata)
+        newRecord.save()
         serializer.save()
         return Response("Invited player successfuly", status=status.HTTP_201_CREATED)
-    return Response("cant invite the player", status=status.HTTP_400_BAD_REQUEST)
+    return Response("invitation already exist", status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

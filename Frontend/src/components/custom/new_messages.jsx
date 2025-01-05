@@ -23,7 +23,7 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
         if ((isWsOpened.current && socket) || !currentChat)
             return;
         const token = Cookies.get('access_token');
-        const newsocket = new WebSocket(`ws://localhost:8000/ws/chat/${currentChat.chat_id}/?token=${token}`);
+        const newsocket = new WebSocket(`ws://167.99.138.209/ws/chat/${currentChat.chat_id}/?token=${token}`);
 
         newsocket.onopen = () => {
             setNewMessages([]);

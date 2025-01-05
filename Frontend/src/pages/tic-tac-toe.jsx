@@ -20,7 +20,7 @@ export function TicTacToe() {
             return;
 
         const token = Cookies.get('access_token');
-        const newSocket = new WebSocket(`ws://localhost:8000/ws/game/lobby/?token=${token}`);
+        const newSocket = new WebSocket(`ws://167.99.138.209/ws/game/lobby/?token=${token}`);
         newSocket.onopen = () => {
             console.log('WebSocket connection established');
             setSocket(newSocket);

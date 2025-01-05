@@ -22,7 +22,7 @@ export function XOGame() {
 
     useEffect(() => {
 
-        const newSocket = new WebSocket('ws://localhost:8000/ws/game/lobby/');
+        const newSocket = new WebSocket('ws://167.99.138.209/ws/game/lobby/');
 
         newSocket.onopen = () => {
             console.log('WebSocket connection established');

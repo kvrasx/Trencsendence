@@ -19,6 +19,8 @@ services:
           - "3000:3000"
         depends_on:
           - backend
+        environment:
+          HOST_IP: 167.99.138.209
 
     backend:
         container_name: backend
@@ -32,6 +34,8 @@ services:
           - postgresql
         ports:
           - 8000:8000
+        environment:
+          HOST_IP: 167.99.138.209
 
     postgresql:
         container_name: postgresql

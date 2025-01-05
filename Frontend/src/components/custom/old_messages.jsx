@@ -23,7 +23,7 @@ export default function OldMessages({ currentChat, user, messagesEndRef, setLoad
             if (!currentChat) return;
 
             try {
-                const res = await get(`/getMessages/${currentChat.chat_id}`);                
+                const res = await get(`api/getMessages/${currentChat.chat_id}`);                
                 setOldMessages(res);
             } catch (error) {
                 console.log('Error fetching messages:', error);

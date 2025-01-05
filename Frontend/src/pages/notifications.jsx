@@ -24,7 +24,7 @@ export function Notifications({setShowNotifications}) {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        let res = await get('/getNotifications/');  // Fetch notifications
+        let res = await get('api/getNotifications/');  // Fetch notifications
         let chatPromises = res.map(async (d) => {
           // Fetch user info for each notification
           let userRes = await get(`/api/user/get-info?user_id=${d.user1}`);
@@ -135,14 +135,14 @@ const NotificationItem = ({ notifications, notification, index, setNotifications
     'https://simplyilm.com/wp-content/uploads/2017/08/temporary-profile-placeholder-1.jpg';
 
   const declineClick = async (id) => {
-    let res = await post(`/decline/`, { "user1": id, "type": "friend" });
+    let res = await post(`api/decline/`, { "user1": id, "type": "friend" });
     setNotifications(prevNotifications =>
       prevNotifications.filter((_, i) => i !== index)
     )
   }
 
   const acceptClick = async (id) => {
-    let res = await post(`/accept/`, { "user1": id, "type": "friend" });
+    let res = await post(`api/accept/`, { "user1": id, "type": "friend" });
     setNotifications(prevNotifications =>
       prevNotifications.filter((_, i) => i !== index)
     );
@@ -229,14 +229,14 @@ const GameItem = ({ notifications, notification, index, setNotifications }) => {
     'https://simplyilm.com/wp-content/uploads/2017/08/temporary-profile-placeholder-1.jpg';
 
   const declineClick = async (id) => {
-    let res = await post(`/decline/`, { "user1": id, "type": "game" });
+    let res = await post(`api/decline/`, { "user1": id, "type": "game" });
     setNotifications(prevNotifications =>
       prevNotifications.filter((_, i) => i !== index)
     )
   }
 
   const acceptClick = async (id) => {
-    let res = await post(`/accept/`, { "user1": id, "type": "game" });
+    let res = await post(`api/accept/`, { "user1": id, "type": "game" });
     setNotifications(prevNotifications =>
       prevNotifications.filter((_, i) => i !== index)
     );
