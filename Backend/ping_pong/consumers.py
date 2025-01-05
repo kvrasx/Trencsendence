@@ -21,7 +21,7 @@ class Match:
 
 
 class Ball:
-    def __init__(self,x, y, radius, speedX, speedY, angle, canvasW, canvasH, constSpeed):
+    def __init__(self,x, y, radius, speedX, speedY, angle, canvasW, canvasH, constSpeed, scoreRight, scoreLeft):
         self.x = x
         self.y = y
         self.radius = radius
@@ -31,6 +31,8 @@ class Ball:
         self.canvas_width = canvasW
         self.canvas_height = canvasH
         self.constSpeed = constSpeed
+        self.scoreRight = scoreRight
+        self.scoreLeft = scoreLeft
     def to_dict(self):
         return {
             'x': self.x,
@@ -41,7 +43,9 @@ class Ball:
             'angle': self.angle,
             'canvas_width': self.canvas_width,
             'canvas_height': self.canvas_height,
-            'constSpeed': self.constSpeed
+            'constSpeed': self.constSpeed,
+            'scoreRight': self.scoreRight,
+            'scoreLeft': self.scoreLeft
         }
 class Paddle:
     def __init__(self, paddleWidth, paddleHeight, paddleX, paddleY, paddleSpeed, paddleBord, paddleScore, canvasHeight, canvasWidth):
@@ -74,6 +78,8 @@ class GameClient(AsyncWebsocketConsumer):
     active_matches = []
     canvasHeight = 400
     canvasWidth = 600
+    # player1 = ''
+    # player2 = ''
     
     ball = Ball(
         x=canvasWidth // 2,
@@ -84,7 +90,9 @@ class GameClient(AsyncWebsocketConsumer):
         angle=0,
         canvasW=canvasWidth,
         canvasH=canvasHeight,
-        constSpeed=0.5
+        constSpeed=0.3,
+        scoreLeft=0,
+        scoreRight=0
     )
     paddleRight = Paddle(
         paddleWidth=10,
@@ -110,6 +118,7 @@ class GameClient(AsyncWebsocketConsumer):
     )
     
     async def connect(self):
+
         self.user = self.scope["user"]
         if self.user.is_anonymous:
             await self.accept()
@@ -131,10 +140,7 @@ class GameClient(AsyncWebsocketConsumer):
             else:
                 self.player['player_number'] = '1'
             self.connected_sockets.append(self.player)
-            await self.send(json.dumps({
-                'type': 'connection',
-                'information': self.player
-            }))
+            
             if len(self.connected_sockets) == 2:
                 player1 = self.connected_sockets.pop(0)
                 player2 = self.connected_sockets.pop(0)
@@ -147,9 +153,7 @@ class GameClient(AsyncWebsocketConsumer):
                 await self.channel_layer.send(player1['player_name'], 
                     {
                         'type': 'game_started',
-                        # 'game_group': self.group_name,
                         'information': player1,
-                        # 'player': player1,
                         'started': 'yes',
                         'paddleRight': self.paddleRight.to_dict(),
                         'paddleLeft': self.paddleLeft.to_dict(),
@@ -158,9 +162,7 @@ class GameClient(AsyncWebsocketConsumer):
                 await self.channel_layer.send(player2['player_name'],
                     {
                         'type': 'game_started',
-                        # 'game_group': self.group_name,
                         'information': player2,
-                        # 'player': player2,
                         'started': 'yes',
                         'paddleRight': self.paddleRight.to_dict(),
                         'paddleLeft': self.paddleLeft.to_dict(),
@@ -170,6 +172,18 @@ class GameClient(AsyncWebsocketConsumer):
                 asyncio.create_task(self.start_ball_movement())
                 
 
+    async def disconnect(self, close_data):
+        if hasattr(self, "group_name"):
+            remove_match = None
+            for match in self.active_matches:
+                if match.group_name == self.group_name:
+                    remove_match = match
+                    break
+            if remove_match:
+                self.active_matches.remove(match)
+                self.is_active = False
+                await self.channel_layer.group_discard(remove_match.group_name, match.player1["player_name"])                
+                await self.channel_layer.group_discard(remove_match.group_name, match.player2["player_name"])                
 
 
 
@@ -184,7 +198,6 @@ class GameClient(AsyncWebsocketConsumer):
                 self._move_paddle(self.paddleRight, data['direction'])
             elif data['playerNumber'] == '2':
                 self._move_paddle(self.paddleLeft, data['direction'])
-            # self.group_name = data['gameGroup']
             await self.channel_layer.group_send(
                 self.group_name,
                 {
@@ -205,13 +218,11 @@ class GameClient(AsyncWebsocketConsumer):
     async def game_started(self, event):
         await self.send(json.dumps({
             'type': event['type'],
-            # 'game_group': event['game_group'],
             'paddleRight': event['paddleRight'],
             'paddleLeft': event['paddleLeft'],
             'information': event['information'],
             'ball': event['ball']
         }))
-        #ball moving
 
 
 
@@ -225,17 +236,16 @@ class GameClient(AsyncWebsocketConsumer):
             if self.ball.y - self.ball.radius <= 0 or self.ball.y + self.ball.radius >= self.ball.canvas_height:
                 self.ball.speedY *= -1  # Reverse the vertical direction
 
-            # # Check for collision with the paddles
-            # if self._check_paddle_collision(self.paddleRight) or self._check_paddle_collision(self.paddleLeft):
-            #     self.ball.speedX *= -1  # Reverse the horizontal direction
-
-            # print("kane")
-            # # Check if the ball has passed the left or right boundary
-            # if self.ball.x - self.ball.radius <= 0 or self.ball.x + self.ball.radius >= self.ball.canvas_width:
-            #     self._reset_ball()  # Reset the ball to the center
-            if self.ball.x - self.ball.radius <= 0 or self.ball.x + self.ball.radius >= self.ball.canvas_width:
-                self.ball.speedY *= -1
+            if await self._check_paddle_collision(self.paddleLeft, "left"):
+                self.ball.speedX *= -1  # Reverse the horizontal direction
+            if await self._check_paddle_collision(self.paddleRight, "Right"):
                 self.ball.speedX *= -1
+
+            if self.ball.x - self.ball.radius <= 0:
+                await self._reset_ball(self.paddleRight, "Right")  # Reset the ball to the center 
+            if self.ball.x + self.ball.radius >= self.ball.canvas_width:
+                await self._reset_ball(self.paddleLeft, "Left")
+
 
             # Broadcast the updated ball position to the group
             await self.channel_layer.group_send(
@@ -255,18 +265,31 @@ class GameClient(AsyncWebsocketConsumer):
             'ball': event['ball'] 
         }))
 
-    async def _check_paddle_collision(self, paddle):
-        return (
-            self.ball.x + self.ball.radius >= paddle.paddleX and
-            self.ball.x - self.ball.radius <= paddle.paddleX + paddle.paddleWidth and
-            self.ball.y >= paddle.paddleY and
-            self.ball.y <= paddle.paddleY + paddle.paddleHeight
-        )
-    async def _reset_ball(self):
+    async def _check_paddle_collision(self, paddle, lORr):
+
+        if (lORr == "left"):
+            if self.ball.x - self.ball.radius <= paddle.paddleX + paddle.paddleWidth and self.ball.y - self.ball.radius >= paddle.paddleY and self.ball.y + self.ball.radius <= paddle.paddleY + paddle.paddleHeight: 
+               return True
+            else:
+               return False
+        if (lORr == "Right"):
+            if self.ball.x + self.ball.radius >= paddle.paddleX and self.ball.y - self.ball.radius >= paddle.paddleY and  self.ball.y + self.ball.radius <= paddle.paddleY + paddle.paddleHeight:
+                return True
+            else:
+                return False
+        
+        
+        
+    async def _reset_ball(self, paddle, lorr):
         self.ball.x = self.ball.canvas_width // 2
         self.ball.y = self.ball.canvas_height // 2
         self.ball.speedX *= -1  # Reverse the horizontal direction
-        self.ball.speedY = 5 if self.ball.speedY > 0 else -5  # Reset to initial vertical speed
+        if lorr == "Left":
+            print ("left")
+            self.ball.scoreRight += 1
+        if lorr == "Right":
+            print ("Right")
+            self.ball.scoreLeft += 1
 
 
     async def paddleMoved(self, event):
@@ -278,8 +301,3 @@ class GameClient(AsyncWebsocketConsumer):
     
     
 
-    async def player_disconnected(self, event):
-        await self.send(json.dumps({
-            'type': event['type'],
-            'message': event['type']
-        }))

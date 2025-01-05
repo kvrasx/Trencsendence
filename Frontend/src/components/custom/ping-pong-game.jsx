@@ -6,7 +6,7 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 12:41:28 by momihamm          #+#    #+#             */
-/*   Updated: 2025/01/05 17:38:01 by yamajid          ###   ########.fr       */
+/*   Updated: 2025/01/05 20:57:34 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@ const Canvas = ({playerNumber, playerName, gameG, canvasW, canvasH, ballX, ballY
     show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height,  10);
     p5.fill(255);
     p5.ellipse(ballX, ballY, 20);
+    p5.text(scoreR, canvasW * 0.25, canvasH * 0.2); // Left score at 25% width
+    p5.text(scoreL, canvasW * 0.75, canvasH * 0.2);
   };
   
   
@@ -96,6 +98,8 @@ let ballY =  0
 let leftPaddle = '' 
 let rightPaddle = ''
 let ball = ''
+let scoreL = 0
+let scoreR = 0
 
 function PingPongGame({sendMessage, lastMessage, readyState}) {
   const [playerNumber, setPlayerNmber] = useState('')
@@ -137,6 +141,8 @@ function PingPongGame({sendMessage, lastMessage, readyState}) {
             if (data['type'] === "ballUpdated"){
               ballX = data.ball.x;
               ballY = data.ball.y;
+              scoreL = data.ball.scoreLeft;
+              scoreR = data.ball.scoreRight;
             }
           }
               
