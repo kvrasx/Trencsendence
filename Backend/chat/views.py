@@ -159,3 +159,7 @@ def getNotifications(request):
     serializer = GlobalFriendSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
 
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def checkInviteStatus(request):
+    

@@ -10,9 +10,23 @@ import { toast } from 'react-toastify';
 import banner from '@/assets/banner.jpeg';
 import { DonutChart } from '@/components/ui/donut-chart';
 import MultiLineChart from '@/components/ui/multiline-chart';
-import { FaTableTennis, FaGamepad } from 'react-icons/fa';
 
 export default function Profile({ user, setUser }) {
+    
+    const sendInvite = async (type, target) => {        
+        try {
+            await post('/invite/', {
+                "user1": target,
+                "type": type
+            });
+            
+            toast.success("Friend request sent successfully!");
+        } catch (e) {
+            console.log(e);
+            toast.error("Failed to send friend request. Please try again.");
+        }
+       
+    }
 
     const updateProfile = async (data, successMsg) => {
         let res = await post('/api/user/update', data, {
@@ -88,8 +102,8 @@ export default function Profile({ user, setUser }) {
                         </>
                     ) : (
                         <>
-                            <Button variant="outline" className="p-6 w-64 border-accent"> <UserPlus /> Add Friend</Button>
-                            <Button variant="outline" className="p-6 w-64 border-accent"> <Swords /> Challenge to Match</Button>
+                            <Button onClick={(e) => sendInvite("friend", user.id)} variant="outline" className="p-6 w-64 border-accent"> <UserPlus /> Add Friend</Button>
+                            <Button onClick={(e) => sendInvite("game", user.id)} variant="outline" className="p-6 w-64 border-accent"> <Swords /> Challenge to Match</Button>
                         </>
                     )}
                     {/* </div> */}
