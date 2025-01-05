@@ -24,7 +24,7 @@ def inviteFriend(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     try: 
-        o = Invitations.objects.get(Q(user1=user1,user2=user2) | Q(user1=user2,user2=user1))
+        o = Invitations.objects.get(Q(user1=user1,user2=jwt_user) | Q(user1=jwt_user,user2=user1))
         #q = user1 <---- mn 3end sma3il
             # return Response("cant invite the player doesnt existe", status=status.HTTP_400_BAD_REQUEST)
     except:
