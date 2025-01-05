@@ -3,7 +3,7 @@ import random
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from datetime import date
-# from user_management.models import Match, User
+from user_management.models import Match, User
 from channels.exceptions import DenyConnection
 import string
 
@@ -46,7 +46,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.match = None
 
     async def add_player_to_lobby(self):
-        self.player_username = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
         if len(self.connected_users) == 0:
             self.room_group_name = f"xo_{self.scope['url_route']['kwargs']['room_name']}_{self.player_username}"
             self.connected_users.append(self.player_username)
@@ -60,11 +59,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 
     async def connect(self):
-        # user: User = self.scope["user"]
-        # if user.is_anonymous:
-        #     await self.accept()
-        #     await self.close(code=4008)
-        #     return
+        user: User = self.scope["user"]
+        if user.is_anonymous:
+            await self.accept()
+            await self.close(code=4008)
+            return
+        
+        self.player_username = user.username
 
         if self.scope['url_route']['kwargs']['room_name'] == 'lobby':
             print(self.scope['url_route']['kwargs']['room_name'])

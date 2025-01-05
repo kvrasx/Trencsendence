@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware', 
+    'corsheaders.middleware.CorsMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,8 +102,16 @@ DATABASES = {
         # 'PASSWORD': 'PASS',
         # 'HOST': 'postgresql',
         # 'PORT': '5432'
+        'NAME': 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': 'my_db',
+        # 'USER': 'postgres',
+        # 'PASSWORD': 'PASS',
+        # 'HOST': 'postgresql',
+        # 'PORT': '5432'
     }
 }
+
 
 
 
@@ -160,6 +169,8 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=15),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
@@ -173,8 +184,10 @@ SIMPLE_JWT = {
 
 OAUTH_CLIENT_ID="u-s4t2ud-130a1202541bd6319e459cf8ad6a3b5974e3e6390afce2a70f081a497e7f8bbe"
 OAUTH_CLIENT_SECRET="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"
+OAUTH_CLIENT_ID="u-s4t2ud-130a1202541bd6319e459cf8ad6a3b5974e3e6390afce2a70f081a497e7f8bbe"
+OAUTH_CLIENT_SECRET="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"
 OAUTH_REDIRECT_URI="http://localhost:8000/api/auth/OAuth"
-# OAUTH_REDIRECT_URI="http://167.99.138.209:80/api/auth/OAuth"
+# OAUTH_REDIRECT_URI="http://localhost:80/api/auth/OAuth"
 
 PUBLIC_PATHS = [
     '/api/auth/login',
@@ -209,3 +222,5 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+ALLOWED_HOSTS = ['*']

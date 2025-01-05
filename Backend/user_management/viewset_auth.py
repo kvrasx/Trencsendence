@@ -114,6 +114,7 @@ class authViewSet:
             user_id = token['user_id']
             user = User.objects.filter(id=user_id).first()
             if not user:
+                print("user does not exists")
                 return Response(status=status.HTTP_404_NOT_FOUND, data={"error": "User does not exist."})
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={"error": str(e)})

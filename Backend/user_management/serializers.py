@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import make_password # for the password hashing
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'display_name', 'email', 'avatar', 'online', 'created_at', 'two_factor_status']
+        fields = ['id', 'username', 'password', 'display_name', 'email', 'avatar', 'online', 'created_at', 'two_factor_status', 'score']
         read_only_fields = ['created_at'] # user_id is AutoField so it will be read_only by default, but I'll add them for readability convention
         extra_kwargs = {
             'password': {'write_only': True},
