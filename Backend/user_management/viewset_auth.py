@@ -94,12 +94,12 @@ class authViewSet:
         r = handle_2fa(user)
         if r:
             r.status_code = 302
-            r['Location'] = 'http://localhost/?otp=true&username=' + user.username
+            r['Location'] = 'http://localhost:8000/?otp=true&username=' + user.username
             return r
 
         response = generate_login_response(user)
         response.status_code = 302
-        response['Location'] = 'http://localhost/oauth-callback'
+        response['Location'] = 'http://localhost:8000/oauth-callback'
         return response
 
 #########################

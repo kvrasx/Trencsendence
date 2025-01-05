@@ -184,8 +184,7 @@ SIMPLE_JWT = {
 
 OAUTH_CLIENT_ID="u-s4t2ud-20460362d67f07847380041454edbee0383256a17cfde5ad634b615bd7862584"
 OAUTH_CLIENT_SECRET="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"
-OAUTH_REDIRECT_URI="https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-20460362d67f07847380041454edbee0383256a17cfde5ad634b615bd7862584&redirect_uri=http%3A%2F%2Flocalhost%3A8000&response_type=code
-"
+OAUTH_REDIRECT_URI="http://localhost:8000/api/auth/OAuth"
 # OAUTH_REDIRECT_URI="http://localhost/api/auth/OAuth"
 
 PUBLIC_PATHS = [
