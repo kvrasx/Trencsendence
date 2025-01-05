@@ -57,7 +57,11 @@ def acceptFriend(request):
     except:
         return Response("Detail: Invitation not found", status=status.HTTP_404_NOT_FOUND)
     query.status="accepted"
+    if query.type == "game":
+        query.type = "join"
     query.save()
+    if (query.type == "game"):
+            return Response(query.friendship_id, status=status.HTTP_200_OK)
     return Response("detail: Invitation accepted successfuly", status=status.HTTP_200_OK)        
     
 @api_view(['POST'])
@@ -155,7 +159,7 @@ def getMessages(request, chat=None):
 def getNotifications(request):
     user: User = request.user
     user_id = user.id
-    notifs = Invitations.objects.filter(Q(user2=user_id) & Q(status="pending"))
+    notifs = Invitations.objects.filter(Q(user2=user_id) & (Q(status="pending") | Q(type="join")))
     serializer = GlobalFriendSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
 

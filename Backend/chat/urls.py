@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import getMessages,getChats,inviteFriend,getNotifications,acceptFriend,blockFriend,deblockFriend,declineFriend
 from .consumers import ChatConsumer
 
