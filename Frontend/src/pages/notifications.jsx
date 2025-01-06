@@ -18,6 +18,7 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useNavigate } from "react-router-dom";
 
 export function Notifications({ setShowNotifications }) {
   const [isSheetOpen, setIsSheetOpen] = useState(true);
@@ -95,7 +96,7 @@ export function Notifications({ setShowNotifications }) {
                         setNotifications={setNotifications}
                       />
                     ) : (
-                      <FriendItem
+                      <JoinItem
                         key={index}
                         index={index}
                         notifications={notifications}
@@ -334,7 +335,7 @@ const GameItem = ({ notifications, notification, index, setNotifications }) => {
 
 
 
-const FriendItem = ({ notifications, notification, index, setNotifications }) => {
+const   JoinItem = ({ notifications, notification, index, setNotifications }) => {
   let userId = notification.user2.id
   let picture = notification.user2.avatar
   let name = notification.user2.username
@@ -352,7 +353,7 @@ const FriendItem = ({ notifications, notification, index, setNotifications }) =>
     // let res = await post(`/accept/`, { "user1": id, "type": "game" });
     // console.log(res);
     
-    <PingPong waitingstate="true" />
+    window.location.href = "/ping-pong/" + notification?.friendship_id
     console.log("game groop name ->");
     
   }
