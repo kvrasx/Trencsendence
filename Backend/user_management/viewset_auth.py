@@ -99,7 +99,7 @@ class authViewSet:
 
         response = generate_login_response(user)
         response.status_code = 302
-        response['Location'] = 'http://localhost:5173/oauth-callback'
+        response['Location'] = 'http://localhost:5173/'
         return response
 
 #########################

@@ -8,6 +8,7 @@ from .models import Message,Invitations
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 from user_management.models import User
+from django.shortcuts import get_object_or_404
 
 
 @api_view(['POST'])
@@ -23,10 +24,11 @@ def inviteFriend(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     try:
-        o = Invitations.objects.get(Q(user1=user1,user2=jwt_user) | Q(user1=jwt_user,user2=user1))
+        o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type=_type) | Q(user1=jwt_user,user2=user1,type=_type))
         #q = user1 <---- mn 3end sma3il
             # return Response("cant invite the player doesnt existe", status=status.HTTP_400_BAD_REQUEST)
-    except:
+    except Exception as e:
+        print(e)
         mydata = {
             "user1": jwt_user,
             "user2": user1,
@@ -163,7 +165,12 @@ def getNotifications(request):
     serializer = GlobalFriendSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
 
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def checkInviteStatus(request):
-    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def invitationStatus(request, type=None, target=None):
+    try:
+        invite = Invitations.objects.get((Q(user1=request.user.id, user2=target) | Q(user1=target, user2=request.user.id)) & Q(type=type))
+        serializer = GlobalFriendSerializer(invite)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except:
+        return Response("Detail: Invitation not found", status=status.HTTP_404_NOT_FOUND)

@@ -10,31 +10,16 @@ import { toast } from 'react-toastify';
 import banner from '@/assets/banner.jpeg';
 import { DonutChart } from '@/components/ui/donut-chart';
 import MultiLineChart from '@/components/ui/multiline-chart';
+import InviteButton from '../components/custom/invite-button';
 
 export default function Profile({ user, setUser }) {
     
-    const sendInvite = async (type, target) => {        
-        try {
-            await post('/invite/', {
-                "user1": target,
-                "type": type
-            });
-            
-            toast.success("Friend request sent successfully!");
-        } catch (e) {
-            console.log(e);
-            toast.error("Failed to send friend request. Please try again.");
-        }
-       
-    }
-
     const updateProfile = async (data, successMsg) => {
         let res = await post('/api/user/update', data, {
             'Content-Type': 'multipart/form-data',
         })
         if (res?.user) {
             toast.success(successMsg);
-            localStorage.setItem('user', JSON.stringify(res.user));
             setUser(res.user);
         }
     }
@@ -102,8 +87,8 @@ export default function Profile({ user, setUser }) {
                         </>
                     ) : (
                         <>
-                            <Button onClick={(e) => sendInvite("friend", user.id)} variant="outline" className="p-6 w-64 border-accent"> <UserPlus /> Add Friend</Button>
-                            <Button onClick={(e) => sendInvite("game", user.id)} variant="outline" className="p-6 w-64 border-accent"> <Swords /> Challenge to Match</Button>
+                            <InviteButton user={user} type={"friend"} />
+                            <InviteButton user={user} type={"game"} />
                         </>
                     )}
                     {/* </div> */}

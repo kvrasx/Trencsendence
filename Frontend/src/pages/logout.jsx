@@ -22,7 +22,6 @@ export default function Logout({ setUser }) {
       }
       setNavigateTo('/');
     };
-    localStorage.removeItem('user');
     setUser(null);
     req();
   }, []);
