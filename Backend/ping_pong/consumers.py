@@ -3,19 +3,21 @@ import json
 import asyncio
 # import asyncio
 import threading
+from channels.db import database_sync_to_async
+from django.shortcuts import get_object_or_404
+from chat.models import Invitations
 
 
         
 class Match:
-    def __init__(self, player_1, player_2, group_name, match_number):
+    def __init__(self, player_1, player_2, group_name):
         self.player1 = player_1
         self.player2 = player_2
         self.group_name = group_name
-        self.match_number = match_number
         self.is_active = True
 
     def players(self):
-        return [self.player1, self.player2, self.group_name, self.match_number, self.is_active]
+        return [self.player1, self.player2, self.group_name, self.is_active]
     
     
 
@@ -76,6 +78,7 @@ class GameClient(AsyncWebsocketConsumer):
 
     connected_sockets = []
     active_matches = []
+    invite_matches = {}
     canvasHeight = 400
     canvasWidth = 600
     # player1 = ''
@@ -117,6 +120,17 @@ class GameClient(AsyncWebsocketConsumer):
         canvasWidth=canvasWidth
     )
     
+    
+    async def start_match(self, event):
+        await self.send(json.dumps({
+            'type': 'game_started',
+            'information': self.player,
+            'started': 'yes',
+            'paddleRight': self.paddleRight.to_dict(),
+            'paddleLeft': self.paddleLeft.to_dict(),
+            'ball': self.ball.to_dict()
+        }))
+    
     async def connect(self):
 
         self.user = self.scope["user"]
@@ -125,16 +139,20 @@ class GameClient(AsyncWebsocketConsumer):
             await self.close(code=4008)
             return
         self.room_name =  self.scope['url_route']['kwargs']['room_name']
-        self.player = {}
+        # if self.connected_sockets[0]['player_username'] == self.user.username:
+        #     await self.accept()
+        #     await self.close(code=4008)
+        #     return 
+        if len(self.connected_sockets) == 1:
+            print(self.connected_sockets[0]['player_username'])
+        self.player = {
+            'player_name': self.channel_name,
+            'player_number': '',
+            'player_username': self.user.username
+        }
         await self.accept()
         if self.room_name == 'random':
             self.group_name = f'group_{self.user.username}'
-            self.scope['player_name'] = self.channel_name
-            self.player = {
-                'player_name': self.channel_name,
-                'player_number': '',
-                'player_username': self.user.username
-            }
             if len (self.connected_sockets) % 2 == 0:
                 self.player['player_number'] = '2'
             else:
@@ -145,31 +163,67 @@ class GameClient(AsyncWebsocketConsumer):
                 player1 = self.connected_sockets.pop(0)
                 player2 = self.connected_sockets.pop(0)
                 self.group_name = f'group_{player1["player_username"]}'
-                self.new_match = Match(player1, player2, self.group_name, len(self.active_matches))
+                self.new_match = Match(player1, player2, self.group_name)
                 await self.channel_layer.group_add(self.new_match.group_name, player1['player_name'])
                 await self.channel_layer.group_add(self.new_match.group_name, player2['player_name'])
                 self.active_matches.append(self.new_match)
-                print(self.group_name)
-                await self.channel_layer.send(player1['player_name'], 
+                await self.channel_layer.group_send(
+                    self.group_name,
                     {
-                        'type': 'game_started',
-                        'information': player1,
-                        'started': 'yes',
-                        'paddleRight': self.paddleRight.to_dict(),
-                        'paddleLeft': self.paddleLeft.to_dict(),
-                        'ball': self.ball.to_dict()
-                    })
-                await self.channel_layer.send(player2['player_name'],
-                    {
-                        'type': 'game_started',
-                        'information': player2,
-                        'started': 'yes',
-                        'paddleRight': self.paddleRight.to_dict(),
-                        'paddleLeft': self.paddleLeft.to_dict(),
-                        'ball': self.ball.to_dict()
-                    })
-                self.is_active = True
+                        "type": "start_match",
+                    }
+                )
+                self.new_match.is_active = True
                 asyncio.create_task(self.start_ball_movement())
+        else:
+            try:
+                inviteId = int(self.scope['url_route']['kwargs']['room_name'])
+                print("invite id:", inviteId)
+                invite = await database_sync_to_async(get_object_or_404)(Invitations, friendship_id=inviteId, type='join', status="accepted")
+                print("hmm:", invite)
+                if invite.user1 != self.user.id and invite.user2 != self.user.id:
+                    # await self.accept()
+                    await self.close(code=4006)
+                    return
+                self.group_name = f"xo_{inviteId}"
+
+                if self.group_name in self.invite_matches:
+                    self.invite_matches[ self.group_name ].append( self.player )
+                else:
+                    self.invite_matches[ self.group_name ] = [ self.player ]
+
+                self.isInvite = True
+
+                await self.channel_layer.group_add(
+                    self.group_name,
+                    self.channel_name
+                )
+                
+                invitedPlayers = self.invite_matches[ self.group_name ]
+                
+                if (len(invitedPlayers) != 2):
+                    self.player['player_number'] = '1'
+                else:
+                    self.player['player_number'] = '2'
+                    
+                    self.new_match = Match(invitedPlayers[0], invitedPlayers[1], self.group_name)
+                    self.active_matches.append(self.new_match)
+                    await self.channel_layer.group_send(
+                        self.group_name,
+                        {
+                            "type": "start_match",
+                        }
+                    )
+                    self.new_match.is_active = True
+                    asyncio.create_task(self.start_ball_movement())
+    
+            except Exception as e:
+                print("error: ", e)
+                raise e
+            
+                # await self.accept()
+                await self.close(code=4007)
+                return
                 
 
     async def disconnect(self, close_data):
@@ -180,10 +234,16 @@ class GameClient(AsyncWebsocketConsumer):
                     remove_match = match
                     break
             if remove_match:
-                self.active_matches.remove(match)
-                self.is_active = False
-                await self.channel_layer.group_discard(remove_match.group_name, match.player1["player_name"])                
-                await self.channel_layer.group_discard(remove_match.group_name, match.player2["player_name"])                
+                remove_match.is_active = False
+                self.active_matches.remove(remove_match)
+                await self.channel_layer.group_discard(remove_match.group_name, remove_match.player1["player_name"])                
+                await self.channel_layer.group_discard(remove_match.group_name, remove_match.player2["player_name"])        
+                
+        if hasattr(self, "isInvite"):
+            try:
+                del self.invite_matches[self.group_name]
+            except:
+                pass
 
 
 
@@ -227,7 +287,7 @@ class GameClient(AsyncWebsocketConsumer):
 
 
     async def start_ball_movement(self):
-        while self.is_active:
+        while self.new_match.is_active:
             # Update the ball's position
             self.ball.x += self.ball.speedX
             self.ball.y += self.ball.speedY
@@ -298,6 +358,7 @@ class GameClient(AsyncWebsocketConsumer):
             'playerNumber': event['playerNumber'],
             'updateY': event['updateY']
         }))
+    
     
     
 
