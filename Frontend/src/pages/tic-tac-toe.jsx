@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import local from "@/assets/local.jpg"
 import remote from "@/assets/remote.jpg"
 import Spinner from "@/components/ui/spinner";
+import {Button} from "@/components/ui/button";
 import Cookies from 'js-cookie';
 
 export function TicTacToe() {
@@ -29,8 +30,13 @@ export function TicTacToe() {
             console.log('WebSocket error:', error);
         };
         newSocket.onclose = (event) => {
-            if (event.code == 4401)
+            console.log('WebSocket connection closed', event.code);
+            if (event.code == 4008)
                 console.log('Not authorized.');
+            else if (event.code == 4009) {
+                setWaiting(false);
+                console.log('User already in another game');
+            }
             else
                 console.log('WebSocket connection closed', event.code);
             setSocket(null);
@@ -56,9 +62,11 @@ export function TicTacToe() {
                 case "game_over":
                     // Trigger game end dialog
                     data.status === "finished" && setWinner(data.winner);
+                    setBoard(data.board);
+                    setIsMyTurn(data.symbol !== symbol);
                     console.log(data.winner);
 
-                    document.getElementById("winner-dialog")?.click();
+                    // document.getElementById("winner-dialog")?.click();
                     break;
 
                 case "game_start":
@@ -147,10 +155,12 @@ export function TicTacToe() {
                     ) : (
                         <div className="flex flex-col items-center justify-center">
                             <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
-                            <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner === "TIE" ? "It's a tie!" : `Winner: ${winner}`}</div>
-                            <button id="winner-dialog" className="hidden" data-bs-toggle="modal" data-bs-target="#winnerModal"></button>
+                            <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner}</div>
+                                <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket.close(); setBoard({}) }}>
+                                    New Game
+                                </Button>
                         </div>
-                )}
+                    )}
                 </div>
 
 

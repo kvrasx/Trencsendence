@@ -3,10 +3,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Send, X, UserPlus, Swords, Ban, BellOff, LogIn } from "lucide-react";
+import { Send, X, UserPlus, Swords, Ban, BellOff, LogIn, BellDot, Target } from "lucide-react";
 import { get } from '@/lib/ft_axios';
 import { post } from '@/lib/ft_axios';
 import { Layout } from '@/components/custom/layout'
+import  PingPong  from './ping-pong.jsx'
 
 
 import {
@@ -17,8 +18,9 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useNavigate } from "react-router-dom";
 
-export function Notifications({setShowNotifications}) {
+export function Notifications({ setShowNotifications }) {
   const [isSheetOpen, setIsSheetOpen] = useState(true);
   const [notifications, setNotifications] = useState([])
   useEffect(() => {
@@ -85,13 +87,23 @@ export function Notifications({setShowNotifications}) {
                       setNotifications={setNotifications}
                     />
                   ) : (
-                    <GameItem
-                      key={index}
-                      index={index}
-                      notifications={notifications}
-                      notification={notification}
-                      setNotifications={setNotifications}
-                    />
+                    notification.type === "game" ? (
+                      <GameItem
+                        key={index}
+                        index={index}
+                        notifications={notifications}
+                        notification={notification}
+                        setNotifications={setNotifications}
+                      />
+                    ) : (
+                      <JoinItem
+                        key={index}
+                        index={index}
+                        notifications={notifications}
+                        notification={notification}
+                        setNotifications={setNotifications}
+                      />
+                    )
                   )
                 ))}
 
@@ -143,6 +155,7 @@ const NotificationItem = ({ notifications, notification, index, setNotifications
 
   const acceptClick = async (id) => {
     let res = await post(`/accept/`, { "user1": id, "type": "friend" });
+
     setNotifications(prevNotifications =>
       prevNotifications.filter((_, i) => i !== index)
     );
@@ -151,7 +164,7 @@ const NotificationItem = ({ notifications, notification, index, setNotifications
   return (
     <div className="flex mt-2 items-center justify-between p-4 rounded-lg glass hover-glass border-l-4 border-primary">
       <div className="flex items-center gap-4">
-      <svg
+        <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
@@ -237,9 +250,15 @@ const GameItem = ({ notifications, notification, index, setNotifications }) => {
 
   const acceptClick = async (id) => {
     let res = await post(`/accept/`, { "user1": id, "type": "game" });
-    setNotifications(prevNotifications =>
-      prevNotifications.filter((_, i) => i !== index)
+    console.log("game groop name ->");
+    console.log(res);
+    const updatedNotification = { ...notification, type: "join" };
+
+    const updatedNotifications = notifications.map((notif, i) =>
+      i === index ? updatedNotification : notif
     );
+
+    setNotifications(updatedNotifications);
   }
 
   return (
@@ -269,8 +288,8 @@ const GameItem = ({ notifications, notification, index, setNotifications }) => {
           />
         </span>
         <div>
-        <span className="font-medium">{name}</span>
-        <span className="text-primary"> invited you to a game</span>
+          <span className="font-medium">{name}</span>
+          <span className="text-primary"> invited you to a game</span>
         </div>
       </div>
       <div className="flex gap-2">
@@ -307,6 +326,61 @@ const GameItem = ({ notifications, notification, index, setNotifications }) => {
             <path d="M6 6l12 12"></path>
           </svg>
         </button>
+      </div>
+    </div>
+  );
+};
+
+
+
+
+
+const   JoinItem = ({ notifications, notification, index, setNotifications }) => {
+  let userId = notification.user2.id
+  let picture = notification.user2.avatar
+  let name = notification.user2.username
+  const defaultPicture =
+    'https://simplyilm.com/wp-content/uploads/2017/08/temporary-profile-placeholder-1.jpg';
+
+  // const declineClick = async (id) => {
+  //   let res = await post(`/decline/`, { "user1": id, "type": "game" });
+  //   setNotifications(prevNotifications =>
+  //     prevNotifications.filter((_, i) => i !== index)
+  //   )
+  // }
+
+  const joinClick = async (id) => {
+    // let res = await post(`/accept/`, { "user1": id, "type": "game" });
+    // console.log(res);
+    
+    window.location.href = "/ping-pong/" + notification?.friendship_id
+    console.log("game groop name ->");
+    
+  }
+
+  return (
+    <div className="flex items-center justify-between p-4 mt-2 rounded-lg backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)] border-l-4 border-l-primary transition-all duration-200 hover:bg-white/10">
+      <div className="flex items-center gap-4">
+        <BellDot className="h-6 w-6 text-primary" />
+        <div className="relative h-10 w-10 overflow-hidden rounded-full">
+          <img
+            className="aspect-square h-full w-full object-cover"
+            src={picture || defaultPicture}
+            alt={`${name}'s profile`}
+          />
+        </div>
+        <div className="max-w-[39px] min-w-[39px]">
+          <span className="font-medium truncate block">{name}</span>
+        </div>
+      </div>
+      <div className="flex gap-2 ml-4">
+        <Button
+          onClick={() => joinClick(userId)}
+          className="inline-flex items-center gap-1"
+        >
+          <Target className="h-4 w-4" />
+          Join Match
+        </Button>
       </div>
     </div>
   );
