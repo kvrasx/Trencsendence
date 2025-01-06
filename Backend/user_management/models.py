@@ -50,7 +50,7 @@ class User(AbstractUser):
 class Match(models.Model):
     class GameChoices(models.IntegerChoices):
         PINGPONG = 1 #, "Ping Pong"
-        DICE = 2 #, "Dice"
+        TICTACTOE = 2 #, "tic tac toe"
     match_id = models.AutoField(primary_key=True)
     game_type = models.IntegerField(choices=GameChoices.choices)
     winner = models.ForeignKey(User, related_name='match_winner', on_delete=models.CASCADE) # If the user got removed -> The match is removed
