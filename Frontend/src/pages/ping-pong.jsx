@@ -11,13 +11,13 @@ import PingPongGame from "../components/custom/ping-pong-game";
 import { useParams } from "react-router-dom";
 import useWebSocket from "react-use-websocket";
 
-export default function PingPong() {
-
+export default function PingPong({waitingstate}) {
+    console.log("sdfdsgdgdsgdsgdsgdsgdsgdgdsdgdsgdsgdgsdgdsg");
     const [connectionUrl, setConnectionUrl] = useState(null)
     const { sendMessage, lastMessage, readyState } = useWebSocket(connectionUrl);
     const [started, setStarted] = useState(false);
 
-    const [waiting, setWaiting] = useState(false);
+    const [waiting, setWaiting] = useState(waitingstate);
     const [winner, setWinner] = useState(null);
     const [random, setRandomMode] = useState(null);
     const { id } = useParams();
