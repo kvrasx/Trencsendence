@@ -7,6 +7,7 @@ import { Send, X, UserPlus, Swords, Ban, BellOff, LogIn, BellDot, Target } from 
 import { get } from '@/lib/ft_axios';
 import { post } from '@/lib/ft_axios';
 import { Layout } from '@/components/custom/layout'
+import  PingPong  from './ping-pong.jsx'
 
 
 import {
@@ -340,18 +341,19 @@ const FriendItem = ({ notifications, notification, index, setNotifications }) =>
   const defaultPicture =
     'https://simplyilm.com/wp-content/uploads/2017/08/temporary-profile-placeholder-1.jpg';
 
-  const declineClick = async (id) => {
-    let res = await post(`/decline/`, { "user1": id, "type": "game" });
-    setNotifications(prevNotifications =>
-      prevNotifications.filter((_, i) => i !== index)
-    )
-  }
+  // const declineClick = async (id) => {
+  //   let res = await post(`/decline/`, { "user1": id, "type": "game" });
+  //   setNotifications(prevNotifications =>
+  //     prevNotifications.filter((_, i) => i !== index)
+  //   )
+  // }
 
-  const acceptClick = async (id) => {
+  const joinClick = async (id) => {
     // let res = await post(`/accept/`, { "user1": id, "type": "game" });
+    // console.log(res);
+    
+    <PingPong waitingstate="true" />
     console.log("game groop name ->");
-    console.log(res);
-
     
   }
 

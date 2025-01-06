@@ -7,7 +7,7 @@ import { TbTicTac } from "react-icons/tb";
 const navItems = [
   { icon: User, label: "Profile", path: "/profile" },
   { icon: Award, label: "Leaderboard", path: "/leaderboard" },
-  { icon: FaTableTennis, label: "Game", path: "/game" },
+  { icon: FaTableTennis, label: "Game", path: "/ping-pong" },
   { icon: TbTicTac, label: "TicTacToe", path: "/tic-tac-toe" },
   { icon: Trophy, label: "Tournament", path: "/tournament" },
   { icon: MessageSquare, label: "Chat", path: "/chat" },
