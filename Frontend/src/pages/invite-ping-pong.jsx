@@ -9,11 +9,11 @@ import {Layout} from "@/components/custom/layout";
 import PingPong from "./ping-pong";
 
 
-export default function InvitePingPong({myId}) {
+export default function InvitePingPong({}) {
 
     const { id } = useParams();
     
-        
+    
     const [match, setMatch] = useState(null);
     const [error404, setError404] = useState(false);
 

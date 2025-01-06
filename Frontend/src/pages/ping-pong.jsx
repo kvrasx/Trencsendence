@@ -13,13 +13,12 @@ import useWebSocket from "react-use-websocket";
 
 export default function PingPong({waitingstate, id=null}) {
     const token = Cookies.get('access_token');
-    const [connectionUrl, setConnectionUrl] = useState(id ? `ws://127.0.0.1:8000/ws/ping_pong/invite/${id}/?token=${token}` : null)
+    const [connectionUrl, setConnectionUrl] = useState(id ? `ws://127.0.0.1:8000/ws/ping_pong/${id}/?token=${token}` : null)
     const { sendMessage, lastMessage, readyState } = useWebSocket(connectionUrl);
     const [started, setStarted] = useState(false);
 
     const [waiting, setWaiting] = useState(waitingstate);
     const [winner, setWinner] = useState(null);
-    const { id } = useParams();
 
     useEffect(() => {
         if (!waiting) return;

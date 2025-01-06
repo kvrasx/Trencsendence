@@ -167,11 +167,12 @@ def getNotifications(request):
 @permission_classes([IsAuthenticated])
 def isValidMatch(request, matchId=None):
     user_id = request.user.id
+    print(user_id)
     try:
-        notif = Invitations.objects.get(Q(friendship_id=matchId) & (Q(user1=user_id) | Q(user2=user_id)) & Q(type="join"))
+        notif = Invitations.objects.get(Q(friendship_id=matchId) & (Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="join"))
         return Response(GlobalFriendSerializer(notif).data, status=status.HTTP_200_OK) 
     except Exception as e:
-        print(e)
+        print("error:", e)
         return Response({"error": "Game not found."}, status=404)
 
 # @api_view(['GET'])
