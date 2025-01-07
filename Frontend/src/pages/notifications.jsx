@@ -369,7 +369,7 @@ const   JoinItem = ({ notifications, notification, index, setNotifications }) =>
             alt={`${name}'s profile`}
           />
         </div>
-        <div className="max-w-[39px] min-w-[39px]">
+        <div className="max-w-[45px] min-w-[39px]">
           <span className="font-medium truncate block">{name}</span>
         </div>
       </div>
