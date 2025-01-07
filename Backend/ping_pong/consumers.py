@@ -6,6 +6,7 @@ import threading
 from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
 from chat.models import Invitations
+from user_management.viewset_match import MatchTableViewSet
 
 
         
@@ -93,7 +94,7 @@ class GameClient(AsyncWebsocketConsumer):
         angle=0,
         canvasW=canvasWidth,
         canvasH=canvasHeight,
-        constSpeed=0.3,
+        constSpeed=0.5,
         scoreLeft=0,
         scoreRight=0
     )
@@ -139,17 +140,17 @@ class GameClient(AsyncWebsocketConsumer):
             await self.close(code=4008)
             return
         self.room_name =  self.scope['url_route']['kwargs']['room_name']
-        # if self.connected_sockets[0]['player_username'] == self.user.username:
-        #     await self.accept()
-        #     await self.close(code=4008)
-        #     return 
-        if len(self.connected_sockets) == 1:
-            print(self.connected_sockets[0]['player_username'])
         self.player = {
             'player_name': self.channel_name,
             'player_number': '',
-            'player_username': self.user.username
+            'player_username': self.user.username,
+            'user_id': self.user.id
         }
+        if len(self.connected_sockets) == 1:
+            if self.connected_sockets[0]['player_username'] == self.user.username:
+                await self.accept()
+                await self.close(code=4008)
+                return 
         await self.accept()
         if self.room_name == 'random':
             self.group_name = f'group_{self.user.username}'
@@ -178,9 +179,7 @@ class GameClient(AsyncWebsocketConsumer):
         else:
             try:
                 inviteId = int(self.scope['url_route']['kwargs']['room_name'])
-                print("invite id:", inviteId)
                 invite = await database_sync_to_async(get_object_or_404)(Invitations, friendship_id=inviteId, type='join', status="accepted")
-                print("hmm:", invite)
                 if invite.user1 != self.user.id and invite.user2 != self.user.id:
                     # await self.accept()
                     await self.close(code=4006)
@@ -214,6 +213,7 @@ class GameClient(AsyncWebsocketConsumer):
                             "type": "start_match",
                         }
                     )
+                    invite.delete()
                     self.new_match.is_active = True
                     asyncio.create_task(self.start_ball_movement())
     
@@ -221,7 +221,7 @@ class GameClient(AsyncWebsocketConsumer):
                 print("error: ", e)
                 raise e
             
-                # await self.accept()
+                await self.accept()
                 await self.close(code=4007)
                 return
                 
@@ -234,10 +234,21 @@ class GameClient(AsyncWebsocketConsumer):
                     remove_match = match
                     break
             if remove_match:
+                if self.ball.scoreLeft < 5 and self.ball.scoreRight < 5:
+                    await self.channel_layer.group_send(
+                        remove_match.group_name,
+                        {
+                            "type": "freee_match",
+                            "winner": remove_match.player2 if remove_match.player1["player_username"] == self.user.username else remove_match.player1
+                        }
+                    )
                 remove_match.is_active = False
-                self.active_matches.remove(remove_match)
+                try:
+                    self.active_matches.remove(remove_match)
+                except:
+                    pass
                 await self.channel_layer.group_discard(remove_match.group_name, remove_match.player1["player_name"])                
-                await self.channel_layer.group_discard(remove_match.group_name, remove_match.player2["player_name"])        
+                await self.channel_layer.group_discard(remove_match.group_name, remove_match.player2["player_name"])  
                 
         if hasattr(self, "isInvite"):
             try:
@@ -288,11 +299,9 @@ class GameClient(AsyncWebsocketConsumer):
 
     async def start_ball_movement(self):
         while self.new_match.is_active:
-            # Update the ball's position
             self.ball.x += self.ball.speedX
             self.ball.y += self.ball.speedY
 
-            # Check for collision with the top and bottom boundaries
             if self.ball.y - self.ball.radius <= 0 or self.ball.y + self.ball.radius >= self.ball.canvas_height:
                 self.ball.speedY *= -1  # Reverse the vertical direction
 
@@ -306,8 +315,27 @@ class GameClient(AsyncWebsocketConsumer):
             if self.ball.x + self.ball.radius >= self.ball.canvas_width:
                 await self._reset_ball(self.paddleLeft, "Left")
 
-
-            # Broadcast the updated ball position to the group
+            if (self.ball.scoreRight == 5 or self.ball.scoreLeft == 5):
+                self.new_match.is_active = False
+                score = f"0{self.ball.scoreRight}:0{self.ball.scoreLeft}"
+                await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
+                    "game_type": 1,
+                    "winner": self.new_match.player2["user_id"] if  self.ball.scoreRight == 5 else self.new_match.player1["user_id"],
+                    "loser": self.new_match.player1["user_id"] if  self.ball.scoreRight == 5 else self.new_match.player2["user_id"],
+                    "score": score
+                })
+                await self.channel_layer.group_send(
+                    self.group_name,
+                    {
+                        "type" : "game_finished",
+                        "winner": self.new_match.player2 if self.ball.scoreLeft == 5 else self.new_match.player1,
+                        "score":  score
+                    }
+                )
+                self.ball.scoreRight = 0
+                self.ball.scoreLeft = 0
+                return ;
+            
             await self.channel_layer.group_send(
                 self.group_name,
                 {
@@ -315,7 +343,6 @@ class GameClient(AsyncWebsocketConsumer):
                     'ball': self.ball.to_dict()
                 }
             )
-            # Control the frame rate (e.g., 60 FPS)
             await asyncio.sleep(1/60)
 
     
@@ -331,7 +358,7 @@ class GameClient(AsyncWebsocketConsumer):
             if self.ball.x - self.ball.radius <= paddle.paddleX + paddle.paddleWidth and self.ball.y - self.ball.radius >= paddle.paddleY and self.ball.y + self.ball.radius <= paddle.paddleY + paddle.paddleHeight: 
                return True
             else:
-               return False
+                   return False
         if (lORr == "Right"):
             if self.ball.x + self.ball.radius >= paddle.paddleX and self.ball.y - self.ball.radius >= paddle.paddleY and  self.ball.y + self.ball.radius <= paddle.paddleY + paddle.paddleHeight:
                 return True
@@ -359,6 +386,18 @@ class GameClient(AsyncWebsocketConsumer):
             'updateY': event['updateY']
         }))
     
-    
-    
+    async def game_finished(self, event):
+        await self.send(json.dumps({
+            'type': event['type'],
+            'winner': event['winner'],
+            'score': event['score']
+        }))
+        await self.close(code=4007)
+        
+    async def freee_match(self, event):
+        await self.send(json.dumps({
+            'type': event['type'],
+            'winner': event['winner']
+        }))
+        await self.close()
 
