@@ -21,6 +21,9 @@ export default function PingPong({waitingstate, id=null}) {
     const [winner, setWinner] = useState(null);
     const [finish, setFinish] = useState(false);
     const [score, setScore] = useState(null);
+ 
+    
+
 
     useEffect(() => {
         if (!waiting) return;
@@ -32,15 +35,16 @@ export default function PingPong({waitingstate, id=null}) {
                     if (data.type === 'game_started')
                         setStarted(true);
                     else if (data.type === 'game_finished'){
-                        console.log(data.type)
+                        console.log(data.type);
                         setWinner(data.winner);
                         setScore(data.score)
                         setFinish(true);
-                        console.log(score)
+                        console.log(score);
 
                     }
                     else if (data.type === "freee_match"){
                         setWinner(data.winner);
+                        setScore("Free Match");
                         setFinish(true);
                     }
                         
@@ -51,6 +55,7 @@ export default function PingPong({waitingstate, id=null}) {
             console.error(error);
         }
     }, [lastMessage])
+
 
     const handdleRandom = () => {
         const url = 'ws://127.0.0.1:8000/ws/ping_pong/random/?token=' + token;
@@ -95,7 +100,7 @@ export default function PingPong({waitingstate, id=null}) {
                             finish ?(
                                 <div className="border rounded-lg w-1/2 h-1/2 p-2 bg-violet-500 bg-opacity-20">
                                     <div className="flex justify-center items-center  w-full h-12   animate-bounc text-2xl font-mono">WINNER is {winner.player_username}</div>
-                                    <div className="flex justify-center items-center  w-full h-10   animate-bounc text-2xl font-mono">result: {score}</div>
+                                    <div className="flex justify-center items-center  w-full h-10   animate-bounc text-2xl font-mono">{score}</div>
                                     <div className="flex justify-center items-center  w-full h-52  animate-bounc text-amber-300"><BsEmojiSunglasses className="size-32"/></div>
                                 </div>
                             ):(
@@ -104,8 +109,10 @@ export default function PingPong({waitingstate, id=null}) {
                         ) : (
 
                             <div className="flex flex-col items-center justify-center">
-                                <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...</div>
+                                <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...    <button onClick={() => {sendMessage(JSON.stringify({"type": "cancel"})); setWaiting(false)}} className="border border-white border-opacity-30 bg-white hover:bg-white hover:text-black hover:text-opacity-60 hover:border-black hover:bg-opacity-75 bg-opacity-20 rounded-xl w-14 h-10 text-sm">
+                                    cancel</button></div>
                                 <Spinner />
+                                
                             </div>
                         )
 

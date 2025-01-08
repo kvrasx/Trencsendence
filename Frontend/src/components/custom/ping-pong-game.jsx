@@ -6,7 +6,7 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 12:41:28 by momihamm          #+#    #+#             */
-/*   Updated: 2025/01/07 17:07:25 by yamajid          ###   ########.fr       */
+/*   Updated: 2025/01/08 20:34:28 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
 
       switch (choosenTheme) {
         case "theme1":
-          setBg(img1);
+          setBg("#ff7f50");
           break;
         case "theme2":
-          setBg(img2);
+          setBg("#006400");
           break;
       }
   }, [])
@@ -65,7 +65,7 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
     canvas.style('top', '2%');
     canvas.style('left', '10%');
     canvas.style('border-radius', '15px');
-    canvas.style('border', '2px dashed white');
+    canvas.style('border', '10px solid white');
     canvas.style('background', '#000000');
 
     p5.frameRate(60);

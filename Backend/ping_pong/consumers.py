@@ -82,8 +82,7 @@ class GameClient(AsyncWebsocketConsumer):
     invite_matches = {}
     canvasHeight = 400
     canvasWidth = 600
-    # player1 = ''
-    # player2 = ''
+    timeout = 30
     
     ball = Ball(
         x=canvasWidth // 2,
@@ -112,7 +111,7 @@ class GameClient(AsyncWebsocketConsumer):
     paddleLeft = Paddle(
         paddleWidth=10,
         paddleHeight=100,
-        paddleX=canvasWidth * 0.01,
+        paddleX=canvasWidth * 0.003,
         paddleY=100,
         paddleSpeed=10,
         paddleBord=10,
@@ -139,6 +138,10 @@ class GameClient(AsyncWebsocketConsumer):
             await self.accept()
             await self.close(code=4008)
             return
+        if len(self.connected_sockets) == 1 and self.connected_sockets[0]['player_username'] == self.user.username:
+                await self.accept()
+                await self.close(code=4008)
+                return 
         self.room_name =  self.scope['url_route']['kwargs']['room_name']
         self.player = {
             'player_name': self.channel_name,
@@ -146,11 +149,7 @@ class GameClient(AsyncWebsocketConsumer):
             'player_username': self.user.username,
             'user_id': self.user.id
         }
-        if len(self.connected_sockets) == 1:
-            if self.connected_sockets[0]['player_username'] == self.user.username:
-                await self.accept()
-                await self.close(code=4008)
-                return 
+            
         await self.accept()
         if self.room_name == 'random':
             self.group_name = f'group_{self.user.username}'
@@ -229,6 +228,8 @@ class GameClient(AsyncWebsocketConsumer):
     async def disconnect(self, close_data):
         if hasattr(self, "group_name"):
             remove_match = None
+            if len(self.connected_sockets) == 1:
+                self.connected_sockets.pop(0)
             for match in self.active_matches:
                 if match.group_name == self.group_name:
                     remove_match = match
@@ -242,7 +243,11 @@ class GameClient(AsyncWebsocketConsumer):
                             "winner": remove_match.player2 if remove_match.player1["player_username"] == self.user.username else remove_match.player1
                         }
                     )
-                remove_match.is_active = False
+                    self.ball.scoreLeft = 0
+                    self.ball.scoreRight = 0
+                    self.paddleLeft.paddleY = 100
+                    self.paddleRight.paddleY = 100
+                remove_match.is_active = False 
                 try:
                     self.active_matches.remove(remove_match)
                 except:
@@ -251,7 +256,7 @@ class GameClient(AsyncWebsocketConsumer):
                 await self.channel_layer.group_discard(remove_match.group_name, remove_match.player2["player_name"])  
                 
         if hasattr(self, "isInvite"):
-            try:
+            try: 
                 del self.invite_matches[self.group_name]
             except:
                 pass
@@ -259,7 +264,7 @@ class GameClient(AsyncWebsocketConsumer):
 
 
     async def receive(self, text_data):
-       
+    
         try:
             data = json.loads(text_data)
         except Exception as e:
@@ -277,6 +282,8 @@ class GameClient(AsyncWebsocketConsumer):
                     'updateY': self.paddleRight.to_dict() if data['playerNumber'] == '1' else self.paddleLeft.to_dict()
                 }
             )
+        if data['type'] == 'cancel':
+            await self.close()
                 
                 
     def _move_paddle(self, paddle, direction):
@@ -334,6 +341,8 @@ class GameClient(AsyncWebsocketConsumer):
                 )
                 self.ball.scoreRight = 0
                 self.ball.scoreLeft = 0
+                self.paddleLeft.paddleY = 100
+                self.paddleRight.paddleY = 100
                 return ;
             
             await self.channel_layer.group_send(
