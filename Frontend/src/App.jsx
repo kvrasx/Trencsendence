@@ -12,6 +12,8 @@ import Logout from './pages/logout';
 import Spinner from '@/components/ui/spinner';
 import { get } from '@/lib/ft_axios';
 import OtherProfile from './pages/other-profile';
+import PingPong from './pages/ping-pong';
+
 import { toast, ToastContainer } from 'react-toastify';
 
 function App() {
@@ -51,6 +53,8 @@ function App() {
                 <Route path="/profile" element={<Layout><Profile user={user} setUser={setUser} /></Layout>} />
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
+                <Route path="/ping-pong/:id" element={<Layout><PingPong /></Layout>} />
+                <Route path="/ping-pong" element={<Layout><PingPong /></Layout>} />
                 <Route path="/tic-tac-toe" element={<Layout><TicTacToe /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>

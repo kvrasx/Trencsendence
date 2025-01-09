@@ -6,7 +6,7 @@ import { Send, X, UserPlus, Swords, Ban, User } from "lucide-react";
 import Message from "@/components/ui/message";
 import { useEffect, useState, useRef, useContext } from "react";
 import axios from "axios";
-import { get } from "@/lib/ft_axios";
+import { get, post } from "@/lib/ft_axios";
 import { UserContext } from "@/contexts";
 import { toast } from "react-toastify";
 import OldMessages from "../components/custom/old_messages";
@@ -14,6 +14,7 @@ import NewMessages from "../components/custom/new_messages";
 import Spinner from "@/components/ui/spinner"
 import { Link } from "react-router-dom";
 import defaultAvatar from "@/assets/profile.jpg";
+import InviteButton from "../components/custom/invite-button";
 
 export function Chat() {
     const user = useContext(UserContext);
@@ -23,6 +24,19 @@ export function Chat() {
     const isWsOpened = useRef(false);
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef(null);
+
+    const blockUser = async(target) => {
+        try {
+            await post('/blockFriend/', {
+                "user2": target.id
+            })
+            toast.success("You have successfully blocked " + target.username + ".");
+        } catch (e) {
+            console.log(e);
+            toast.error("Failed to block " + target.username + ". Please try again.");
+        }
+
+    };
 
     const sendHandler = (e) => {
         e.preventDefault();
@@ -152,22 +166,19 @@ export function Chat() {
                                 <p className="text-sm text-gray-500">Online</p>
                             </div>
                             <div className="space-y-2">
-                                <Button variant="outline" className="w-full">
-                                    <Swords />
-                                    Challenge to Match
-                                </Button>
-                                <Button variant="outline" className="w-full">
-                                    <UserPlus />
-                                    Invite to tournament
-                                </Button>
-                                <Button variant="destructive" className="w-full">
+
+                                <InviteButton user_id={currentChat?.user2?.id} type={"game"} defaultStatus={"Challenge to Game"} className="w-full capitalize" />
+                                
+                                <InviteButton user_id={currentChat?.user2?.id} type={"tournament"} defaultStatus={"Invite to tournament"} className="w-full capitalize" />
+
+                                <Button variant="destructive" className="w-full" onClick={() => blockUser(currentChat?.user2)}>
                                     <Ban />
                                     Block User
                                 </Button>
-                                <Button variant="destructive" className="w-full">
+                                {/* <Button variant="destructive" className="w-full">
                                     <X />
                                     Delete Chat
-                                </Button>
+                                </Button> */}
                             </div>
                         </>
                     )

@@ -120,14 +120,14 @@ export default function SearchBar() {
           </div>
           {/* <Link to="/notifications"> */}
           <Button variant="ghost" size="icon" className="relative hover:bg-secondary" onClick={() => { setShowNotifications(true) }} >
-            <Bell className="" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-xs flex items-center justify-center">
-              {3}
+            <Bell className=" " />
+            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary text-xs flex items-center justify-center">
+              
             </span>
           </Button>
-          {/* </Link> */}
         </div>
       </div>
     </>
   );
 }
+//<span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-primary" />
