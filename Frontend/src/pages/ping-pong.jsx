@@ -9,12 +9,18 @@ import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { GiTabletopPlayers } from "react-icons/gi";
 import PingPongGame from "../components/custom/ping-pong-game";
 import { BsEmojiSunglasses } from "react-icons/bs";
-import useWebSocket from "react-use-websocket";
+import useWebSocket, {ReadyState} from "react-use-websocket";
 
 export default function PingPong({waitingstate, id=null}) {
     const token = Cookies.get('access_token');
     const [connectionUrl, setConnectionUrl] = useState(id ? `ws://127.0.0.1:8000/ws/ping_pong/${id}/?token=${token}` : null)
-    const { sendMessage, lastMessage, readyState } = useWebSocket(connectionUrl);
+    const { sendMessage, lastMessage, readyState } = useWebSocket(connectionUrl, {
+        onClose: (event) => {
+            console.log('WebSocket closed with code:', event.code);
+            console.log('Reason:', event.reason); // Optional: reason for closing
+            
+        },
+    });
     const [started, setStarted] = useState(false);
 
     const [waiting, setWaiting] = useState(waitingstate);
@@ -22,8 +28,6 @@ export default function PingPong({waitingstate, id=null}) {
     const [finish, setFinish] = useState(false);
     const [score, setScore] = useState(null);
  
-    
-
 
     useEffect(() => {
         if (!waiting) return;
@@ -31,7 +35,7 @@ export default function PingPong({waitingstate, id=null}) {
         try {
             if (lastMessage != null) {
                 const data = JSON.parse(lastMessage.data);
-                console.log(data);
+                // console.log(data);
                 if (data && data.type) {
                     if (data.type === 'game_started')
                         setStarted(true);
@@ -110,7 +114,8 @@ export default function PingPong({waitingstate, id=null}) {
                         ) : (
 
                             <div className="flex flex-col items-center justify-center">
-                                <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...    <button onClick={() => {sendMessage(JSON.stringify({"type": "cancel"})); setWaiting(false)}} className="border border-white border-opacity-30 bg-white hover:bg-white hover:text-black hover:text-opacity-60 hover:border-black hover:bg-opacity-75 bg-opacity-20 rounded-xl w-14 h-10 text-sm">
+                                <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...
+                                <button onClick={() => {sendMessage(JSON.stringify({"type": "cancel"})); setWaiting(false)}} className="border border-white border-opacity-30 bg-white hover:bg-white hover:text-black hover:text-opacity-60 hover:border-black hover:bg-opacity-75 bg-opacity-20 rounded-xl w-14 h-10 text-sm">
                                     cancel</button></div>
                                 <Spinner />
                                 
