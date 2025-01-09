@@ -126,9 +126,8 @@ def blockFriend(request):
     serializer = GlobalFriendSerializer(data=request.data)
     if (serializer.is_valid()):
         validated_data = serializer.validated_data
-        user: User = request.user
-        user1 = user.id
-        user2 = validated_data.get('user2')
+        user1 = request.user.id
+        user2 = validated_data.get('user1')
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -151,7 +150,7 @@ def deblockFriend(request):
         validated_data = serializer.validated_data
         user: User = request.user
         user1 = user.id
-        user2 = validated_data.get('user2')
+        user2 = validated_data.get('user1')
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
