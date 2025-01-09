@@ -31,6 +31,7 @@ export default function PingPong({waitingstate, id=null}) {
         try {
             if (lastMessage != null) {
                 const data = JSON.parse(lastMessage.data);
+                console.log(data);
                 if (data && data.type) {
                     if (data.type === 'game_started')
                         setStarted(true);
@@ -99,9 +100,9 @@ export default function PingPong({waitingstate, id=null}) {
                         started ? (
                             finish ?(
                                 <div className="border rounded-lg w-1/2 h-1/2 p-2 bg-violet-500 bg-opacity-20">
-                                    <div className="flex justify-center items-center  w-full h-12   animate-bounc text-2xl font-mono">WINNER is {winner.player_username}</div>
-                                    <div className="flex justify-center items-center  w-full h-10   animate-bounc text-2xl font-mono">{score}</div>
-                                    <div className="flex justify-center items-center  w-full h-52  animate-bounc text-amber-300"><BsEmojiSunglasses className="size-32"/></div>
+                                    <div className="flex justify-center items-center  w-full h-12   animate-bounc text-2xl font-mono animate-bounce">WINNER is {winner.player_username}</div>
+                                    <div className="flex justify-center items-center  w-full h-10   animate-bounc text-2xl font-mono ">{score}</div>
+                                    <div className="flex justify-center items-center  w-full h-52  animate-bounc text-amber-300 animate-bounce"><BsEmojiSunglasses className="size-32"/></div>
                                 </div>
                             ):(
                                 <PingPongGame sendMessage={sendMessage} lastMessage={lastMessage} readyState={readyState} />

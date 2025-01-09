@@ -6,15 +6,13 @@
 /*   By: yamajid <yamajid@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 12:41:28 by momihamm          #+#    #+#             */
-/*   Updated: 2025/01/08 20:34:28 by yamajid          ###   ########.fr       */
+/*   Updated: 2025/01/08 21:44:51 by yamajid          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 import React, { useState, useEffect } from 'react';
 import Sketch from 'react-p5';
-import img1 from "@/assets/auth.png"
-import img2 from "@/assets/auth.png"
 
 const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ballY, leftPaddle, rightPaddle, sendMessage }) => {
   const [bg, setBg] = useState("#000000");
@@ -66,7 +64,6 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
     canvas.style('left', '10%');
     canvas.style('border-radius', '15px');
     canvas.style('border', '10px solid white');
-    canvas.style('background', '#000000');
 
     p5.frameRate(60);
   };
@@ -92,6 +89,8 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
     show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height, 10);
     p5.fill(255);
     p5.ellipse(ballX, ballY, 20);
+    p5.fill(255);
+
     p5.text(scoreR, canvasW * 0.25, canvasH * 0.2); // Left score at 25% width
     p5.text(scoreL, canvasW * 0.75, canvasH * 0.2);
   };

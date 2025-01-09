@@ -32,6 +32,8 @@ export const Navbar = () => {
   const location = useLocation();
   const currentPath = normalizePath(location.pathname);
 
+  const [defaultTheme, setDefaultTheme] = useState(localStorage.getItem("theme"))
+
   return (
     <div className="fixed left-0 top-0 h-screen w-16 glass py-8">
       <div className="flex h-full flex-col items-center justify-between ">
@@ -71,8 +73,9 @@ export const Navbar = () => {
               <DialogHeader>
                 <DialogTitle className="capitalize text-center">Customize your gaming experience</DialogTitle>
                 <DialogDescription className="flex justify-center items-center">
-                  <RadioGroup defaultValue="comfortable" className="p-5" onValueChange={(choice) => {
+                  <RadioGroup defaultValue={defaultTheme} className="p-5" onValueChange={(choice) => {
                     localStorage.setItem("theme", choice);
+                    setDefaultTheme(choice);
                   }}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="default" id="r1" />
