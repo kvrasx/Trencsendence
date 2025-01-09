@@ -1,8 +1,8 @@
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 # from .views import async_to_sync
-from .serializer import ChatsSerializer, MessageSerializer
-from .models import Invitations
+from .serializer import ChatsSerializer, MessageSerializer, NotifCount
+from .models import Invitations, NotifCountmodel
 import json
 from django.db.models import Q
 from user_management.models import User
@@ -64,3 +64,58 @@ class ChatConsumer(WebsocketConsumer):
         message = event["message"]
         # if self.channel_name != event["sender_channel_name"]:
         self.send(text_data=json.dumps({"message": message}))
+
+
+
+
+class count(WebsocketConsumer):
+    def connect(self):
+        user: User = self.scope["user"]
+        if user.is_anonymous:
+            self.accept()
+            self.close(code=4001, reason='Unauthorized')
+            return
+        else:
+            self.accept()
+            self.user_id = user.id
+            self.group_name = f"user_{self.user_id}"
+            print("hada dyl lconsumer --> " + str(self.group_name))
+            # self.group_name = "testgrp"
+            async_to_sync(self.channel_layer.group_add)(
+                self.group_name, self.channel_name)
+            try :
+                query = NotifCountmodel.objects.get(Q(user_id=self.user_id))
+                self.send(text_data=json.dumps({"count": query.count}))
+            except:
+                self.send(text_data=json.dumps({"count": 0}))
+
+    def update_count(self, event):
+        count = event["message"]
+        print(f"count ---->" + str(count))
+        self.send(text_data=json.dumps({"count": count}))
+        return
+
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        isReaded = text_data_json["readed"]
+        query = NotifCount.objects.get(Q(user_id=self.user_id))
+        if isReaded == "True":
+            query.count = 0
+            query.save()
+            async_to_sync(self.channel_layer.group_send)(
+                self.group_name,
+                {
+                    "type": "update.count",
+                    "message": 0
+                }
+            )
+
+        return
+
+    def disconnect(self, close_code):
+        if hasattr(self, "group_name"):
+            print("disconnected: ", self.group_name)
+            async_to_sync(self.channel_layer.group_discard)(
+                self.group_name,
+                self.channel_name
+            )
