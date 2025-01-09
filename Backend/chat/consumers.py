@@ -44,7 +44,6 @@ class ChatConsumer(WebsocketConsumer):
             serializer = MessageSerializer(data=full_data)
             print(message)
             if serializer.is_valid(raise_exception=True):
-                print("saved :)")
                 serializer.save()
             else:
                 return
@@ -98,17 +97,23 @@ class count(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         isReaded = text_data_json["readed"]
-        query = NotifCount.objects.get(Q(user_id=self.user_id))
-        if isReaded == "True":
+        try:
+            query = NotifCountmodel.objects.get(Q(user_id=self.user_id))
+        except Exception as e:
+            print(e)
+            return
+        if isReaded == True:
+            print("dddddddddd")
             query.count = 0
             query.save()
-            async_to_sync(self.channel_layer.group_send)(
-                self.group_name,
-                {
-                    "type": "update.count",
-                    "message": 0
-                }
-            )
+            self.send(text_data=json.dumps({"count": 0}))
+            # async_to_sync(self.channel_layer.group_send)(
+            #     self.group_name,
+            #     {
+            #         "type": "update.count",
+            #         "message": 0
+            #     }
+            # )
 
         return
 

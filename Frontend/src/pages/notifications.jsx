@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/sheet"
 import { useNavigate } from "react-router-dom";
 
-export function Notifications({ setShowNotifications }) {
+export function Notifications({ setShowNotifications, socket }) {
   const [isSheetOpen, setIsSheetOpen] = useState(true);
   const [notifications, setNotifications] = useState([])
   useEffect(() => {

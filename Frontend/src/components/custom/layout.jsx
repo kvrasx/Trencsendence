@@ -8,11 +8,10 @@ import Cookies from 'js-cookie';
 
 export const Layout = ({ children }) => {
   const [count, setCount] = useState(0);
-
+  
+  const token = Cookies.get('access_token');
+  const socket = new WebSocket(`ws://127.0.0.1:8000/ws/?token=${token}`);
   useEffect(() => {
-    const token = Cookies.get('access_token');
-    const socket = new WebSocket(`ws://127.0.0.1:8000/ws/?token=${token}`);
-    console.log("dsfdsfsdffdfdfdsfdsfdfdf");
 
     socket.onopen = () => {
       console.log('Connected to WebSocket server');
@@ -24,6 +23,12 @@ export const Layout = ({ children }) => {
         setCount(data.count);
     };
 
+    socket.onerror = (e) => {
+      console.log("error");
+    }
+    socket.onclose = (e) => {
+      console.log("error");
+    }
 
     return () => {
       if (socket) {
@@ -33,7 +38,7 @@ export const Layout = ({ children }) => {
   }, []);
   return (
     <div className="min-h-screen bg-dark-image bg-cover bg-no-repeat bg-center relative flex flex-col">
-      <SearchBar count={count} />
+      <SearchBar count={count} socket={socket} setCount={setCount} />
       <div className="flex flex-1">
         <Navbar />
         <main className="md:container pl-16 w-full h-full pt-16 overflow-auto">

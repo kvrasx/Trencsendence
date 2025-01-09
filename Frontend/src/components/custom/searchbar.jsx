@@ -17,7 +17,7 @@ function debounce(func, delay) {
   };
 }
 
-export default function SearchBar({count}) {
+export default function SearchBar({count, socket, setCount}) {
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +50,7 @@ export default function SearchBar({count}) {
     debouncedSearch(query);
   };
 
-  const handleClickOutside = (event) => {
+  const handleClickOutside = (event, setCount) => {
     if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
       setSearch("");
       setUsers([]);
@@ -66,7 +66,7 @@ export default function SearchBar({count}) {
 
   return (
     <>
-      {showNotifications && <Notifications setShowNotifications={setShowNotifications} />}
+      {showNotifications && <Notifications setShowNotifications={setShowNotifications} socket={socket} />}
       <div className="fixed top-0 left-16 right-0 h-16 glass z-50">
         <div ref={searchContainerRef} className="container h-full flex items-center justify-center gap-4">
           <div className="relative max-w-md w-full">
@@ -119,7 +119,7 @@ export default function SearchBar({count}) {
             )}
           </div>
 
-          <Button variant="ghost" size="icon" className="relative hover:bg-secondary" onClick={() => { setShowNotifications(true) }} >
+          <Button variant="ghost" size="icon" className="relative hover:bg-secondary" onClick={() => {setShowNotifications(true); socket.send(JSON.stringify({"readed": true})); setCount(0) }} >
           <Bell className="h-8 w-8" />
           {
             count > 0 && (
