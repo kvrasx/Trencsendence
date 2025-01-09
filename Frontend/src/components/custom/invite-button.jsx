@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 
 export default function InviteButton({ user_id, type, defaultStatus, ...props }) {
-    
+
     const [status, setStatus] = useState(defaultStatus);
 
 
@@ -14,7 +14,11 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
             try {
                 const response = await get(`/invitation-status/${type}/${user_id}`);
                 console.log("invite button", response);
-                setStatus(`${type} Invite ${response.status}`);
+                if (response.status === "blocked") {
+                    setStatus("Unblock User");
+                } else {
+                    setStatus(`${type} Invite ${response.status}`);
+                }
             } catch (e) {
                 if (e.response && e.response.status === 404) {
                     setStatus(defaultStatus);
@@ -28,12 +32,20 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
 
     const sendInvite = async (target) => {
         try {
-            let res = await post('/invite/', {
-                "user1": target,
-                "type": type
-            });
-            console.log(res);
-            setStatus(`${type} Invite Pending`); // type will be capitalized by tailwind classname
+            if (status === "Unblock User") {
+                await post('/deblockFriend/', {
+                    "user1": target,
+                    "type": "friend"
+                });
+                setStatus(`${type} Invite Accepted`); // type will be capitalized by tailwind classname
+            } else {
+                await post('/invite/', {
+                    "user1": target,
+                    "type": type
+                });
+                setStatus(`${type} Invite Pending`); // type will be capitalized by tailwind classname
+            }
+
             toast.success(type.charAt(0).toUpperCase() + type.slice(1) + " request sent successfully!");
         } catch (e) {
             console.log(e);
@@ -44,7 +56,7 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
 
 
     return (
-        <Button onClick={() => sendInvite(user_id)} variant="outline" {...props} disabled={status !== defaultStatus}>
+        <Button onClick={() => sendInvite(user_id)} variant="outline" {...props} disabled={status !== defaultStatus && status !== "Unblock User"}>
             {type === "game" ? <Swords /> : <UserPlus />} {status}
         </Button>
     )

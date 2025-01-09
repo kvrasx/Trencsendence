@@ -24,13 +24,34 @@ export function Chat() {
     const isWsOpened = useRef(false);
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef(null);
-
+    
+    const fetchChats = async () => {
+        try {
+            const res = await get('/getChats/');
+            const chatPromises = res.map(async (chat) => {
+                const userRes = await get(`/api/user/get-info?user_id=${chat.user2}`);
+                chat.user2 = userRes;
+                return chat;
+            });
+    
+            const cchats = await Promise.all(chatPromises);
+            setChats(cchats);
+            cchats.length !== 0 ? setCurrentChat(cchats[0]) : setCurrentChat("nothing");
+    
+        } catch (error) {
+            console.log('Error fetching chats:', error);
+            toast.error("Failed to load chats. Please try again.")
+        }
+    };
+    
     const blockUser = async(target) => {
         try {
             await post('/blockFriend/', {
-                "user2": target.id
+                "user1": target.id,
+                "type": "friend"
             })
             toast.success("You have successfully blocked " + target.username + ".");
+            fetchChats();
         } catch (e) {
             console.log(e);
             toast.error("Failed to block " + target.username + ". Please try again.");
@@ -52,24 +73,6 @@ export function Chat() {
 
 
     useEffect(() => {
-        const fetchChats = async () => {
-            try {
-                const res = await get('/getChats/');
-                const chatPromises = res.map(async (chat) => {
-                    const userRes = await get(`/api/user/get-info?user_id=${chat.user2}`);
-                    chat.user2 = userRes;
-                    return chat;
-                });
-
-                const cchats = await Promise.all(chatPromises);
-                setChats(cchats);
-                cchats.length !== 0 ? setCurrentChat(cchats[0]) : setCurrentChat("nothing");
-
-            } catch (error) {
-                console.log('Error fetching chats:', error);
-                toast.error("Failed to load chats. Please try again.")
-            }
-        };
 
         fetchChats();
     }, []);
