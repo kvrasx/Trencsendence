@@ -33,3 +33,9 @@ class Message(models.Model):
     
     def formatted_sent_at(self):
         return self.sent_at.strftime('%Y-%m-%d %H:%M:%S')
+
+
+class NotifCountmodel(models.Model):
+    # user_id = models.ForeignKey(Invitations, on_delete=models.CASCADE)
+    user_id = models.IntegerField()
+    count = models.IntegerField()

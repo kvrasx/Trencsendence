@@ -1,4 +1,5 @@
 from django.urls import path, include
+from .views import getMessages,getChats,inviteFriend,getNotifications,acceptFriend,blockFriend,deblockFriend,declineFriend, isValidMatch
 from .views import getMessages,getChats,inviteFriend,getNotifications,acceptFriend,blockFriend,deblockFriend,declineFriend,invitationStatus
 from .consumers import ChatConsumer
 
@@ -12,5 +13,7 @@ urlpatterns = [
     path('getNotifications/', getNotifications),
     path('getChats/', getChats),
     path('getMessages/<int:chat>', getMessages),
+
+    path('check-match/<int:matchId>', isValidMatch),
     path('invitation-status/<str:type>/<int:target>', invitationStatus),
 ]
