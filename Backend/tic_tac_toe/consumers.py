@@ -76,30 +76,35 @@ class GameConsumer(AsyncWebsocketConsumer):
         if self.scope['url_route']['kwargs']['room_name'] == 'random':
             await self.add_player_to_lobby()
         else:
-            try:
-                inviteId = self.scope['url_route']['kwargs']['room_name']
-            except:
-                await self.accept()
-                await self.close(code=4007)
-                return
-            invite = get_object_or_404(Invitations, id=inviteId)
-            if invite.user1.id != user.id or invite.user2.id != user.id or invite.status != "accepted":
-                await self.accept()
-                await self.close(code=4006)
-                return
-            self.room_group_name = f"xo_{inviteId}"
-            await self.channel_layer.group_add(
-                self.room_group_name,
-                self.channel_name
-            )
+            await self.accept()
+            await self.close(code=4007)
+            return
 
-            if self.room_group_name not in self.matchs:
-                self.matchs[ self.room_group_name ].append(self.user_id)
-            else:
-                self.matchs[ self.room_group_name ] = [ self.user_id ]
+        # else:
+        #     try:
+        #         inviteId = self.scope['url_route']['kwargs']['room_name']
+        #     except:
+        #         await self.accept()
+        #         await self.close(code=4007)
+        #         return
+        #     invite = get_object_or_404(Invitations, id=inviteId)
+        #     if invite.user1.id != user.id or invite.user2.id != user.id or invite.status != "accepted":
+        #         await self.accept()
+        #         await self.close(code=4006)
+        #         return
+        #     self.room_group_name = f"xo_{inviteId}"
+        #     await self.channel_layer.group_add(
+        #         self.room_group_name,
+        #         self.channel_name
+        #     )
 
-            if (len(self.matchs[ self.room_group_name ]) == 2):
-                await self.game_started()
+        #     if self.room_group_name not in self.matchs:
+        #         self.matchs[ self.room_group_name ].append(self.user_id)
+        #     else:
+        #         self.matchs[ self.room_group_name ] = [ self.user_id ]
+
+        #     if (len(self.matchs[ self.room_group_name ]) == 2):
+        #         await self.game_started()
 
         current_players.add(self.user.id)
         print(current_players)
@@ -170,7 +175,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, close_code):
-        if close_code == 4008 or close_code == 4009:
+        if close_code == 4008 or close_code == 4009 or close_code == 4007:
             return
 
         try:
