@@ -107,15 +107,6 @@ class count(WebsocketConsumer):
             query.count = 0
             query.save()
             self.send(text_data=json.dumps({"count": 0}))
-            # async_to_sync(self.channel_layer.group_send)(
-            #     self.group_name,
-            #     {
-            #         "type": "update.count",
-            #         "message": 0
-            #     }
-            # )
-
-        return
 
     def disconnect(self, close_code):
         if hasattr(self, "group_name"):
@@ -124,3 +115,32 @@ class count(WebsocketConsumer):
                 self.group_name,
                 self.channel_name
             )
+
+
+class onlineStatus(WebsocketConsumer):
+    online_users = {}
+
+    def connect(self):
+        self.user: User = self.scope["user"]
+        if self.user.is_anonymous:
+            self.accept()
+            self.close(code=4001, reason='Unauthorized')
+            return
+        
+        if self.user.id not in self.online_users:
+            self.online_users[self.user.id] = [ self.channel_name ]
+            self.user.online = True
+            self.user.save()
+        else:
+            self.online_users[self.user.id].append(self.channel_name)
+
+        self.accept()
+
+
+    def disconnect(self, close_code):
+        self.online_users[self.user.id].remove(self.channel_name)
+        print(self.online_users[self.user.id])
+        if len(self.online_users[self.user.id]) == 0:
+            del self.online_users[self.user.id]
+            self.user.online = False
+            self.user.save()

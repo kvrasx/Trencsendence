@@ -11,6 +11,7 @@ export const Layout = ({ children }) => {
   
   const token = Cookies.get('access_token');
   const socket = new WebSocket(`ws://127.0.0.1:8000/ws/?token=${token}`);
+  const onlineStatusSocket = new WebSocket(`ws://127.0.0.1:8000/ws/online/?token=${token}`);
   useEffect(() => {
 
     socket.onopen = () => {

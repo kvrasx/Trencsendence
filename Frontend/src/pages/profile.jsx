@@ -74,7 +74,7 @@ export default function Profile({ user, setUser }) {
 
                 <span className='mt-16 flex flex-col items-center'>
                     <h1 className="text-2xl font-bold">{user.username}</h1>
-                    <p className="text-muted-foreground">{user?.isOnline ? "online" : "offline"}</p>
+                    <p className="text-muted-foreground">{user?.online ? "online" : "offline"}</p>
                 </span>
             </div>
 
