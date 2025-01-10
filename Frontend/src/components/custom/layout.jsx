@@ -3,19 +3,18 @@ import { ToastContainer } from 'react-toastify';
 import SearchBar from "./searchbar";
 import { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
-
+import connect_websocket from "@/lib/connect_websocket";
 
 
 export const Layout = ({ children }) => {
   const [count, setCount] = useState(0);
   
-  const token = Cookies.get('access_token');
-  const socket = new WebSocket(`ws://127.0.0.1:8000/ws/?token=${token}`);
-  const onlineStatusSocket = new WebSocket(`ws://127.0.0.1:8000/ws/online/?token=${token}`);
+  const socket = connect_websocket('ws://127.0.0.1:8000/ws/');
+  const onlineStatusSocket = connect_websocket('ws://127.0.0.1:8000/ws/online/');
   useEffect(() => {
 
     socket.onopen = () => {
-      console.log('Connected to WebSocket server');
+      console.log('Connected to WebSocket server notifs');
     };
 
     socket.onmessage = (event) => {
@@ -23,13 +22,6 @@ export const Layout = ({ children }) => {
         console.log("--------->", data);
         setCount(data.count);
     };
-
-    socket.onerror = (e) => {
-      console.log("error");
-    }
-    socket.onclose = (e) => {
-      console.log("error");
-    }
 
     return () => {
       if (socket) {

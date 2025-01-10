@@ -32,7 +32,10 @@ function App() {
             setUser(storedUser);
           }
         } catch (e) {
-          // console.log(e);
+          
+          if (e === 401)
+            setUser(null);
+          
         } finally {
           setReady(true);
         }
