@@ -193,9 +193,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             pass
 
         # debug logging
-        print(f"Disconnected user: {self.player_username}")
-        print(f"Connected users: {self.connected_users}")
-        print(f"Matches: {list(self.matchs.keys())}")
+        # print(f"Disconnected user: {self.player_username}")
+        # print(f"Connected users: {self.connected_users}")
+        # print(f"Matches: {list(self.matchs.keys())}")
 
     async def game_started(self):
         print("sended start game to group")

@@ -100,6 +100,7 @@ class GameClient(AsyncWebsocketConsumer):
             await self.accept()
             await self.close(code=4008)
             return
+        print(self.user)
         if self.user.id in current_players:
             await self.accept()
             await self.close(code=4009)
@@ -127,16 +128,17 @@ class GameClient(AsyncWebsocketConsumer):
     async def disconnect(self, close_data):
         self.safe_operation("current_players.remove(self.user.id)")
         if hasattr(self, 'group_name'):
-            self.safe_operation("self.connected_sockets.remove(self.group_name)")
-            self.new_match.is_active = False
-            if self.new_match.ball.scoreLeft < 5 and self.new_match.ball.scoreRight < 5:
-                await self.channel_layer.group_send(
-                    self.new_match.group_name,
-                    {
-                        "type": "freee_match",
-                        "winner": self.new_match.player2 if self.new_match.player1["player_username"] == self.user.username else self.new_match.player1
-                    }
-                )
+            self.safe_operation("self.connected_sockets.remove(self.player)")
+            if hasattr(self, "new_match"):
+                self.new_match.is_active = False
+                if self.new_match.ball.scoreLeft < 5 and self.new_match.ball.scoreRight < 5:
+                    await self.channel_layer.group_send(
+                        self.new_match.group_name,
+                        {
+                            "type": "freee_match",
+                            "winner": self.new_match.player2 if self.new_match.player1["player_username"] == self.user.username else self.new_match.player1
+                        }
+                    )
             await self.channel_layer.group_discard(self.group_name, self.player["p"]["player_name"])
             self.safe_operation("del self.invite_matches[self.group_name]")
 
@@ -149,7 +151,6 @@ class GameClient(AsyncWebsocketConsumer):
         else:
             self.player["p"]['player_number'] = '1'
         self.connected_sockets.append(self.player)
-        print("df")
         if len(self.connected_sockets) == 2: # Running only by second player
             player1 = self.connected_sockets.pop(0)
             player2 = self.connected_sockets.pop(0)

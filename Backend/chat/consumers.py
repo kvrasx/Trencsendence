@@ -12,7 +12,7 @@ class ChatConsumer(WebsocketConsumer):
         user: User = self.scope["user"]
         if user.is_anonymous:
             self.accept()
-            self.close(code=4001, reason='Unauthorized')
+            self.close(code=4008, reason='Unauthorized')
             return
         self.accept()
         self.user_name = user.id
@@ -42,7 +42,7 @@ class ChatConsumer(WebsocketConsumer):
                 "sender_id": self.user_name,
             }
             serializer = MessageSerializer(data=full_data)
-            print(message)
+            # print(message)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
             else:
@@ -72,13 +72,13 @@ class count(WebsocketConsumer):
         user: User = self.scope["user"]
         if user.is_anonymous:
             self.accept()
-            self.close(code=4001, reason='Unauthorized')
+            self.close(code=4008, reason='Unauthorized')
             return
         else:
             self.accept()
             self.user_id = user.id
             self.group_name = f"user_{self.user_id}"
-            print("hada dyl lconsumer --> " + str(self.group_name))
+            # print("hada dyl lconsumer --> " + str(self.group_name))
             # self.group_name = "testgrp"
             async_to_sync(self.channel_layer.group_add)(
                 self.group_name, self.channel_name)
@@ -90,7 +90,7 @@ class count(WebsocketConsumer):
 
     def update_count(self, event):
         count = event["message"]
-        print(f"count ---->" + str(count))
+        # print(f"count ---->" + str(count))
         self.send(text_data=json.dumps({"count": count}))
         return
 
@@ -100,17 +100,16 @@ class count(WebsocketConsumer):
         try:
             query = NotifCountmodel.objects.get(Q(user_id=self.user_id))
         except Exception as e:
-            print(e)
+            # print(e)
             return
         if isReaded == True:
-            print("dddddddddd")
             query.count = 0
             query.save()
             self.send(text_data=json.dumps({"count": 0}))
 
     def disconnect(self, close_code):
         if hasattr(self, "group_name"):
-            print("disconnected: ", self.group_name)
+            # print("disconnected: ", self.group_name)
             async_to_sync(self.channel_layer.group_discard)(
                 self.group_name,
                 self.channel_name
@@ -124,7 +123,7 @@ class onlineStatus(WebsocketConsumer):
         self.user: User = self.scope["user"]
         if self.user.is_anonymous:
             self.accept()
-            self.close(code=4001, reason='Unauthorized')
+            self.close(code=4008, reason='Unauthorized')
             return
         
         if self.user.id not in self.online_users:
@@ -138,6 +137,8 @@ class onlineStatus(WebsocketConsumer):
 
 
     def disconnect(self, close_code):
+        if (close_code == 4008):
+            return
         self.online_users[self.user.id].remove(self.channel_name)
         print(self.online_users[self.user.id])
         if len(self.online_users[self.user.id]) == 0:

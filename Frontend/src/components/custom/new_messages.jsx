@@ -47,6 +47,8 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
                 setSocket(null);
             }
 
+            // onclose is missing
+
         };
 
 
