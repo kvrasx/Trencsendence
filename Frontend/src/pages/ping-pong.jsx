@@ -1,7 +1,5 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { Card } from "@/components/ui/card";
-import local from "@/assets/local.jpg"
-import remote from "@/assets/remote.jpg"
 import Spinner from "@/components/ui/spinner";
 import Cookies from 'js-cookie';
 import { RiWifiOffLine } from "react-icons/ri";
@@ -9,7 +7,12 @@ import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { GiTabletopPlayers } from "react-icons/gi";
 import PingPongGame from "../components/custom/ping-pong-game";
 import { BsEmojiSunglasses } from "react-icons/bs";
-import useWebSocket, {ReadyState} from "react-use-websocket";
+import useWebSocket from "react-use-websocket";
+import Canvas from "../components/custom/localgame";
+
+
+
+
 
 export default function PingPong({waitingstate, id=null}) {
     const token = Cookies.get('access_token');
@@ -27,15 +30,17 @@ export default function PingPong({waitingstate, id=null}) {
     const [winner, setWinner] = useState(null);
     const [finish, setFinish] = useState(false);
     const [score, setScore] = useState(null);
+    const [local, setLocal] = useState(null);
+    const [countdownValue, setCountdownValue] = useState(5);
  
 
+    
     useEffect(() => {
         if (!waiting) return;
 
         try {
             if (lastMessage != null) {
                 const data = JSON.parse(lastMessage.data);
-                // console.log(data);
                 if (data && data.type) {
                     if (data.type === 'game_started')
                         setStarted(true);
@@ -44,7 +49,6 @@ export default function PingPong({waitingstate, id=null}) {
                         setWinner(data.winner);
                         setScore(data.score)
                         setFinish(true);
-                        console.log(score);
 
                     }
                     else if (data.type === "freee_match"){
@@ -68,6 +72,21 @@ export default function PingPong({waitingstate, id=null}) {
         setWaiting(true);
     }
 
+    
+    const handdleLocal = () => {
+        setLocal(true);
+        let countdown = 5;
+    
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            setCountdownValue(countdown); // Update the state for countdown
+      
+            if (countdown === 0) {
+              clearInterval(countdownInterval);
+              setStarted(true);
+            }
+          }, 1000); 
+    }
     return (
 
         <>
@@ -75,15 +94,17 @@ export default function PingPong({waitingstate, id=null}) {
 
                 <div className="p-5 flex-1 glass flex flex-row justify-center items-center h-[50vh] space-x-16">
 
-                    {!waiting ? (
+                    {!local ? (
 
-                        <>
+                        !waiting ? (
+                            
+                            <>
                             <div className='inline space-y-4 space-x-'>
                                 <div className='border-y-2 border-white border-opacity-40 rounded-lg white w-72 h-80 flex justify-center items-center'>
                                     <RiWifiOffLine className='size-44 animate-pulse' />
                                 </div>
                                 <div className='flex justify-center items-center'>
-                                    <button className='border-y-4 border-red-700 w-48 h-14 rounded-lg text-2xl hover:border-y-4 hover:border-blue-600 '>
+                                    <button onClick={handdleLocal} className='border-y-4 border-red-700 w-48 h-14 rounded-lg text-2xl hover:border-y-4 hover:border-blue-600 '>
                                         local mode
                                     </button>
                                 </div>
@@ -100,7 +121,7 @@ export default function PingPong({waitingstate, id=null}) {
                             </div>
                         </>
                     ) : (
-
+                        
                         started ? (
                             finish ?(
                                 <div className="border rounded-lg w-1/2 h-1/2 p-2 bg-violet-500 bg-opacity-20">
@@ -109,7 +130,11 @@ export default function PingPong({waitingstate, id=null}) {
                                     <div className="flex justify-center items-center  w-full h-52  animate-bounc text-amber-300 animate-bounce"><BsEmojiSunglasses className="size-32"/></div>
                                 </div>
                             ):(
-                                <PingPongGame sendMessage={sendMessage} lastMessage={lastMessage} readyState={readyState} />
+                                !start ?(
+                                    <div ><p className="text-[70px] animate-ping text-ring">{countdownValue}</p></div>
+                                ):(    
+                                    <PingPongGame sendMessage={sendMessage} lastMessage={lastMessage} readyState={readyState} />
+                                )
                             )
                         ) : (
 
@@ -121,10 +146,18 @@ export default function PingPong({waitingstate, id=null}) {
                                 
                             </div>
                         )
+                        
+                    )
 
+                    ):(
+                        !started ?(
+                            <div ><p className="text-[70px] animate-ping text-ring">{countdownValue}</p></div>
+                        ):(    
+                            <Canvas/>
+                        )
                     )}
-
-                </div>
+                        
+                        </div>
 
 
 
