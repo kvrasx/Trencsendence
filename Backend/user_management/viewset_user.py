@@ -60,7 +60,9 @@ class UserTableViewSet:
             except:
                 raise ValidationError({'error': 'Invalid user_id.'})
         else:
-            return Response(UserSerializer(instance=request.user).data)
+            data = UserSerializer(instance=request.user).data
+            data["online"] = True
+            return Response(data, status=200)
         user = get_object_or_404(User, id=userId)
         serializer = UserSerializer(instance=user)
         return Response(serializer.data)

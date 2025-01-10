@@ -56,7 +56,7 @@ class ChatConsumer(WebsocketConsumer):
                 }
             )
         except Exception as e:
-            print(f"debug: {e}")
+            # print(f"debug: {e}")
             return
 
     def chat_message(self, event):
@@ -140,7 +140,7 @@ class onlineStatus(WebsocketConsumer):
         if (close_code == 4008):
             return
         self.online_users[self.user.id].remove(self.channel_name)
-        print(self.online_users[self.user.id])
+        # print(self.online_users[self.user.id])
         if len(self.online_users[self.user.id]) == 0:
             del self.online_users[self.user.id]
             self.user.online = False
