@@ -2,6 +2,7 @@ import { useState, useContext, useEffect, useRef } from "react";
 import { get } from "@/lib/ft_axios";
 import Message from "@/components/ui/message";
 import Cookies from 'js-cookie';
+import connect_websocket from "@/lib/connect_websocket";
 
 export default function NewMessages({ currentChat, user, socket, setSocket, isWsOpened, messagesEndRef }) {
     const formatDate = (timestamp) => {
@@ -22,8 +23,14 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
     useEffect(() => {
         if ((isWsOpened.current && socket) || !currentChat)
             return;
-        const token = Cookies.get('access_token');
-        const newsocket = new WebSocket(`ws://localhost:8000/ws/chat/${currentChat.chat_id}/?token=${token}`);
+
+        const newsocket = connect_websocket(`ws://localhost:8000/ws/chat/${currentChat.chat_id}/`, () => {
+            if (isWsOpened.current) {
+                console.log("reconnecting to the websocket after an error now..");
+                isWsOpened.current = false;
+                setSocket(null);
+            }
+        });
 
         newsocket.onopen = () => {
             setNewMessages([]);
@@ -38,17 +45,6 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
 
             setNewMessages((prevMessages) => [...prevMessages, receivedMessage.message]);
         };
-
-        newsocket.onerror = (_) => {
-            // console.log("A websocket error has happened");
-            if (isWsOpened.current) {
-                console.log("reconnecting to the websocket after an error now..");
-                isWsOpened.current = false;
-                setSocket(null);
-            }
-
-        };
-
 
         return () => {
             newsocket.close();

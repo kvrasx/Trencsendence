@@ -12,7 +12,7 @@ export default function OtherProfile({myId}) {
 
     const { id } = useParams();
     
-    if (id == myId)        
+    if (id == myId)
         return <Navigate to="/profile" />
         
     const [user, setUser] = useState(null);
@@ -36,19 +36,16 @@ export default function OtherProfile({myId}) {
         getUser();
     }, [id]);
 
-    if (error404) {
-        return <Error404 />
-    }
 
     return (
         <>
-            {user ? (
+            {!error404 ? (user ? (
                 <Profile user={user} setUser={null} />
             ) : (
                 <div className="flex justify-center items-center">
                     <Spinner w="16" h="16" />
                 </div>
-            )}
+            )) : <Error404 />}
             {/* <ToastContainer pauseOnFocusLoss={false} theme="dark" position="bottom-right" autoClose={1000} /> */}
         </>
     )

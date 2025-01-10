@@ -23,7 +23,7 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-async function refreshAuthToken() {
+export async function refreshAuthToken() {
   try {
     const response = await axios.get('http://localhost:8000/api/auth/refresh', {
       withCredentials: true,
@@ -32,8 +32,8 @@ async function refreshAuthToken() {
       throw Error
     axiosInstance.defaults.headers['Authorization'] = `Bearer ${Cookies.get('access_token')}`;
   } catch (error) {
-    toast.error("You are not authorized.")
-    window.location.href = '/logout';
+    // toast.error(error?.response?.data?.error ?? "You are not authorized.");
+    throw Error(401);
   }
 }
 

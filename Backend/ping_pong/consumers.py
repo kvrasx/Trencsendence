@@ -89,6 +89,7 @@ class GameClient(AsyncWebsocketConsumer):
             await self.accept()
             await self.close(code=4008)
             return
+        print(self.user)
         if self.user.id in current_players:
             await self.accept()
             await self.close(code=4009)
@@ -110,14 +111,17 @@ class GameClient(AsyncWebsocketConsumer):
             await self.invite_mode()
                 
         current_players.add(self.user.id)
+        print(current_players)
         await self.accept()
 
 
-    async def disconnect(self, close_data):
+    async def disconnect(self, close_code):
+        if close_code == 4008 or close_code == 4009:
+            return
         self.safe_operation("current_players.remove(self.user.id)")
         if hasattr(self, 'group_name'):
             self.safe_operation("self.connected_sockets.remove(self.player)")
-            try:
+            if hasattr(self, "new_match"):
                 self.new_match.is_active = False
                 if self.new_match.ball.scoreLeft < 5 and self.new_match.ball.scoreRight < 5:
                     await self.channel_layer.group_send(
@@ -126,9 +130,7 @@ class GameClient(AsyncWebsocketConsumer):
                             "type": "freee_match",
                             "winner": self.new_match.player2 if self.new_match.player1["player_username"] == self.user.username else self.new_match.player1
                         }
-                        )
-            except:
-                pass
+                    )
             await self.channel_layer.group_discard(self.group_name, self.player["p"]["player_name"])
             self.safe_operation("del self.invite_matches[self.group_name]")
 
@@ -141,7 +143,6 @@ class GameClient(AsyncWebsocketConsumer):
         else:
             self.player["p"]['player_number'] = '1'
         self.connected_sockets.append(self.player)
-        print("df")
         if len(self.connected_sockets) == 2: # Running only by second player
             player1 = self.connected_sockets.pop(0)
             player2 = self.connected_sockets.pop(0)

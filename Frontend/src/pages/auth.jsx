@@ -32,7 +32,6 @@ export default function Auth({ setUser }) {
       if (res.status === 200) {
         toast.success("You've logged in successfully!");
         if (res.data.user) {
-          localStorage.setItem('user', JSON.stringify(res.data.user));
           setUser(res.data.user);
         }
       }
@@ -69,7 +68,6 @@ export default function Auth({ setUser }) {
       setIsSignup(false);
 
       if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
         setUser(response.data.user);
       }
     } catch (err) {

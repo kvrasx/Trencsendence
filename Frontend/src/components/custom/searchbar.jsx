@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Search, User, Bell } from "lucide-react";
+import { Search, User, Bell, BellDot } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { get } from '@/lib/ft_axios';
 import { Link } from "react-router-dom";
@@ -17,7 +17,7 @@ function debounce(func, delay) {
   };
 }
 
-export default function SearchBar() {
+export default function SearchBar({count, socket, setCount}) {
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +50,7 @@ export default function SearchBar() {
     debouncedSearch(query);
   };
 
-  const handleClickOutside = (event) => {
+  const handleClickOutside = (event, setCount) => {
     if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
       setSearch("");
       setUsers([]);
@@ -66,7 +66,7 @@ export default function SearchBar() {
 
   return (
     <>
-      {showNotifications && <Notifications setShowNotifications={setShowNotifications} />}
+      {showNotifications && <Notifications setShowNotifications={setShowNotifications} socket={socket} />}
       <div className="fixed top-0 left-16 right-0 h-16 glass z-50">
         <div ref={searchContainerRef} className="container h-full flex items-center justify-center gap-4">
           <div className="relative max-w-md w-full">
@@ -118,13 +118,18 @@ export default function SearchBar() {
               </div>
             )}
           </div>
-          {/* <Link to="/notifications"> */}
-          <Button variant="ghost" size="icon" className="relative hover:bg-secondary" onClick={() => { setShowNotifications(true) }} >
-            <Bell className=" " />
-            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary text-xs flex items-center justify-center">
-              
-            </span>
+
+          <Button variant="ghost" size="icon" className="relative hover:bg-secondary" onClick={() => {setShowNotifications(true); socket.send(JSON.stringify({"readed": true})); setCount(0) }} >
+          <Bell className="h-8 w-8" />
+          {
+            count > 0 && (
+              <span className="absolute -top-0 -right-0 h-4 w-4 rounded-full bg-red-600 text-xs flex items-center justify-center">
+                {count > 99 ? '99+' : count}
+              </span>
+            )
+          }
           </Button>
+
         </div>
       </div>
     </>

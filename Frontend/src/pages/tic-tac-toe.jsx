@@ -5,6 +5,7 @@ import remote from "@/assets/remote.jpg"
 import Spinner from "@/components/ui/spinner";
 import {Button} from "@/components/ui/button";
 import Cookies from 'js-cookie';
+import connect_websocket from "../lib/connect_websocket";
 
 export function TicTacToe() {
 
@@ -20,27 +21,17 @@ export function TicTacToe() {
         if (!waiting)
             return;
 
-        const token = Cookies.get('access_token');
-        const newSocket = new WebSocket(`ws://localhost:8000/ws/game/random/?token=${token}`);
+        const newSocket = connect_websocket('ws://localhost:8000/ws/game/random/', () => {
+            setWaiting(false);
+            setStarted(false);
+            setSocket(null);
+        });
+
         newSocket.onopen = () => {
             console.log('WebSocket connection established');
             setSocket(newSocket);
         };
-        newSocket.onerror = (error) => {
-            console.log('WebSocket error:', error);
-        };
-        newSocket.onclose = (event) => {
-            console.log('WebSocket connection closed', event.code);
-            if (event.code == 4008)
-                console.log('Not authorized.');
-            else if (event.code == 4009) {
-                setWaiting(false);
-                console.log('User already in another game');
-            }
-            else
-                console.log('WebSocket connection closed', event.code);
-            setSocket(null);
-        };
+       
         newSocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
 

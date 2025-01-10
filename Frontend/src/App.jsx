@@ -1,8 +1,7 @@
 import { Layout } from '@/components/custom/layout'
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { TicTacToe } from './pages/tic-tac-toe'
 import { Chat } from './pages/chat'
-import { Notifications } from './pages/notifications'
 import { Leaderboard } from './pages/leaderboard'
 import Error404 from './pages/error404';
 import Profile from './pages/profile';
@@ -11,14 +10,12 @@ import { createContext, useState, useEffect } from 'react';
 import { UserContext } from '@/contexts'
 import Logout from './pages/logout';
 import Spinner from '@/components/ui/spinner';
-import Cookies from 'js-cookie';
 import { get } from '@/lib/ft_axios';
-import OAuthHandle from './pages/oauth';
 import OtherProfile from './pages/other-profile';
-import { ToastContainer } from 'react-toastify';
 import PingPong from './pages/ping-pong';
 import InvitePingPong from './pages/invite-ping-pong';
 
+import { toast, ToastContainer } from 'react-toastify';
 
 function App() {
 
@@ -26,13 +23,23 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const starting = () => {
-      let storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        storedUser = JSON.parse(storedUser);
-        setUser(storedUser);
+
+    const starting = async () => {
+      if (!user) {
+        try {
+          const storedUser = await get('/api/user/get-info');
+          if (storedUser) {
+            setUser(storedUser);
+          }
+        } catch (e) {
+          
+          if (e === 401)
+            setUser(null);
+          
+        } finally {
+          setReady(true);
+        }
       }
-      setReady(true);
     };
 
     starting();
@@ -59,7 +66,6 @@ function App() {
               <>
                 <Route path="/" element={<Auth setUser={setUser} />} />
                 <Route path="*" element={<Navigate to="/" />} />
-                <Route path="/oauth-callback" element={<OAuthHandle />} />
               </>
             )}
             <Route path="/logout" element={<Layout><Logout setUser={setUser} /></Layout>} />

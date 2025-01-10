@@ -36,7 +36,7 @@ export function DonutChart({wins, losses}) {
   return (
     <ChartContainer
     config={chartConfig}
-    className="mx-auto aspect-square h-full"
+    className=" aspect-square h-3/6"
   >
     <PieChart>
       <ChartTooltip
@@ -47,8 +47,8 @@ export function DonutChart({wins, losses}) {
         data={chartData}
         dataKey="value"
         nameKey="type"
-        innerRadius={60}
-        outerRadius={80}
+        innerRadius={55}
+        outerRadius={70}
         strokeWidth={5}
       >
         <Label

@@ -20,14 +20,14 @@ winningCombinations = [
 ];
 
 class MatchXO:
-    def __init__(self, player1, player2):
+    def __init__(self, player1: User, player2: User):
         self.player1 = player1
         self.player2 = player2
         self.roles = {
-            self.player1: "X",
-            self.player2: "O"
+            self.player1.id: "X",
+            self.player2.id: "O"
         }
-        self.turn = self.player1
+        self.turn = self.player1.id
         self.board = {}
         self.finished = False
         
@@ -41,71 +41,73 @@ class GameConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.room_group_name = None
-        self.player_username = None
         self.match = None
-        self.user_id = None
 
     async def add_player_to_lobby(self):
+        print(len(self.connected_users))
         if len(self.connected_users) == 0:
-            self.room_group_name = f"xo_{self.scope['url_route']['kwargs']['room_name']}_{self.user_id}"
-            self.connected_users.append(self.user_id)
+            self.room_group_name = f"xo_random_{self.user.id}"
+            self.connected_users.append(self.user)
             await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         else:
-            player1 = self.connected_users.pop(0)
-            if player1 == self.user_id:
+            player1: User = self.connected_users.pop(0)
+            if player1.id == self.user.id:
+                print("la ilaha ila lah")
                 self.connected_users.append(player1)
                 return
-            self.room_group_name = f"xo_{self.scope['url_route']['kwargs']['room_name']}_{player1}"
+            self.room_group_name = f"xo_random_{player1.id}"
             await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-            self.matchs[ self.room_group_name ] = MatchXO(player1, self.user_id)
+            self.matchs[ self.room_group_name ] = MatchXO(player1, self.user)
             await self.game_started()
 
 
     async def connect(self):
-        user: User = self.scope["user"]
-        if user.is_anonymous:
+        self.user: User = self.scope["user"]
+        if self.user.is_anonymous:
             await self.accept()
             await self.close(code=4008)
             return
         
-        self.user_id = user.id
-        
-        if user.id in current_players or user.username in self.connected_users:
+        if self.user.id in current_players:
             await self.accept()
             await self.close(code=4009)
             return
-        self.player_username = user.username
 
         if self.scope['url_route']['kwargs']['room_name'] == 'random':
-            print(self.scope['url_route']['kwargs']['room_name'])
             await self.add_player_to_lobby()
         else:
-            try:
-                inviteId = self.scope['url_route']['kwargs']['room_name']
-            except:
-                await self.accept()
-                await self.close(code=4007)
-                return
-            invite = get_object_or_404(Invitations, id=inviteId)
-            if invite.user1.id != user.id or invite.user2.id != user.id or invite.status != "accepted":
-                await self.accept()
-                await self.close(code=4006)
-                return
-            self.room_group_name = f"xo_{inviteId}"
-            await self.channel_layer.group_add(
-                self.room_group_name,
-                self.channel_name
-            )
+            await self.accept()
+            await self.close(code=4007)
+            return
 
-            if self.room_group_name not in self.matchs:
-                self.matchs[ self.room_group_name ].append(self.user_id)
-            else:
-                self.matchs[ self.room_group_name ] = [ self.user_id ]
+        # else:
+        #     try:
+        #         inviteId = self.scope['url_route']['kwargs']['room_name']
+        #     except:
+        #         await self.accept()
+        #         await self.close(code=4007)
+        #         return
+        #     invite = get_object_or_404(Invitations, id=inviteId)
+        #     if invite.user1.id != user.id or invite.user2.id != user.id or invite.status != "accepted":
+        #         await self.accept()
+        #         await self.close(code=4006)
+        #         return
+        #     self.room_group_name = f"xo_{inviteId}"
+        #     await self.channel_layer.group_add(
+        #         self.room_group_name,
+        #         self.channel_name
+        #     )
 
-            if (len(self.matchs[ self.room_group_name ]) == 2):
-                await self.game_started()
+        #     if self.room_group_name not in self.matchs:
+        #         self.matchs[ self.room_group_name ].append(self.user_id)
+        #     else:
+        #         self.matchs[ self.room_group_name ] = [ self.user_id ]
 
-        current_players.add(user.id)
+        #     if (len(self.matchs[ self.room_group_name ]) == 2):
+        #         await self.game_started()
+
+        current_players.add(self.user.id)
+        print(current_players)
         await self.accept()
         
 
@@ -114,13 +116,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         if self.match is None or self.match.finished:
             return
         data = json.loads(text_data)
+        print(self.match.roles, self.match.turn, self.user.id)
         if data.get("action") == "move":
-            if self.match.roles[self.player_username] != data.get("symbol") or self.match.turn != self.player_username:
+            if self.match.roles[self.user.id] != data.get("symbol") or self.match.turn != self.user.id:
                 return
             if data.get("cellId") in self.match.board:
                 return
             self.match.board[data.get("cellId")] = data.get("symbol")
-            self.match.turn = self.match.player1 if self.match.turn == self.match.player2 else self.match.player2
+            self.match.turn = self.match.player1.id if self.match.turn == self.match.player2.id else self.match.player2.id
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -133,11 +136,11 @@ class GameConsumer(AsyncWebsocketConsumer):
             )
             if self.check_winner():
                 self.match.finished = True
-                MatchTableViewSet.createMatchEntry({
+                await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                     "game_type": 2,
-                    "winner": self.user_id if self.match.turn == self.player_username else self.match.player1,
-                    "loser": self.match.player1 if self.match.player2 == self.match.turn else self.match.player2,
-                    "score": f"01:00"
+                    "winner": self.user.id,
+                    "loser": self.match.player1.id if self.match.player2.id == self.user.id else self.match.player2.id,
+                    "score": "01:00"
                 })
                 await self.channel_layer.group_send(
                     self.room_group_name,
@@ -146,8 +149,8 @@ class GameConsumer(AsyncWebsocketConsumer):
                         "message": {
                             "action": "game_over",
                             "status": "finished",
-                            "winner": self.player_username,
-                            "loser": self.match.player1 if self.match.player2 == self.player_username else self.match.player2
+                            "winner": self.user.username,
+                            "loser": self.match.player1.username if self.match.player2.id == self.user.id else self.match.player2.username
                         }
                     }
                 )
@@ -156,9 +159,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.match.board = {}
                 
                 # Reset the turn to the starting player
-                self.match.turn = self.match.player1 if self.match.turn == self.match.player2 else self.match.player2
-                print(self.match.roles)
-                print(self.match.turn)
+                self.match.turn = self.match.player1.id if self.match.turn == self.match.player2.id else self.match.player2.id
                 
                 await self.channel_layer.group_send(
                     self.room_group_name,
@@ -174,10 +175,17 @@ class GameConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, close_code):
-        
+        if close_code == 4008 or close_code == 4009 or close_code == 4007:
+            return
+
+        try:
+            current_players.remove(self.user.id)
+        except:
+            pass
+
         # remove the user from connected users if present
-        if self.player_username and self.player_username in self.connected_users:
-            self.connected_users.remove(self.player_username)
+        if self.user and self.user in self.connected_users:
+            self.connected_users.remove(self.user)
         
         # remove the match associated with this room group
         if self.room_group_name and self.room_group_name in self.matchs:
@@ -187,16 +195,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         if self.room_group_name:
             await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         
-        try:
-            current_players.remove(self.user_id)
-        except:
-            pass
-
-        # debug logging
-        print(f"Disconnected user: {self.player_username}")
-        print(f"Connected users: {self.connected_users}")
-        print(f"Matches: {list(self.matchs.keys())}")
-
+        
     async def game_started(self):
         print("sended start game to group")
         await self.channel_layer.group_send(
@@ -218,6 +217,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         ))
 
     async def start_group_match(self, event):
+        print("grp name :" , self.room_group_name)
         self.match = self.matchs[self.room_group_name]
         await self.send(text_data=json.dumps({
             "action": "game_start"
@@ -225,6 +225,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         await self.send(text_data=json.dumps({
             "action": "assign_symbol",
-            "symbol": self.match.roles[self.player_username]
+            "symbol": self.match.roles[self.user.id]
         }))
                 

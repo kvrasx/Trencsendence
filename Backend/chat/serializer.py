@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Invitations,Message
+from .models import Invitations,Message, NotifCountmodel
 
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,7 +14,7 @@ class InviteFriendSerializer(serializers.ModelSerializer):
 class GlobalFriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Invitations
-        fields = ['user1', 'type', 'friendship_id']
+        fields = ['user1', 'type', 'friendship_id', 'status']
 
 # class ChatsSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -38,5 +38,8 @@ class ChatsSerializer(serializers.ModelSerializer):
 
     def get_chat_id(self, obj):
         return obj.friendship_id
-
-
+    
+class NotifCount(serializers.ModelSerializer):
+    class Meta:
+        model = NotifCountmodel
+        fields = ['user_id', 'count']
