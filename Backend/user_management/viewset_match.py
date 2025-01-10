@@ -52,6 +52,8 @@ class MatchTableViewSet:
     @permission_classes([IsAuthenticated])
     def getAllMatchEntries(request): # todo: add filtering
         user_id = request.GET.get('user_id')
+        if not user_id:
+            user_id = request.user.id
         winner = request.GET.get('winner')
         loser = request.GET.get('loser')
         query = Q()
@@ -62,7 +64,8 @@ class MatchTableViewSet:
         if loser:
             query &= Q(loser=loser)
         
-        matchs = Match.objects.filter(query)
+        matchs = Match.objects.filter(query).order_by('-match_date')
+
         serializer = MatchSerializer(instance=matchs, many=True)
         return Response(serializer.data)
 

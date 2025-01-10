@@ -47,10 +47,15 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MatchSerializer(serializers.ModelSerializer):
+
+    winner = UserSerializer(read_only=True)
+    loser = UserSerializer(read_only=True)
+
     class Meta:
         model = Match
         fields = ['match_id', 'game_type', 'winner', 'loser', 'score', 'match_date']
         read_only_fields = ['match_id', 'match_date']
+    
 
     def create(self, validated_data):
         if validated_data.get('winner') == validated_data.get('loser'):

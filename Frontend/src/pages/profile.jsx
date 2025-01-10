@@ -5,18 +5,45 @@ import { Camera, UserPlus, Swords, MessageSquare } from 'lucide-react';
 import ProfileSettings from '@/components/custom/profile_settings';
 import CreateTournament from '@/components/custom/create_tournament';
 import defaultAvatar from '@/assets/profile.jpg';
-import { post } from '@/lib/ft_axios';
+import { post, get } from '@/lib/ft_axios';
 import { toast } from 'react-toastify';
 import banner from '@/assets/banner.jpeg';
 import { DonutChart } from '@/components/ui/donut-chart';
 import MultiLineChart from '@/components/ui/multiline-chart';
 import InviteButton from '../components/custom/invite-button';
 import { ProgressDemo } from '@/components/ui/progress'
+import { useEffect, useState } from 'react';
 
 export default function Profile({ user, setUser }) {
+    const [matches, setMatches] = useState(null);
+    const [matchesData, setMatchesData] = useState(null);
+
+    useEffect(() => {
+        const fetchMatches = async () => {
+            try {
+                let res = await get('/api/match/get-all');
+                setMatchesData({
+                    playedPong: res.filter(match => match.game_type === 1).length,
+                    playedXO: res.filter(match => match.game_type === 2).length,
+                    winsPong: res.filter(match => match.winner.username === user.username).length,
+                    lossesPong: res.filter(match => match.loser.username === user.username).length,
+                    goalsPong: res.reduce((acc, match) => acc + parseInt(match.score.split(':')[0]), 0),
+                    winsXO: res.filter(match => match.game_type === 2 && match.winner.username === user.username).length,
+                    lossesXO: res.filter(match => match.game_type === 2 && match.loser.username === user.username).length
+                })
+                console.log(res);
+                
+                setMatches(res);
+            } catch (e) {
+                console.log(e);
+                toast.error("Failed to fetch matches. Please try again.")
+            }
+        }
+        fetchMatches();
+    }, [])
 
     console.log(user);
-    
+
     const updateProfile = async (data, successMsg) => {
         let res = await post('/api/user/update', data, {
             'Content-Type': 'multipart/form-data',
@@ -97,9 +124,9 @@ export default function Profile({ user, setUser }) {
 
             </div>
 
-
+            {matchesData && matches && 
+            
             <div className="flex max-h-[50vh] flex-row justify-center min-w-full ">
-
 
                 <div className="grid md:grid-cols-2 md:grid-rows-2  gap-x-20 pt-7  gap-4 flex-1 ">
 
@@ -109,46 +136,49 @@ export default function Profile({ user, setUser }) {
                             <div className="flex flex-col flex-1 gap-2 text-lg font-bold">
                                 <div className="flex flex-row justify-center items-center gap-3">
                                     <span>Score</span>
-                                    <ProgressDemo value={user.score / 1000} className="" />
+                                    <ProgressDemo value={user.score} className="" />
                                     <span className='font-semibold text-sm'>{user.score}</span>
                                 </div>
                                 <div className="flex flex-row justify-center items-center gap-3 ">
                                     <span>Played/Pong</span>
-                                    <ProgressDemo value={84} className="" />
-                                    <span className='font-semibold text-sm'>500</span>
+                                    <ProgressDemo value={matchesData.playedPong} className="" />
+                                    <span className='font-semibold text-sm'>{matchesData.playedPong}</span>
                                 </div>
                                 <div className="flex flex-row justify-center items-center gap-3 ">
                                     <span>Wins/Pong</span>
-                                    <ProgressDemo value={84} className="" />
-                                    <span className='font-semibold text-sm'>500</span>
+                                    <ProgressDemo value={matchesData.winsPong} className="" />
+                                    <span className='font-semibold text-sm'>{matchesData.winsPong}</span>
                                 </div>
                                 <div className="flex flex-row justify-center items-center gap-3">
                                     <span>Losses/Pong</span>
-                                    <ProgressDemo value={33} className="" />
-                                    <span className='font-semibold text-sm'>14</span>
+                                    <ProgressDemo value={matchesData.lossesPong} className="" />
+                                    <span className='font-semibold text-sm'>{matchesData.lossesPong}</span>
                                 </div>
                                 <div className="flex flex-row justify-center items-center gap-3">
                                     <span>Goals/Pong</span>
-                                    <ProgressDemo value={55} className="" />
-                                    <span className='font-semibold text-sm'>331</span>
+                                    <ProgressDemo value={matchesData.goalsPong} className="" />
+                                    <span className='font-semibold text-sm'>{matchesData.goalsPong}</span>
+                                </div>
+                                <div className="flex flex-row justify-center items-center gap-3">
+                                    <span>Played/XO</span>
+                                    <ProgressDemo value={matchesData.playedXO} className="" />
+                                    <span className='font-semibold text-sm'>{matchesData.playedXO}</span>
                                 </div>
                                 <div className="flex flex-row justify-center items-center gap-3">
                                     <span>Wins/XO</span>
-                                    <ProgressDemo value={99} className="" />
-                                    <span className='font-semibold text-sm'>74</span>
+                                    <ProgressDemo value={matchesData.winsXO} className="" />
+                                    <span className='font-semibold text-sm'>{matchesData.winsXO}</span>
                                 </div>
-
                                 <div className="flex flex-row justify-center items-center gap-3">
                                     <span>Losses/XO</span>
-                                    <ProgressDemo value={12} className="" />
-                                    <span className='font-semibold text-sm'>68</span>
+                                    <ProgressDemo value={matchesData.lossesXO} className="" />
+                                    <span className='font-semibold text-sm'>{matchesData.lossesXO}</span>
                                 </div>
-
-                               
-
                             </div>
-
-                            <DonutChart wins={190} losses={55} />
+                            <DonutChart
+                                wins={matchesData.winsPong + matchesData.winsXO}
+                                losses={matchesData.lossesPong + matchesData.lossesXO}
+                            />
                         </div>
                     </div>
 
@@ -157,13 +187,13 @@ export default function Profile({ user, setUser }) {
                         <div className="">
                             <div className="-ml-8">
 
-                                <MultiLineChart className="" />
+                                <MultiLineChart matches={matches} />
                             </div>
                         </div>
 
                     </div>
 
-                    <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] overflow-y-auto themed-scrollbar flex-col flex gap-2">
+                    {/* <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none overflow-y-auto themed-scrollbar flex-col flex gap-2">
                         <h2 className="text-xl font-semibold text-gray-400">My Friends</h2>
                         <div className="space-y-3">
                             {Array.from({ length: 10 }).map((_, index) => (
@@ -187,11 +217,45 @@ export default function Profile({ user, setUser }) {
                                 </div>
                             ))}
                         </div>
+                    </div> */}
+
+
+                    <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none flex-initial overflow-y-auto themed-scrollbar flex-col flex gap-2">
+                        <h2 className="text-xl font-semibold text-gray-400">Last Matches</h2>
+                        <div className="space-y-3">
+                            {matches.map((match, index) => (
+                                <div
+                                    key={match.match_id}
+                                    className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
+                                >
+                                    <div>
+                                        <div className="font-medium">vs {user.id === match.winner.id ? match.loser.username : match.winner.username}</div>
+                                        <div className="text-sm text-muted-foreground">
+                                            {match.match_date}
+                                        </div>
+                                    </div>
+
+                                    {match.game_type === 1 && <div className="text-lg font-semibold">
+                                        {match.score.split(':').map(num => parseInt(num, 10)).join(' : ')}
+                                    </div>}
+
+                                    <span
+                                        className={`px-3 py-1 rounded-full text-sm font-medium ${match.winner.id === user.id
+                                            ? "bg-green-500/20 text-green-500"
+                                            : "bg-red-500/20 text-red-500"
+                                            }`}
+                                    >
+                                        {match.winner.id === user.id ? "Win" : "Loss"}
+                                    </span>
+                                </div>
+                            ))}
+
+                        </div>
                     </div>
 
 
-                    <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] flex-initial overflow-y-auto themed-scrollbar flex-col flex gap-2">
-                        <h2 className="text-xl font-semibold text-gray-400">Last Matches</h2>
+                    <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none flex-initial overflow-y-auto themed-scrollbar flex-col flex gap-2">
+                        <h2 className="text-xl font-semibold text-gray-400">Last Tournaments</h2>
                         <div className="space-y-3">
                             {Array.from({ length: 10 }).map((_, index) => (
                                 <div
@@ -220,7 +284,7 @@ export default function Profile({ user, setUser }) {
 
 
                 </div>
-            </div>
+            </div>}
 
 
         </div>

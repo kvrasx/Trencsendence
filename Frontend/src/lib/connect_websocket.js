@@ -10,7 +10,7 @@ export default function connect_websocket(url, closeOrError) {
     
     newSocket.onerror = (error) => {
         console.log('WebSocket error:', error);
-        closeOrError();
+        closeOrError && closeOrError();
     };
 
     newSocket.onclose = async (event) => {
@@ -29,9 +29,8 @@ export default function connect_websocket(url, closeOrError) {
         }
         else
             console.log('WebSocket connection closed', event.code);
-        
-            closeOrError();
-    };
+            closeOrError && closeOrError();
+        };
 
     return newSocket;
 
