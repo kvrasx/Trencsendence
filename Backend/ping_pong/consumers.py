@@ -122,10 +122,13 @@ class GameClient(AsyncWebsocketConsumer):
             await self.invite_mode()
                 
         current_players.add(self.user.id)
+        print(current_players)
         await self.accept()
 
 
-    async def disconnect(self, close_data):
+    async def disconnect(self, close_code):
+        if close_code == 4008 or close_code == 4009:
+            return
         self.safe_operation("current_players.remove(self.user.id)")
         if hasattr(self, 'group_name'):
             self.safe_operation("self.connected_sockets.remove(self.player)")

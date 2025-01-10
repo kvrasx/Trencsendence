@@ -25,10 +25,10 @@ export default function Profile({ user, setUser }) {
                 setMatchesData({
                     playedPong: res.filter(match => match.game_type === 1).length,
                     playedXO: res.filter(match => match.game_type === 2).length,
-                    winsPong: res.filter(match => match.winner.username === user.username).length,
+                    winsPong: res.filter(match => match.winner_user.username === user.username).length,
                     lossesPong: res.filter(match => match.loser.username === user.username).length,
                     goalsPong: res.reduce((acc, match) => acc + parseInt(match.score.split(':')[0]), 0),
-                    winsXO: res.filter(match => match.game_type === 2 && match.winner.username === user.username).length,
+                    winsXO: res.filter(match => match.game_type === 2 && match.winner_user.username === user.username).length,
                     lossesXO: res.filter(match => match.game_type === 2 && match.loser.username === user.username).length
                 })
                 console.log(res);
@@ -229,7 +229,7 @@ export default function Profile({ user, setUser }) {
                                     className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
                                 >
                                     <div>
-                                        <div className="font-medium">vs {user.id === match.winner.id ? match.loser.username : match.winner.username}</div>
+                                        <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser.username : match.winner_user.username}</div>
                                         <div className="text-sm text-muted-foreground">
                                             {match.match_date}
                                         </div>
@@ -240,12 +240,12 @@ export default function Profile({ user, setUser }) {
                                     </div>}
 
                                     <span
-                                        className={`px-3 py-1 rounded-full text-sm font-medium ${match.winner.id === user.id
+                                        className={`px-3 py-1 rounded-full text-sm font-medium ${match.winner_user.id === user.id
                                             ? "bg-green-500/20 text-green-500"
                                             : "bg-red-500/20 text-red-500"
                                             }`}
                                     >
-                                        {match.winner.id === user.id ? "Win" : "Loss"}
+                                        {match.winner_user.id === user.id ? "Win" : "Loss"}
                                     </span>
                                 </div>
                             ))}

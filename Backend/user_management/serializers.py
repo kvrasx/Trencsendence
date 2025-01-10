@@ -48,17 +48,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 class MatchSerializer(serializers.ModelSerializer):
 
-    winner = UserSerializer(read_only=True)
-    loser = UserSerializer(read_only=True)
+    winner_user = UserSerializer(source='winner', read_only=True)
+    loser_user = UserSerializer(source='loser', read_only=True)
 
     class Meta:
         model = Match
-        fields = ['match_id', 'game_type', 'winner', 'loser', 'score', 'match_date']
+        fields = ['match_id', 'game_type', 'winner', 'loser', 'score', 'winner_user', 'loser_user', 'match_date']
         read_only_fields = ['match_id', 'match_date']
     
 
     def create(self, validated_data):
         if validated_data.get('winner') == validated_data.get('loser'):
+            print(validated_data.get('winner'), validated_data.get('loser'))
             raise serializers.ValidationError("the winner and loser should not be the same.")
         instance = Match.objects.create(**validated_data)
         instance.save()
