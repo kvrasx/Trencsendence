@@ -85,7 +85,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                     :
                                     <RemoteGameComponent websocket={socket} setWinner={setWinner} />
                             ) : (
-                                <LocalGameComponent />
+                                <LocalGameComponent setWinner={setWinner} />
                             )) : (
 
                                 <div className="flex flex-col items-center justify-center">

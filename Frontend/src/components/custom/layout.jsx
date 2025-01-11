@@ -9,8 +9,8 @@ import connect_websocket from "@/lib/connect_websocket";
 export const Layout = ({ children }) => {
   const [count, setCount] = useState(0);
   
-  const socket = connect_websocket('ws://127.0.0.1:8000/ws/');
-  const onlineStatusSocket = connect_websocket('ws://127.0.0.1:8000/ws/online/');
+  const socket = connect_websocket('ws://127.0.0.1:8080/ws/');
+  const onlineStatusSocket = connect_websocket('ws://127.0.0.1:8080/ws/online/');
   useEffect(() => {
 
     socket.onopen = () => {

@@ -1,6 +1,6 @@
 ### Signing up / creating new user
 
-POST http://127.0.0.1:8000/api/user/create
+POST http://127.0.0.1:8080/api/user/create
 Content-Type: application/json
 
 {
@@ -11,7 +11,7 @@ Content-Type: application/json
 
 ###
 
-POST http://127.0.0.1:8000/api/user/create
+POST http://127.0.0.1:8080/api/user/create
 Content-Type: application/json
 
 {
@@ -22,7 +22,7 @@ Content-Type: application/json
 
 ###
 
-POST http://127.0.0.1:8000/api/auth/login
+POST http://127.0.0.1:8080/api/auth/login
 Content-Type: application/json
 
 {
@@ -33,7 +33,7 @@ Content-Type: application/json
 ###-----------------------------------------
 ### Updating user data
 
-POST http://127.0.0.1:8000/api/user/update
+POST http://127.0.0.1:8080/api/user/update
 Content-Type: application/json
 
 {
@@ -44,13 +44,13 @@ Content-Type: application/json
 ###-----------------------------------------
 ### Get all users
 
-GET http://127.0.0.1:8000/api/user/get-all
+GET http://127.0.0.1:8080/api/user/get-all
 Content-Type: application/json
 
 ###-----------------------------------------
 ### creating match entry
 
-POST http://127.0.0.1:8000/api/match/create
+POST http://127.0.0.1:8080/api/match/create
 Content-Type: application/json
 
 {
@@ -61,27 +61,27 @@ Content-Type: application/json
 }
 
 ###
-GET http://127.0.0.1:8000/api/match/get-all?winner=2
+GET http://127.0.0.1:8080/api/match/get-all?winner=2
 Content-Type: application/json
 
 ###
 
-GET http://127.0.0.1:8000/api/match/get-all?user_id=1
+GET http://127.0.0.1:8080/api/match/get-all?user_id=1
 Content-Type: application/json
 
 ###
 
-GET http://127.0.0.1:8000/api/match/get-all?loser=1
+GET http://127.0.0.1:8080/api/match/get-all?loser=1
 Content-Type: application/json
 
 ###
 
-GET http://127.0.0.1:8000/api/match/get-all?loser=2
+GET http://127.0.0.1:8080/api/match/get-all?loser=2
 Content-Type: application/json
 
 
 ###
-DELETE http://127.0.0.1:8000/api/match/delete?match_id=1
+DELETE http://127.0.0.1:8080/api/match/delete?match_id=1
 Content-Type: application/json
 
 {

@@ -95,3 +95,80 @@ export function TicTacToe({ websocket, setWinner }) {
 
     );
 }
+
+export function LocalTicTacToe({ setWinner }) {
+
+    const winningCombinations = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+    const [symbol, setSymbol] = useState("X");
+    const [board, setBoard] = useState({});
+
+    const checkWinning = (arr) => {
+        return winningCombinations.some((combination) => {
+            return combination.every((value) => arr.includes(value));
+        });
+    };
+
+    const handleCellClick = (event) => {
+
+        const cellId = Number(event.currentTarget.id);
+        if (board[cellId])
+            return ;
+
+
+        let updatedBoard = {...board};
+        updatedBoard[cellId] = symbol;
+        
+        setBoard(updatedBoard)
+        
+        let tmp = []
+        Object.keys(updatedBoard).forEach((key, index) => {
+            if (updatedBoard[key] === symbol) {
+                tmp.push(Number(key));
+            }
+        });
+
+        if (checkWinning(tmp))
+            setWinner(`Player using ${symbol}`);
+        else if (Object.keys(updatedBoard).length === 9)
+            setBoard({});
+
+        setSymbol((prev) => prev === "X" ? "O" : "X");
+
+    };
+
+    const renderBoard = () => {
+        const cells = [];
+        for (let i = 0; i < 9; i++) {
+            cells.push(
+                <div
+                    className="border border-white min-w-20 min-h-20 flex justify-center"
+                    id={`${i}`}
+                    key={i}
+                    onClick={handleCellClick}
+                >
+                    <span className="text-center flex justify-center items-center text-3xl">{board[i]}</span>
+                </div>
+            );
+        }
+        return cells;
+    };
+
+    return (
+        <>
+            <Card className="p-5 bg-transparent border-gray-500">
+                <div className="grid grid-cols-3 gap-5 m-auto w-full">{renderBoard()}</div>
+            </Card>           
+
+        </>
+
+    );
+}
