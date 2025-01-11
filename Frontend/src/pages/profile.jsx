@@ -193,32 +193,6 @@ export default function Profile({ user, setUser }) {
 
                     </div>
 
-                    {/* <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none overflow-y-auto themed-scrollbar flex-col flex gap-2">
-                        <h2 className="text-xl font-semibold text-gray-400">My Friends</h2>
-                        <div className="space-y-3">
-                            {Array.from({ length: 10 }).map((_, index) => (
-                                <div key={index} className="overflow-x-auto flex justify-between items-center p-4 rounded-lg glass hover:shadow-lg transition-shadow duration-300 space-x-4">
-                                    <div className="flex items-center gap-3 cursor-pointer">
-                                        <Avatar className="flex-none w-10 h-10">
-                                            <AvatarImage src={null} alt="user avatar" />
-                                            <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
-                                        </Avatar>
-                                        <span className="text-md font-medium">{"test"}</span>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Button variant="ghost" className="rounded-xl border border-gray-500 hover:bg-secondary px-2" size="lg">
-                                            <MessageSquare className="" />
-                                        </Button>
-                                        <Button variant="ghost" className="rounded-xl border border-gray-500  hover:bg-secondary px-3" size="lg">
-                                            <Swords className="w-6 h-6 mr-2" />
-                                            <span className='hidden md:block'>Challenge</span>
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div> */}
-
 
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none flex-initial overflow-y-auto themed-scrollbar flex-col flex gap-2">
                         <h2 className="text-xl font-semibold text-gray-400">Last Matches</h2>

@@ -3,9 +3,18 @@ import { Card } from "@/components/ui/card";
 import local from "@/assets/local.jpg"
 import remote from "@/assets/remote.jpg"
 import Spinner from "@/components/ui/spinner";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Cookies from 'js-cookie';
 import connect_websocket from "../lib/connect_websocket";
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Camera, UserPlus, Swords, MessageSquare } from 'lucide-react';
+import defaultAvatar from '@/assets/profile.jpg';
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs"
 
 export function TicTacToe() {
 
@@ -31,7 +40,7 @@ export function TicTacToe() {
             console.log('WebSocket connection established');
             setSocket(newSocket);
         };
-       
+
         newSocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
 
@@ -118,9 +127,9 @@ export function TicTacToe() {
 
     return (
         <>
-            <div className="flex gap-6">
+            <div className="flex gap-6 h-[50vh]">
 
-                <div className="p-5 flex-1 glass flex flex-row justify-center items-center h-[50vh]">
+                <div className="p-5 flex-1 glass flex flex-row justify-center items-center">
                     {!winner ? (
                         waiting ? (
                             started ? (
@@ -147,16 +156,103 @@ export function TicTacToe() {
                         <div className="flex flex-col items-center justify-center">
                             <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
                             <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner}</div>
-                                <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket.close(); setBoard({}) }}>
-                                    New Game
-                                </Button>
+                            <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket.close(); setBoard({}) }}>
+                                New Game
+                            </Button>
                         </div>
                     )}
                 </div>
 
 
-                <Card className="glass w-1/4 p-6 space-y-6">
-                    user info
+                <Card className="glass w-1/4 p-4 space-y-6 flex flex-col ">
+                    {started ? (
+                        <div className="flex flex-col gap-4">
+                            <h2 className="text-xl font-semibold text-center text-gray-400">Challenge Friends</h2>
+                            <div className="space-y-3 overflow-auto themed-scrollbar max-h-[45vh]">
+                                {Array.from({ length: 10 }).map((_, index) => (
+                                    <div key={index} className=" flex justify-between items-center p-3 rounded-lg border-secondary border hover:shadow-lg transition-shadow duration-300 space-x-4">
+                                        <div className="flex items-center gap-3 cursor-pointer">
+                                            <Avatar className="flex-none w-11 h-11">
+                                                <AvatarImage src={null} alt="user avatar" />
+                                                <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
+                                            </Avatar>
+                                            <span className="text-md font-medium">{"test"}</span>
+                                        </div>
+                                        <div className="flex gap-3">
+                                            <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
+                                                <MessageSquare className="" />
+                                            </Button>
+                                            <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
+                                                <Swords className="" />
+                                            </Button>
+
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-2">
+                                <h2 className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
+                                <div className="flex justify-between border border-gray-700 rounded-xl px-2 py-3">
+                                    <div className="flex flex-col items-center gap-3 cursor-pointer">
+                                        <Avatar className="flex-none w-16 h-16">
+                                            <AvatarImage src={null} alt="user avatar" />
+                                            <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
+                                        </Avatar>
+                                        <span className="text-md font-medium">{"ijaija"}</span>
+                                    </div>
+                                    <div className="text-center text-2xl font-bold text-gray-300 my-5">
+                                        vs
+                                    </div>
+                                    <div className="flex flex-col items-center gap-3 cursor-pointer">
+                                        <Avatar className="flex-none w-16 h-16">
+                                            <AvatarImage src={null} alt="user avatar" />
+                                            <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
+                                        </Avatar>
+                                        <span className="text-md font-medium">{"Ismail"}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div className="flex flex-col gap-2">
+
+                                <h3 className="text-md text-left font-semibold text-gray-300">Matches history</h3>
+                                <div className="space-y-3 w-full  overflow-auto themed-scrollbar">
+
+                                    {Array.from({ length: 5 }).map((_, index) => (
+                                        <div
+                                            key={index}
+                                            className={`flex items-center justify-between p-3 rounded-lg  ${1 === 1 ? 'glass' : 'bg-secondary'}`}
+                                        >
+                                            <div>
+                                                <div className="font-medium">vs {"sdfs"}</div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {"15/20/2025"}
+                                                </div>
+                                            </div>
+
+                                            {1 === 1 && <div className="text-lg font-semibold">
+                                                {"10:15".split(':').map(num => parseInt(num, 10)).join(' : ')}
+                                            </div>}
+
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-sm font-medium ${true
+                                                    ? "bg-green-500/20 text-green-500"
+                                                    : "bg-red-500/20 text-red-500"
+                                                    }`}
+                                            >
+                                                {true ? "Win" : "Loss"}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 </Card>
 
             </div>
