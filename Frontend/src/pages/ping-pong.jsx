@@ -9,30 +9,44 @@ import PingPongGame from "../components/custom/ping-pong-game";
 import { BsEmojiSunglasses } from "react-icons/bs";
 import useWebSocket from "react-use-websocket";
 import Canvas from "../components/custom/localgame";
+import { refreshAuthToken } from "../lib/ft_axios";
 
 
 
-
-
-export default function PingPong({waitingstate, id=null}) {
-    const token = Cookies.get('access_token');
-    const [connectionUrl, setConnectionUrl] = useState(id ? `ws://127.0.0.1:8000/ws/ping_pong/${id}/?token=${token}` : null)
-    const { sendMessage, lastMessage, readyState } = useWebSocket(connectionUrl, {
-        onClose: (event) => {
-            console.log('WebSocket closed with code:', event.code);
-            console.log('Reason:', event.reason); // Optional: reason for closing
-            
-        },
-    });
+export default function PingPong({waitingstate=false, id=null}) {
+    
     const [started, setStarted] = useState(false);
-
     const [waiting, setWaiting] = useState(waitingstate);
     const [winner, setWinner] = useState(null);
     const [finish, setFinish] = useState(false);
     const [score, setScore] = useState(null);
     const [local, setLocal] = useState(null);
-    const [countdownValue, setCountdownValue] = useState(5);
+    const [countdownValue, setCountdownValue] = useState(3);
+    const [connection, setConnection] = useState(false);
  
+    
+    
+    const token = Cookies.get('access_token');
+    const [connectionUrl, setConnectionUrl] = useState(id ? `ws://127.0.0.1:8000/ws/ping_pong/${id}/?token=${token}` : null)
+
+    
+    const { sendMessage, lastMessage, readyState, connect } = useWebSocket(connectionUrl, {
+        onClose: async (event) => {
+            if (event.code == 4008) {
+                try {
+                    await refreshAuthToken();
+                    await connect();
+                    
+                } catch (e) {
+                    toast.error("You are not authorized.");
+                    window.location.href = '/login';
+                }
+            }
+            
+        },
+    });
+
+        
 
     
     useEffect(() => {
@@ -75,7 +89,7 @@ export default function PingPong({waitingstate, id=null}) {
     
     const handdleLocal = () => {
         setLocal(true);
-        let countdown = 5;
+        let countdown = 3;
     
         const countdownInterval = setInterval(() => {
             countdown--;
@@ -129,18 +143,15 @@ export default function PingPong({waitingstate, id=null}) {
                                     <div className="flex justify-center items-center  w-full h-10   animate-bounc text-2xl font-mono ">{score}</div>
                                     <div className="flex justify-center items-center  w-full h-52  animate-bounc text-amber-300 animate-bounce"><BsEmojiSunglasses className="size-32"/></div>
                                 </div>
-                            ):(
-                                !start ?(
-                                    <div ><p className="text-[70px] animate-ping text-ring">{countdownValue}</p></div>
-                                ):(    
+                            ):(   
                                     <PingPongGame sendMessage={sendMessage} lastMessage={lastMessage} readyState={readyState} />
-                                )
+                                
                             )
                         ) : (
 
                             <div className="flex flex-col items-center justify-center">
                                 <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...
-                                <button onClick={() => {sendMessage(JSON.stringify({"type": "cancel"})); setWaiting(false)}} className="border border-white border-opacity-30 bg-white hover:bg-white hover:text-black hover:text-opacity-60 hover:border-black hover:bg-opacity-75 bg-opacity-20 rounded-xl w-14 h-10 text-sm">
+                                <button onClick={() => {sendMessage(JSON.stringify({"type": "cancel"})); setWaiting(false); }} className="border border-white border-opacity-30 bg-white hover:bg-white hover:text-black hover:text-opacity-60 hover:border-black hover:bg-opacity-75 bg-opacity-20 rounded-xl w-14 h-10 text-sm">
                                     cancel</button></div>
                                 <Spinner />
                                 

@@ -6,7 +6,7 @@ export default function Error404() {
         <div className="flex gap-6">
 
                 <div className="p-5 flex-1 glass flex flex-row justify-center items-center h-[50vh] space-x-16">
-                        <div className='border-white border-2 rounded-lg border-opacity-50 w-1/2 h-full flex p-4 justify-center items-center'>
+                        <div className='w-[70%] h-full flex p-4 justify-center items-center'>
 
                             <div className='h-full w-1/3 space-y-2'>
                                 <div className='h-1/2 w-full  p-2 space-y-2'>
@@ -60,8 +60,7 @@ export default function Error404() {
 
 
 
-                <Card className="glass w-1/4 p-6 space-y-6">
-                </Card>
+                
 
             </div>
     );

@@ -19,7 +19,6 @@ export const Layout = ({ children }) => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-        console.log("--------->", data);
         setCount(data.count);
     };
 

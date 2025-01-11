@@ -26,10 +26,10 @@ export default function Profile({ user, setUser }) {
                     playedPong: res.filter(match => match.game_type === 1).length,
                     playedXO: res.filter(match => match.game_type === 2).length,
                     winsPong: res.filter(match => match.winner_user.username === user.username).length,
-                    lossesPong: res.filter(match => match.loser.username === user.username).length,
+                    lossesPong: res.filter(match => match.loser_user.username === user.username).length,
                     goalsPong: res.reduce((acc, match) => acc + parseInt(match.score.split(':')[0]), 0),
                     winsXO: res.filter(match => match.game_type === 2 && match.winner_user.username === user.username).length,
-                    lossesXO: res.filter(match => match.game_type === 2 && match.loser.username === user.username).length
+                    lossesXO: res.filter(match => match.game_type === 2 && match.loser_user.username === user.username).length
                 })
                 console.log(res);
                 
@@ -229,7 +229,7 @@ export default function Profile({ user, setUser }) {
                                     className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
                                 >
                                     <div>
-                                        <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser.username : match.winner_user.username}</div>
+                                        <div className="font-medium"> <span className='text-xs'>vs</span> {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
                                         <div className="text-sm text-muted-foreground">
                                             {match.match_date}
                                         </div>
