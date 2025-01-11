@@ -24,7 +24,7 @@ export default function NewMessages({ currentChat, user, socket, setSocket, isWs
         if ((isWsOpened.current && socket) || !currentChat)
             return;
 
-        const newsocket = connect_websocket(`ws://localhost:8000/ws/chat/${currentChat.chat_id}/`, () => {
+        const newsocket = connect_websocket(`ws://localhost:8080/ws/chat/${currentChat.chat_id}/`, () => {
             if (isWsOpened.current) {
                 console.log("reconnecting to the websocket after an error now..");
                 isWsOpened.current = false;
