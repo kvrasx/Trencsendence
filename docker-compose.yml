@@ -56,7 +56,7 @@ services:
         depends_on:
           - filebeat
         ports:
-          - "80:80"
+          - "8080:80"
   
     filebeat:
         container_name: filebeat

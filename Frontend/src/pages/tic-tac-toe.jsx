@@ -21,7 +21,7 @@ export function TicTacToe() {
         if (!waiting)
             return;
 
-        const newSocket = connect_websocket('ws://localhost:8000/ws/game/random/', () => {
+        const newSocket = connect_websocket('ws://localhost:8080/ws/game/random/', () => {
             setWaiting(false);
             setStarted(false);
             setSocket(null);

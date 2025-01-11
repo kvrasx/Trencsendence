@@ -10,7 +10,7 @@ export default function Logout({ setUser }) {
   useEffect(() => {
     const req = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/auth/logout', { withCredentials: true });
+        const res = await axios.get('http://localhost:8080/api/auth/logout', { withCredentials: true });
         if (res?.data?.success) {
           console.log(res);
           toast.success("You've logged out! See you 👋");

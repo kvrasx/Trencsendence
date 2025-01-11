@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
     '/avatars': {
-      target: 'http://localhost:8000/avatars',
+      target: 'http://localhost:8080/avatars',
       changeOrigin: true,
       rewrite: (path) => path.replace(/^\/avatars/, ''),
     },
