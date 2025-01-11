@@ -14,24 +14,24 @@
 import React, { useState, useEffect } from 'react';
 import Sketch from 'react-p5';
 
-const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ballY, leftPaddle, rightPaddle, sendMessage }) => {
+const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ballY, leftPaddle, rightPaddle, websocket, scoreR, scoreL }) => {
   const [bg, setBg] = useState("#000000");
   useEffect(() => {
     let choosenTheme = localStorage.getItem('theme');
 
-      switch (choosenTheme) {
-        case "theme1":
-          setBg("#ff7f50");
-          break;
-        case "theme2":
-          setBg("#006400");
-          break;
-      }
+    switch (choosenTheme) {
+      case "theme1":
+        setBg("#ff7f50");
+        break;
+      case "theme2":
+        setBg("#006400");
+        break;
+    }
   }, [])
 
   const handlePaddleMovement = (p5) => {
     if (p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW)) {
-      sendMessage(JSON.stringify({
+      websocket.send(JSON.stringify({
         'type': 'paddleMove',
         'direction': 'up',
         'playerNumber': playerNumber,
@@ -40,7 +40,7 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
       }))
     }
     if (p5.keyIsDown(83) || p5.keyIsDown(p5.DOWN_ARROW)) {
-      sendMessage(JSON.stringify({
+      websocket.send(JSON.stringify({
         'type': 'paddleMove',
         'direction': 'down',
         'playerNumber': playerNumber,
@@ -103,64 +103,103 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
 
 let canvasH = 0
 let canvasW = 0
-let ballX = 0
-let ballY = 0
-let leftPaddle = ''
-let rightPaddle = ''
-let ball = ''
-let scoreL = 0
-let scoreR = 0
 
-function PingPongGame({ sendMessage, lastMessage, readyState }) {
+function PingPongGame({ websocket, setWinner, gameStartData }) {
+
+
   const [playerNumber, setPlayerNmber] = useState('')
   const [playerName, setPlayerName] = useState('')
   const [gameG, setGame] = useState('')
+  const [gameData, setGameData] = useState({
+    ballX: 0,
+    ballY: 0,
+    leftPaddle: '',
+    rightPaddle: '',
+    ball: '',
+    scoreL: 0,
+    scoreR: 0
+  })
+
 
   useEffect(() => {
-    if (readyState === WebSocket.OPEN) {
-      if (lastMessage != null) {
-        const data = JSON.parse(lastMessage.data);
+    // data received when game started
+    setPlayerNmber(gameStartData['information']['player_number'])
+    setPlayerName(gameStartData['information']['player_name'])
+    canvasH = gameStartData.paddleLeft.canvasHeight
+    canvasW = gameStartData.paddleRight.canvasWidth
+    if (gameStartData.information.player_number === '1') {
 
-        if (data['type'] === 'game_started') {
-          setPlayerNmber(data['information']['player_number'])
-          setPlayerName(data['information']['player_name'])
-          canvasH = data.paddleLeft.canvasHeight
-          canvasW = data.paddleRight.canvasWidth
-          if (data.information.player_number === '1') {
-            rightPaddle = data.paddleRight;
-            leftPaddle = data.paddleLeft;
-            ball = data.ball;
-          }
-          else {
-            leftPaddle = data.paddleLeft;
-            rightPaddle = data.paddleRight;
-            ball = data.ball;
-
-          }
-          setGame(data.game_group)
-        }
-        if (data['type'] === "paddleMoved") {
-          if (data['playerNumber'] === '1')
-            rightPaddle = data.updateY;
-          else
-            leftPaddle = data.updateY;
-        }
-        if (data['type'] === "ballUpdated") {
-          ballX = data.ball.x;
-          ballY = data.ball.y;
-          scoreL = data.ball.scoreLeft;
-          scoreR = data.ball.scoreRight;
-        }
-      }
+      setGameData((prev) => ({
+        ...prev,
+        rightPaddle: gameStartData.paddleRight,
+        leftPaddle: gameStartData.paddleLeft,
+        ball: gameStartData.ball,
+      }))
 
     }
-  }, [lastMessage])
+    else {
+      setGameData((prev) => ({
+        ...prev,
+        leftPaddle: gameStartData.paddleLeft,
+        rightPaddle: gameStartData.paddleRight,
+        ball: gameStartData.ball,
+      }))
+
+
+    }
+    setGame(gameStartData.game_group)
+
+
+    // add event listener
+    websocket.onmessage = (lastMessage) => {
+      const data = JSON.parse(lastMessage.data);
+
+      if (data['type'] === "paddleMoved") {
+        if (data['playerNumber'] === '1')
+          // rightPaddle = data.updateY;
+          setGameData((prev) => ({
+            ...prev,
+            rightPaddle: data.updateY
+          }))
+        else
+          setGameData((prev) => ({
+            ...prev,
+            leftPaddle: data.updateY
+          }))
+        // leftPaddle = data.updateY;
+      }
+      else if (data['type'] === "ballUpdated") {
+        setGameData((prev) => ({
+          ...prev,
+          ballX: data.ball.x,
+          ballY: data.ball.y,
+          scoreL: data.ball.scoreLeft,
+          scoreR: data.ball.scoreRight,
+        }));
+
+        // ballX = data.ball.x;
+        // ballY = data.ball.y;
+        // scoreL = data.ball.scoreLeft;
+        // scoreR = data.ball.scoreRight;
+      }
+      else if (data.type === 'game_finished') {
+        console.log(data.type);
+        console.log(data.winner);
+        
+        setWinner(data.winner.player_username);
+      }
+      else if (data.type === "freee_match") {
+        setWinner(data.winner.player_username);
+      }
+    }
+
+  }, [])
 
 
 
 
   return (
-    <Canvas playerName={playerName} playerNumber={playerNumber} gameG={gameG} canvasH={400} canvasW={600} ballX={ballX} ballY={ballY} leftPaddle={leftPaddle} rightPaddle={rightPaddle} sendMessage={sendMessage} />
+    <Canvas playerName={playerName} playerNumber={playerNumber} gameG={gameG} canvasH={400} canvasW={600} ballX={gameData.ballX} ballY={gameData.ballY} leftPaddle={gameData.leftPaddle} rightPaddle={gameData.rightPaddle} scoreL={gameData.scoreL} scoreR={gameData.scoreR} websocket={websocket} />
   );
 }
 

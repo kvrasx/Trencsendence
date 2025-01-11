@@ -7,7 +7,6 @@ import { Send, X, UserPlus, Swords, Ban, BellOff, LogIn, BellDot, Target } from 
 import { get } from '@/lib/ft_axios';
 import { post } from '@/lib/ft_axios';
 import { Layout } from '@/components/custom/layout'
-import  PingPong  from './ping-pong.jsx'
 
 
 import {

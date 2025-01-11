@@ -12,10 +12,12 @@ import Logout from './pages/logout';
 import Spinner from '@/components/ui/spinner';
 import { get } from '@/lib/ft_axios';
 import OtherProfile from './pages/other-profile';
-import PingPong from './pages/ping-pong';
+// import PingPong from './pages/ping-pong';
 import InvitePingPong from './pages/invite-ping-pong';
 
 import { toast, ToastContainer } from 'react-toastify';
+import { Game } from './pages/game';
+import PingPongGame from './components/custom/ping-pong-game';
 
 function App() {
 
@@ -58,8 +60,8 @@ function App() {
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
-                <Route path="/ping-pong" element={<Layout><PingPong /></Layout>} />
-                <Route path="/tic-tac-toe" element={<Layout><TicTacToe /></Layout>} />
+                <Route path="/ping-pong" element={<Layout><Game RemoteGameComponent={PingPongGame} websocketUrl={"ws://127.0.0.1:8000/ws/ping_pong/random/"} /></Layout>} />
+                <Route path="/tic-tac-toe" element={<Layout><Game RemoteGameComponent={TicTacToe} websocketUrl={"ws://localhost:8000/ws/game/random/"} /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>
             ) : (

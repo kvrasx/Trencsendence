@@ -64,7 +64,7 @@ class MatchTableViewSet:
         if loser:
             query &= Q(loser=loser)
         
-        matchs = Match.objects.filter(query).order_by('-match_date')
+        matchs = Match.objects.filter(query).order_by('match_date')
 
         serializer = MatchSerializer(instance=matchs, many=True)
         return Response(serializer.data)
