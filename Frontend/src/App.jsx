@@ -1,6 +1,6 @@
 import { Layout } from '@/components/custom/layout'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { TicTacToe } from './pages/tic-tac-toe'
+import { LocalTicTacToe, TicTacToe } from './pages/tic-tac-toe'
 import { Chat } from './pages/chat'
 import { Leaderboard } from './pages/leaderboard'
 import Error404 from './pages/error404';
