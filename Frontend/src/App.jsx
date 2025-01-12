@@ -60,8 +60,8 @@ function App() {
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
-                <Route path="/ping-pong" element={<Layout><Game RemoteGameComponent={PingPongGame} websocketUrl={"ws://127.0.0.1:8000/ws/ping_pong/random/"} /></Layout>} />
-                <Route path="/tic-tac-toe" element={<Layout><Game RemoteGameComponent={TicTacToe} websocketUrl={"ws://localhost:8000/ws/game/random/"} /></Layout>} />
+                <Route path="/ping-pong" element={<Layout><Game RemoteGameComponent={PingPongGame} websocketUrl={"ws://167.99.138.209:80/ws/ping_pong/random/"} /></Layout>} />
+                <Route path="/tic-tac-toe" element={<Layout><Game RemoteGameComponent={TicTacToe} websocketUrl={"ws://167.99.138.209:80/ws/game/random/"} /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>
             ) : (

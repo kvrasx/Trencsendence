@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 
 export const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://167.99.138.209:80',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -25,7 +25,7 @@ axiosInstance.interceptors.request.use(
 
 export async function refreshAuthToken() {
   try {
-    const response = await axios.get('http://localhost:8080/api/auth/refresh', {
+    const response = await axios.get('http://167.99.138.209:80/api/auth/refresh', {
       withCredentials: true,
     });
     if (response.status !== 200)

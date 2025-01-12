@@ -5,7 +5,7 @@ import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const intraApiUrl = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-130a1202541bd6319e459cf8ad6a3b5974e3e6390afce2a70f081a497e7f8bbe&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fauth%2FOAuth&response_type=code'
+const intraApiUrl = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-c1875c5f2e6306bab3da45484c4d83553ef06bd9b5478c76476541d74d20ebb6&redirect_uri=http%3A%2F%2F167.99.138.209%3A80%2Fapi%2Fauth%2FOAuth&response_type=code'
 
 export default function Auth({ setUser }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -25,7 +25,7 @@ export default function Auth({ setUser }) {
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
-      let res = await axios.post('http://localhost:8080/api/OTP/verify', {
+      let res = await axios.post('http://167.99.138.209:80/api/OTP/verify', {
         username: username,
         code: e.target.otp.value
       }, {withCredentials: true});
@@ -63,7 +63,7 @@ export default function Auth({ setUser }) {
         ? { username, email, password }
         : { username, password };
 
-      const response = await axios.post(`http://localhost:8080/${endpoint}`, payload, { withCredentials: true });
+      const response = await axios.post(`http://167.99.138.209:80/${endpoint}`, payload, { withCredentials: true });
       isSignup ? toast.success("You've created an account successfully!") : toast.success("You've logged in successfully!");
       setIsSignup(false);
 
