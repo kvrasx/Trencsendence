@@ -8,17 +8,23 @@ import Cookies from 'js-cookie';
 import connect_websocket from "../lib/connect_websocket";
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Camera, UserPlus, Swords, MessageSquare } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import defaultAvatar from '@/assets/profile.jpg';
 import { RiWifiOffLine } from "react-icons/ri";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
+import { Input } from '@/components/ui/input';
+import { get } from "../lib/ft_axios";
+import { toast } from "react-toastify";
+import InviteButton from "../components/custom/invite-button";
 
-export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate=false }) {
+export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false }) {
 
     const [waiting, setWaiting] = useState(waitingstate);
     const [started, setStarted] = useState(null);
     const [winner, setWinner] = useState(null);
     const [socket, setSocket] = useState(null);
     const [gamePongStartData, setPongGameStartData] = useState(null);
+    const [friends, setFriends] = useState([])
 
     useEffect(() => {
 
@@ -70,6 +76,33 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
         }
     }, [waiting]);
 
+
+    useEffect(() => {
+        if (started) return;
+
+        const fetchFriends = async () => {
+            try {
+                const res = await get('/getChats/');
+                const chatPromises = res.map(async (chat) => {
+                    const userRes = await get(`/api/user/get-info?user_id=${chat.user2}`);
+                    chat.user2 = userRes;
+                    return chat;
+                });
+
+                const cchats = await Promise.all(chatPromises);
+                console.log(cchats);
+                
+                setFriends(cchats);
+
+            } catch (error) {
+                console.log('Error fetching chats:', error);
+                toast.error("Failed to load chats. Please try again.")
+            }
+        };
+
+        fetchFriends();
+
+    }, [started])
 
     return (
         <>
@@ -133,27 +166,31 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
                 </div>
 
-                <Card className="glass w-1/4 p-4 space-y-6 flex flex-col ">
+                <Card className="glass w-1/4 px-5 py-8 space-y-6 flex flex-col ">
                     {!started ? (
                         <div className="flex flex-col gap-4">
                             <h2 className="text-xl font-semibold text-center text-gray-400">Challenge Friends</h2>
-                            <div className="space-y-3 overflow-auto themed-scrollbar max-h-[45vh]">
-                                {Array.from({ length: 10 }).map((_, index) => (
+                            <Input type="text flex-initial" placeholder="Search friends..." />
+                            <div className="space-y-3 overflow-auto themed-scrollbar max-h-[63.4vh]">
+                                {friends.map((friend, index) => (
                                     <div key={index} className=" flex justify-between items-center p-3 rounded-lg border-secondary border hover:shadow-lg transition-shadow duration-300 space-x-4">
                                         <div className="flex items-center gap-3 cursor-pointer">
                                             <Avatar className="flex-none w-11 h-11">
-                                                <AvatarImage src={null} alt="user avatar" />
+                                                <AvatarImage src={friend.user2.avatar} alt="user avatar" />
                                                 <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                             </Avatar>
-                                            <span className="text-md font-medium">{"test"}</span>
+                                            <span className="text-md font-medium">{friend.user2.username}</span>
                                         </div>
                                         <div className="flex gap-3">
-                                            <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
-                                                <MessageSquare className="" />
-                                            </Button>
-                                            <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
-                                                <Swords className="" />
-                                            </Button>
+
+                                           <Link to={"/chat?chad_id="+friend.chat_id}>
+                                                <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
+                                                    <MessageSquare className="" />
+                                                </Button>
+                                           </Link>
+                                            
+                                            <InviteButton type={"game"} defaultStatus={""} user_id={friend.user2.id} variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg" />
+
 
                                         </div>
                                     </div>
@@ -161,7 +198,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                             </div>
                         </div>
                     ) : (
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-6">
                             <div className="flex flex-col gap-2">
                                 <h2 className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
                                 <div className="flex justify-between border border-gray-700 rounded-xl px-2 py-3">
