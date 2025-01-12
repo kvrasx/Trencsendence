@@ -4,15 +4,15 @@ import path from "path"
 
 // https://vite.dev/config/
 export default defineConfig({
-  server: {
-    proxy: {
-    '/avatars': {
-      target: 'http://167.99.138.209:80/avatars',
-      changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/avatars/, ''),
-    },
-  },
-  },
+  // server: {
+  //   proxy: {
+  //   '/avatars': {
+  //     target: 'http://167.99.138.209:80/avatars',
+  //     changeOrigin: true,
+  //     rewrite: (path) => path.replace(/^\/avatars/, ''),
+  //   },
+  // },
+  // },
   plugins: [react()],
   resolve: {
     alias: {

@@ -19,6 +19,8 @@ services:
           - "3000:3000"
         depends_on:
           - backend
+        env_file:
+          - .env
 
     backend:
         container_name: backend
@@ -32,6 +34,8 @@ services:
           - postgresql
         ports:
           - 8000:8000
+        env_file:
+          - .env
 
     postgresql:
         container_name: postgresql

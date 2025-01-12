@@ -15,9 +15,10 @@ import { ProgressDemo } from '@/components/ui/progress'
 import { useEffect, useState } from 'react';
 
 export default function Profile({ user, setUser }) {
+
     const [matches, setMatches] = useState(null);
     const [matchesData, setMatchesData] = useState(null);
-
+    
     useEffect(() => {
         const fetchMatches = async () => {
             try {

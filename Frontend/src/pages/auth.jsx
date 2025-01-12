@@ -25,7 +25,7 @@ export default function Auth({ setUser }) {
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
-      let res = await axios.post('http://167.99.138.209:80/OTP/verify', {
+      let res = await axios.post(`http://${import.meta.env.VITE_HOST}/OTP/verify`, {
         username: username,
         code: e.target.otp.value
       }, {withCredentials: true});
@@ -46,6 +46,7 @@ export default function Auth({ setUser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const formData = new FormData(e.target);
     const username = formData.get("username");
     const email = formData.get("email");
@@ -63,7 +64,7 @@ export default function Auth({ setUser }) {
         ? { username, email, password }
         : { username, password };
 
-      const response = await axios.post(`http://167.99.138.209:80/${endpoint}`, payload, { withCredentials: true });
+      const response = await axios.post(`http://${import.meta.env.VITE_HOST}/${endpoint}`, payload, { withCredentials: true });
       isSignup ? toast.success("You've created an account successfully!") : toast.success("You've logged in successfully!");
       setIsSignup(false);
 
