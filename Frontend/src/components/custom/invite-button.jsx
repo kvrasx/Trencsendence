@@ -57,7 +57,7 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
 
     return (
         <Button onClick={() => sendInvite(user_id)} variant="outline" {...props} disabled={status !== defaultStatus && status !== "Unblock User"}>
-            {type === "game" ? <Swords /> : <UserPlus />} {status}
+            {type === "game" ? <Swords /> : <UserPlus />} {defaultStatus === "" ? "" : status}
         </Button>
     )
 }

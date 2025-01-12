@@ -15,6 +15,7 @@ import Spinner from "@/components/ui/spinner"
 import { Link } from "react-router-dom";
 import defaultAvatar from "@/assets/profile.jpg";
 import InviteButton from "../components/custom/invite-button";
+import { useSearchParams } from 'react-router-dom';
 
 export function Chat() {
     const user = useContext(UserContext);
