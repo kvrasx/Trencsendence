@@ -4,6 +4,7 @@ import Logo42 from "@/assets/42.svg"
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import auth_img from "@/assets/auth.png"
 
 const intraApiUrl = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-c1875c5f2e6306bab3da45484c4d83553ef06bd9b5478c76476541d74d20ebb6&redirect_uri=http%3A%2F%2F167.99.138.209%3A80%2Fapi%2Fauth%2FOAuth&response_type=code'
 
@@ -187,7 +188,7 @@ export default function Auth({ setUser }) {
         <div className="hidden md:flex flex-col w-[44%]">
           <img
             // loading="lazy"
-            src="https://cdn.builder.iov1/image/assets/6cf02da4bad24179a51f8a7eecbdc347/22567e203d7fccc709b8fdb4363ed7dd90b445c3bdff983c0814e065fd27302f?apiKey=6cf02da4bad24179a51f8a7eecbdc347&"
+            src={auth_img}
             alt=""
             className="object-contain grow w-full rounded-none aspect-[0.84]"
           />
