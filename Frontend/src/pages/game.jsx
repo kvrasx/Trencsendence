@@ -84,7 +84,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
             try {
                 const res = await get('/getChats/');
                 const chatPromises = res.map(async (chat) => {
-                    const userRes = await get(`/api/user/get-info?user_id=${chat.user2}`);
+                    const userRes = await get(`/user/get-info?user_id=${chat.user2}`);
                     chat.user2 = userRes;
                     return chat;
                 });
