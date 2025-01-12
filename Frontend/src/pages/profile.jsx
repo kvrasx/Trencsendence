@@ -21,7 +21,7 @@ export default function Profile({ user, setUser }) {
     useEffect(() => {
         const fetchMatches = async () => {
             try {
-                let res = await get('/api/match/get-all');
+                let res = await get('match/get-all');
                 setMatchesData({
                     playedPong: res.filter(match => match.game_type === 1).length,
                     playedXO: res.filter(match => match.game_type === 2).length,
@@ -45,7 +45,7 @@ export default function Profile({ user, setUser }) {
     console.log(user);
 
     const updateProfile = async (data, successMsg) => {
-        let res = await post('/api/user/update', data, {
+        let res = await post('user/update', data, {
             'Content-Type': 'multipart/form-data',
         })
         if (res?.user) {

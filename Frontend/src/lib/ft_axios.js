@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 
 export const axiosInstance = axios.create({
-  baseURL: 'http://167.99.138.209:80',
+  baseURL: 'http://167.99.138.209:80/api/',
   headers: {
     'Content-Type': 'application/json',
   },

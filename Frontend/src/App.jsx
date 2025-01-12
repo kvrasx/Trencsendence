@@ -29,7 +29,7 @@ function App() {
     const starting = async () => {
       if (!user) {
         try {
-          const storedUser = await get('/api/user/get-info');
+          const storedUser = await get('user/get-info');
           if (storedUser) {
             setUser(storedUser);
           }
@@ -61,7 +61,7 @@ function App() {
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
                 <Route path="/ping-pong" element={<Layout><Game RemoteGameComponent={PingPongGame} websocketUrl={"ws://167.99.138.209:80/ws/ping_pong/random/"} /></Layout>} />
-                <Route path="/tic-tac-toe" element={<Layout><Game RemoteGameComponent={TicTacToe} websocketUrl={"ws://167.99.138.209:80/ws/game/random/"} /></Layout>} />
+                <Route path="/tic-tac-toe" element={<Layout><Game RemoteGameComponent={TicTacToe} websocketUrl={"ws://167.99.138.209:80/ws/game/random/"} LocalGameComponent={LocalTicTacToe} /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>
             ) : (

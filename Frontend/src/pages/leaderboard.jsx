@@ -10,7 +10,7 @@ export function Leaderboard() {
     useEffect(() => {
         const fetchPlayers = async () => {
             try {
-                let res = await get('/api/user/get-all');  // Fetch Players
+                let res = await get('user/get-all');  // Fetch Players
                 console.log(res);
                 setPlayers(res);
             } catch (e) { console.log("Failed to fetch"); }

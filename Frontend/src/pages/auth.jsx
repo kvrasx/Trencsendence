@@ -25,7 +25,7 @@ export default function Auth({ setUser }) {
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
-      let res = await axios.post('http://167.99.138.209:80/api/OTP/verify', {
+      let res = await axios.post('http://167.99.138.209:80/OTP/verify', {
         username: username,
         code: e.target.otp.value
       }, {withCredentials: true});
@@ -186,7 +186,7 @@ export default function Auth({ setUser }) {
         <div className="hidden md:flex flex-col w-[44%]">
           <img
             // loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/6cf02da4bad24179a51f8a7eecbdc347/22567e203d7fccc709b8fdb4363ed7dd90b445c3bdff983c0814e065fd27302f?apiKey=6cf02da4bad24179a51f8a7eecbdc347&"
+            src="https://cdn.builder.iov1/image/assets/6cf02da4bad24179a51f8a7eecbdc347/22567e203d7fccc709b8fdb4363ed7dd90b445c3bdff983c0814e065fd27302f?apiKey=6cf02da4bad24179a51f8a7eecbdc347&"
             alt=""
             className="object-contain grow w-full rounded-none aspect-[0.84]"
           />

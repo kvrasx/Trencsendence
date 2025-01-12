@@ -22,7 +22,7 @@ export default function OtherProfile({myId}) {
     useEffect(() => {
         const getUser = async () => {
             try {
-                let res = await get('/api/user/get-info?user_id=' + id);
+                let res = await get('user/get-info?user_id=' + id);
                 setUser(res);
             } catch (e) {
                 if (e?.response?.status === 404) {

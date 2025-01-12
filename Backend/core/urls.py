@@ -25,7 +25,7 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     
     path("api/", include('user_management.urls')),
-    path("", include('chat.urls')),
+    path("api/", include('chat.urls')),
 
 ]
 
