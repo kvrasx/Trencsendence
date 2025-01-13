@@ -22,7 +22,7 @@ export default function Profile({ user, setUser }) {
     useEffect(() => {
         const fetchMatches = async () => {
             try {
-                let res = await get('match/get-all');
+                let res = await get(setUser ? 'match/get-all' : 'match/get-all?user_id='+user.id);
                 setMatchesData({
                     playedPong: res.filter(match => match.game_type === 1).length,
                     playedXO: res.filter(match => match.game_type === 2).length,
@@ -187,7 +187,7 @@ export default function Profile({ user, setUser }) {
                         <h2 className="text-xl font-semibold text-gray-400">Summary</h2>
                         <div className="">
                             <div className="-ml-8">
-
+    
                                 <MultiLineChart matches={matches} />
                             </div>
                         </div>

@@ -145,3 +145,5 @@ class onlineStatus(WebsocketConsumer):
             del self.online_users[self.user.id]
             self.user.online = False
             self.user.save()
+
+            

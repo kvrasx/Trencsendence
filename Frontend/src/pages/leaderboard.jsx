@@ -1,8 +1,10 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogIn } from "lucide-react";
+import { LogIn, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { get, post } from '@/lib/ft_axios';
+import { Link } from "react-router-dom";
+import defaultPicture from "@/assets/profile.jpg";
 
 export function Leaderboard() {
 
@@ -37,8 +39,6 @@ export function Leaderboard() {
 
 export function Showplayer({Player, index}) {
     
-    const defaultPicture = "https://simplyilm.com/wp-content/uploads/2017/08/temporary-profile-placeholder-1.jpg";
-    console.log(index)
     return (
         <div className="flex items-center justify-between p-4 rounded-lg glass hover-glass">
             <div className="flex items-center gap-4">
@@ -46,8 +46,9 @@ export function Showplayer({Player, index}) {
                 <span className="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
                     <img className="aspect-square h-full w-full" src={Player.avatar || defaultPicture}></img>
                 </span>
-                <span className="font-medium">{Player.username}
-                </span>
+                <Link to={"/profile/"+Player.id}>
+                <span className="font-medium cursor-pointer">{Player.username}</span>
+                </Link>
             </div>
             <span className="text-lg font-semibold">{Player.score}
             </span>

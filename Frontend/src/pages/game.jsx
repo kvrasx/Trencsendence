@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Card } from "@/components/ui/card";
 import local from "@/assets/local.jpg"
 import remote from "@/assets/remote.jpg"
@@ -16,8 +16,11 @@ import { Input } from '@/components/ui/input';
 import { get } from "../lib/ft_axios";
 import { toast } from "react-toastify";
 import InviteButton from "../components/custom/invite-button";
+import { UserContext } from "@/contexts"
 
 export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false }) {
+
+    const user = useContext(UserContext);
 
     const [waiting, setWaiting] = useState(waitingstate);
     const [started, setStarted] = useState(null);
@@ -28,6 +31,9 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
     const [searchResults, setSearchResults] = useState(friends);
     const [userSearch, setUserSearch] = useState("");
+
+    const [opponent, setOpponent] = useState(null);
+    const [recentMathces, setRecentMatches] = useState([]);
 
     useEffect(() => {
 
@@ -60,6 +66,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
             const data = JSON.parse(event.data);
 
             if (data?.action === "game_start") {
+                console.log(data);
 
                 setStarted("remote");
                 console.log("Game is ready to begin");
@@ -81,41 +88,53 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
 
     useEffect(() => {
-        if (started) return;
-
-        const fetchFriends = async () => {
-            try {
-                const res = await get('/getChats/');
-                const chatPromises = res.map(async (chat) => {
-                    const userRes = await get(`/user/get-info?user_id=${chat.user2}`);
-                    chat.user2 = userRes;
-                    return chat;
-                });
-
-                const cchats = await Promise.all(chatPromises);
-                console.log(cchats);
+        if (started) {
+            const fetchRecentMatches = async () => {
+                if (!opponent || !opponent.id) return;
+                console.log(opponent);
                 
-                setFriends(cchats);
-                setSearchResults(cchats);
+                try {
+                    let res = await get('/match/get-all?with_id=' + opponent.id);
+                    setRecentMatches(res);
+                } catch (e) {
+                    toast.error("Error fetching recent matches. Please try again.")
+                }
+            };
+            fetchRecentMatches();
+        } else {
+            const fetchFriends = async () => {
+                try {
+                    const res = await get('/getChats/');
+                    const chatPromises = res.map(async (chat) => {
+                        const userRes = await get(`/user/get-info?user_id=${chat.user2}`);
+                        chat.user2 = userRes;
+                        return chat;
+                    });
 
-            } catch (error) {
-                console.log('Error fetching chats:', error);
-                toast.error("Failed to load chats. Please try again.")
-            }
-        };
+                    const cchats = await Promise.all(chatPromises);
+                    console.log(cchats);
 
-        fetchFriends();
+                    setFriends(cchats);
+                    setSearchResults(cchats);
 
-    }, [started])
+                } catch (error) {
+                    console.log('Error fetching chats:', error);
+                    toast.error("Failed to load chats. Please try again.")
+                }
+            };
+            fetchFriends();
+        }
 
-    useEffect(() => {        
-        if (!userSearch || userSearch.trim() === ""){
+    }, [started, opponent])
+
+    useEffect(() => {
+        if (!userSearch || userSearch.trim() === "") {
             setSearchResults(friends);
-            return ;
+            return;
         };
 
         setSearchResults(friends.filter(friend => friend.user2.username.match(new RegExp(`\\b${userSearch}`, 'i'))));
-        
+
     }, [userSearch])
 
     return (
@@ -130,9 +149,9 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                 gamePongStartData ?
                                     <RemoteGameComponent websocket={socket} setWinner={setWinner} gameStartData={gamePongStartData} />
                                     :
-                                    <RemoteGameComponent websocket={socket} setWinner={setWinner} />
+                                    <RemoteGameComponent websocket={socket} setWinner={setWinner} setOpponent={setOpponent} />
                             ) : (
-                                <LocalGameComponent setWinner={setWinner} />
+                                <LocalGameComponent setWinner={setWinner} setOpponent={setOpponent} />
                             )) : (
 
                                 <div className="flex flex-col items-center justify-center">
@@ -197,12 +216,12 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                         </div>
                                         <div className="flex gap-3">
 
-                                           <Link to={"/chat?chat_id="+friend.chat_id}>
+                                            <Link to={"/chat?chat_id=" + friend.chat_id}>
                                                 <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
                                                     <MessageSquare className="" />
                                                 </Button>
-                                           </Link>
-                                            
+                                            </Link>
+
                                             <InviteButton type={"game"} defaultStatus={""} user_id={friend.user2.id} variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg" />
 
 
@@ -218,20 +237,20 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                 <div className="flex justify-between border border-gray-700 rounded-xl px-2 py-3">
                                     <div className="flex flex-col items-center gap-3 cursor-pointer">
                                         <Avatar className="flex-none w-16 h-16">
-                                            <AvatarImage src={null} alt="user avatar" />
+                                            <AvatarImage src={user.avatar} alt="user avatar" />
                                             <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                         </Avatar>
-                                        <span className="text-md font-medium">{"ijaija"}</span>
+                                        <span className="text-md font-medium">{user.username}</span>
                                     </div>
                                     <div className="text-center text-2xl font-bold text-gray-300 my-5">
                                         vs
                                     </div>
                                     <div className="flex flex-col items-center gap-3 cursor-pointer">
                                         <Avatar className="flex-none w-16 h-16">
-                                            <AvatarImage src={null} alt="user avatar" />
+                                            <AvatarImage src={opponent?.avatar} alt="user avatar" />
                                             <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                         </Avatar>
-                                        <span className="text-md font-medium">{"Ismail"}</span>
+                                        <span className="text-md font-medium">{opponent?.username}</span>
                                     </div>
                                 </div>
                             </div>
@@ -242,29 +261,29 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                 <h3 className="text-md text-left font-semibold text-gray-300">Matches history</h3>
                                 <div className="space-y-3 w-full  overflow-auto themed-scrollbar">
 
-                                    {Array.from({ length: 5 }).map((_, index) => (
+                                    {recentMathces.map((match, index) => (
                                         <div
-                                            key={index}
-                                            className={`flex items-center justify-between p-3 rounded-lg  ${1 === 1 ? 'glass' : 'bg-secondary'}`}
+                                            key={match.match_id}
+                                            className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
                                         >
                                             <div>
-                                                <div className="font-medium">vs {"sdfs"}</div>
+                                                <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
                                                 <div className="text-sm text-muted-foreground">
-                                                    {"15/20/2025"}
+                                                    {match.match_date}
                                                 </div>
                                             </div>
 
-                                            {1 === 1 && <div className="text-lg font-semibold">
-                                                {"10:15".split(':').map(num => parseInt(num, 10)).join(' : ')}
+                                            {match.game_type === 1 && <div className="text-lg font-semibold">
+                                                {match.score.split(':').map(num => parseInt(num, 10)).join(' : ')}
                                             </div>}
 
                                             <span
-                                                className={`px-3 py-1 rounded-full text-sm font-medium ${true
+                                                className={`px-3 py-1 rounded-full text-sm font-medium ${match.winner_user.id === user.id
                                                     ? "bg-green-500/20 text-green-500"
                                                     : "bg-red-500/20 text-red-500"
                                                     }`}
                                             >
-                                                {true ? "Win" : "Loss"}
+                                                {match.winner_user.id === user.id ? "Win" : "Loss"}
                                             </span>
                                         </div>
                                     ))}

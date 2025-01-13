@@ -20,6 +20,14 @@ import { Game } from './pages/game';
 import PingPongGame from './components/custom/ping-pong-game';
 import Tournament from './pages/tournament';
 
+function PingPongPage() {
+  return <Game RemoteGameComponent={PingPongGame} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`} />
+}
+
+function TicTacToePage() {
+  return <Game RemoteGameComponent={TicTacToe} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/game/random/`} LocalGameComponent={LocalTicTacToe} />
+}
+
 function App() {
 
   const [ready, setReady] = useState(false);
@@ -61,8 +69,8 @@ function App() {
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
-                <Route path="/ping-pong" element={<Layout><Game RemoteGameComponent={PingPongGame} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`} /></Layout>} />
-                <Route path="/tic-tac-toe" element={<Layout><Game RemoteGameComponent={TicTacToe} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/game/random/`} LocalGameComponent={LocalTicTacToe} /></Layout>} />
+                <Route path="/ping-pong" element={<Layout><PingPongPage /></Layout>} />
+                <Route path="/tic-tac-toe" element={<Layout><TicTacToePage /></Layout>} />
                 <Route path="/tournament" element={<Layout><Tournament /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>

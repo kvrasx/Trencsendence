@@ -73,7 +73,7 @@ export const Navbar = () => {
               <DialogHeader>
                 <DialogTitle className="capitalize text-center">Customize your gaming experience</DialogTitle>
                 <DialogDescription className="flex justify-center items-center">
-                  <RadioGroup defaultValue={defaultTheme} className="p-5" onValueChange={(choice) => {
+                  <RadioGroup defaultValue={defaultTheme || "default"} className="p-5" onValueChange={(choice) => {
                     localStorage.setItem("theme", choice);
                     setDefaultTheme(choice);
                   }}>
