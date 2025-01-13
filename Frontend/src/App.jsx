@@ -18,6 +18,7 @@ import InvitePingPong from './pages/invite-ping-pong';
 import { toast, ToastContainer } from 'react-toastify';
 import { Game } from './pages/game';
 import PingPongGame from './components/custom/ping-pong-game';
+import Tournament from './pages/tournament';
 
 function App() {
 
@@ -62,6 +63,7 @@ function App() {
                 <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
                 <Route path="/ping-pong" element={<Layout><Game RemoteGameComponent={PingPongGame} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`} /></Layout>} />
                 <Route path="/tic-tac-toe" element={<Layout><Game RemoteGameComponent={TicTacToe} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/game/random/`} LocalGameComponent={LocalTicTacToe} /></Layout>} />
+                <Route path="/tournament" element={<Layout><Tournament /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>
             ) : (
