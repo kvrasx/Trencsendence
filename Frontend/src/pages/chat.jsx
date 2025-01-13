@@ -25,7 +25,14 @@ export function Chat() {
     const isWsOpened = useRef(false);
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef(null);
-    
+
+    const [searchParams] = useSearchParams();
+    const chat_id = !(Number(searchParams.get("chat_id"))) ? null : Number(searchParams.get("chat_id"));
+
+    const [searchResults, setSearchResults] = useState(chats);
+    const [userSearch, setUserSearch] = useState("");
+
+
     const fetchChats = async () => {
         try {
             const res = await get('/getChats/');
@@ -37,7 +44,14 @@ export function Chat() {
     
             const cchats = await Promise.all(chatPromises);
             setChats(cchats);
-            cchats.length !== 0 ? setCurrentChat(cchats[0]) : setCurrentChat("nothing");
+            setSearchResults(cchats);
+
+            if (cchats.length !== 0 && chat_id) {
+                let targetedCurrentChat = cchats.find(c => c.chat_id === chat_id);
+                setCurrentChat(targetedCurrentChat);
+            }
+            else
+                cchats.length !== 0 ? setCurrentChat(cchats[0]) : setCurrentChat("nothing");
     
         } catch (error) {
             console.log('Error fetching chats:', error);
@@ -72,22 +86,30 @@ export function Chat() {
         }
     }
 
-
     useEffect(() => {
-
         fetchChats();
     }, []);
+
+
+    useEffect(() => {        
+        if (!userSearch || userSearch.trim() === ""){
+            setSearchResults(chats);
+            return ;
+        };
+        setSearchResults(chats.filter(friend => friend.user2.username.match(new RegExp(`\\b${userSearch}`, 'i'))));
+        
+    }, [userSearch])
 
 
     return (
         <div className="flex gap-6 h-[calc(100vh-8rem)]">
             {/* Chat List */}
             <Card className="glass w-64 p-4 flex flex-col gap-3">
-                <Input type="text flex-initial" placeholder="Search chats..." />
+                <Input type="text flex-initial" placeholder="Search chats..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
 
-                {chats ? (
-                    chats.length !== 0 ? (
-                        chats.map((chat, index) => {
+                {searchResults ? (
+                    searchResults.length !== 0 ? (
+                        searchResults.map((chat, index) => {
                             return (
                                 <div
                                     key={index}
@@ -167,7 +189,7 @@ export function Chat() {
                                         <span>{currentChat?.user2?.username}</span>
                                     </Link>
                                 </h3>
-                                <p className="text-sm text-gray-500">Online</p>
+                                <p className="text-sm text-gray-500">{currentChat?.user2?.online ? "Online" : "Offline"}</p>
                             </div>
                             <div className="space-y-2">
 

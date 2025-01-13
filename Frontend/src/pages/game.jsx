@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import Cookies from 'js-cookie';
 import connect_websocket from "../lib/connect_websocket";
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Camera, UserPlus, Swords, MessageSquare } from 'lucide-react';
+import { Camera, UserPlus, Swords, MessageSquare, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import defaultAvatar from '@/assets/profile.jpg';
 import { RiWifiOffLine } from "react-icons/ri";
@@ -25,6 +25,9 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
     const [socket, setSocket] = useState(null);
     const [gamePongStartData, setPongGameStartData] = useState(null);
     const [friends, setFriends] = useState([])
+
+    const [searchResults, setSearchResults] = useState(friends);
+    const [userSearch, setUserSearch] = useState("");
 
     useEffect(() => {
 
@@ -93,6 +96,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                 console.log(cchats);
                 
                 setFriends(cchats);
+                setSearchResults(cchats);
 
             } catch (error) {
                 console.log('Error fetching chats:', error);
@@ -103,6 +107,16 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
         fetchFriends();
 
     }, [started])
+
+    useEffect(() => {        
+        if (!userSearch || userSearch.trim() === ""){
+            setSearchResults(friends);
+            return ;
+        };
+
+        setSearchResults(friends.filter(friend => friend.user2.username.match(new RegExp(`\\b${userSearch}`, 'i'))));
+        
+    }, [userSearch])
 
     return (
         <>
@@ -170,9 +184,9 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                     {!started ? (
                         <div className="flex flex-col gap-4">
                             <h2 className="text-xl font-semibold text-center text-gray-400">Challenge Friends</h2>
-                            <Input type="text flex-initial" placeholder="Search friends..." />
+                            <Input type="text flex-initial" placeholder="Search friends..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
                             <div className="space-y-3 overflow-auto themed-scrollbar max-h-[63.4vh]">
-                                {friends.map((friend, index) => (
+                                {searchResults.map((friend, index) => (
                                     <div key={index} className=" flex justify-between items-center p-3 rounded-lg border-secondary border hover:shadow-lg transition-shadow duration-300 space-x-4">
                                         <div className="flex items-center gap-3 cursor-pointer">
                                             <Avatar className="flex-none w-11 h-11">
@@ -183,7 +197,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                         </div>
                                         <div className="flex gap-3">
 
-                                           <Link to={"/chat?chad_id="+friend.chat_id}>
+                                           <Link to={"/chat?chat_id="+friend.chat_id}>
                                                 <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
                                                     <MessageSquare className="" />
                                                 </Button>
