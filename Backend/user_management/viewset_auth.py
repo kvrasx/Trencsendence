@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer
 
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
-
+import os
 
 
 class authViewSet:
@@ -55,8 +55,12 @@ class authViewSet:
         if not code:
             return Response({'error': 'Authorization code is not provided.'}, status=status.HTTP_400_BAD_REQUEST)
         
+
+        print("uid", settings.OAUTH_CLIENT_ID)
+        print("secret", settings.OAUTH_CLIENT_SECRET)
         TOKEN_URL = 'https://api.intra.42.fr/oauth/token'
         USER_INFO_URL = 'https://api.intra.42.fr/v2/me'
+
 
         reqBody = {
             'client_id': settings.OAUTH_CLIENT_ID,
@@ -94,12 +98,12 @@ class authViewSet:
         r = handle_2fa(user)
         if r:
             r.status_code = 302
-            r['Location'] = 'http://167.99.138.209:80/?otp=true&username=' + user.username
+            r['Location'] = f'http://{os.getenv("VITE_HOST")}/?otp=true&username=' + user.username
             return r
 
         response = generate_login_response(user)
         response.status_code = 302
-        response['Location'] = 'http://167.99.138.209:80/'
+        response['Location'] = f'http://{os.getenv("VITE_HOST")}/'
         return response
 
 #########################
