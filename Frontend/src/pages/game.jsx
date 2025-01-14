@@ -17,6 +17,7 @@ import { get } from "../lib/ft_axios";
 import { toast } from "react-toastify";
 import InviteButton from "../components/custom/invite-button";
 import { UserContext } from "@/contexts"
+import { formatDate } from "@/lib/utils";
 
 export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, ...o }) {
 
@@ -79,7 +80,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                 setStarted("remote");
             };
         }
-
+        
         return () => {
             websocket.close();
             setSocket(null);
@@ -206,7 +207,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                         <h2 className="text-xl font-semibold text-center text-gray-400">Challenge Friends</h2>
                         <Input type="text flex-initial" placeholder="Search friends..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
                         <div className="space-y-3 overflow-auto themed-scrollbar max-h-[63.4vh]">
-                            {searchResults.map((friend, index) => (
+                            {searchResults.length !== 0 ? searchResults.map((friend, index) => (
                                 <div key={index} className=" flex justify-between items-center p-3 rounded-lg border-secondary border hover:shadow-lg transition-shadow duration-300 space-x-4">
                                     <div className="flex items-center gap-3 cursor-pointer">
                                         <Avatar className="flex-none w-11 h-11">
@@ -228,7 +229,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
                                     </div>
                                 </div>
-                            ))}
+                            )) : <div className="text-center mt-4 text-gray-300">No friends found</div>}
                         </div>
                     </div>
                 ) : (
@@ -262,7 +263,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                             <h3 className="text-md text-left font-semibold text-gray-300">Matches history</h3>
                             <div className="space-y-3 w-full  overflow-auto themed-scrollbar">
 
-                                {recentMathces.map((match, index) => (
+                                {recentMathces !== 0 ? recentMathces.map((match, index) => (
                                     <div
                                         key={match.match_id}
                                         className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
@@ -270,7 +271,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                         <div>
                                             <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
                                             <div className="text-sm text-muted-foreground">
-                                                {match.match_date}
+                                                {formatDate(match.match_date)}
                                             </div>
                                         </div>
 
@@ -287,7 +288,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                             {match.winner_user.id === user.id ? "Win" : "Loss"}
                                         </span>
                                     </div>
-                                ))}
+                                )): <div className="text-center mt-4 text-gray-300">No recent matches</div>}
                             </div>
                         </div>
                     </div>
