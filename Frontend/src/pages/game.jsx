@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 import InviteButton from "../components/custom/invite-button";
 import { UserContext } from "@/contexts"
 
-export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, key }) {
+export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, ...o }) {
 
     const user = useContext(UserContext);
 
@@ -140,7 +140,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
     return (
 
-        <div className="flex gap-6 h-[75vh]" key={key} >
+        <div className="flex gap-6 h-[75vh]" {...o} >
 
             <div className="p-5 flex-1 glass flex flex-row justify-center items-center">
 

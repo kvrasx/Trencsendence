@@ -64,7 +64,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         self.user: User = self.scope["user"]
-        print("dsfdssdgsdgdsnkgndsngndslglkdslkgdsvdsg", self.user)
         if self.user.is_anonymous:
             await self.accept()
             await self.close(code=4008)
@@ -155,6 +154,25 @@ class GameConsumer(AsyncWebsocketConsumer):
         if close_code == 4008 or close_code == 4009 or close_code == 4007:
             return
 
+        if hasattr(self, 'match'):
+            await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
+                    "game_type": 2,
+                    "winner": self.match.player1.id if self.match.player2.id == self.user.id else self.match.player2.id,
+                    "loser": self.user.id,
+                    "score": "01:00"
+                })
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "group_message",
+                    "message": {
+                        "action": "game_over",
+                        "status": "finished",
+                        "winner": self.match.player1.username if self.match.player2.id == self.user.id else self.match.player2.username,
+                        "loser": self.user.username
+                    }
+                }
+            )
         try:
             current_players.remove(self.user.id)
         except:
@@ -171,6 +189,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         # discard the channel from the group
         if self.room_group_name:
             await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
         
         
     async def game_started(self):
