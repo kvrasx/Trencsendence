@@ -6,7 +6,8 @@ import { toast, ToastContainer } from "react-toastify";
 import Error404 from "./error404";
 import Spinner from '@/components/ui/spinner';
 import {Layout} from "@/components/custom/layout";
-import PingPong from "./ping-pong";
+import PingPongGame from "../components/custom/ping-pong-game";
+import { Game } from "./game";
 
 
 export default function InvitePingPong({}) {
@@ -42,7 +43,7 @@ export default function InvitePingPong({}) {
     return (
         <>
             {match ? (
-                <PingPong waitingstate={true} id={id} />
+                <Game RemoteGameComponent={PingPongGame} waitingstate={true} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/` + id + '/'} />
             ) : (
                 <div className="flex justify-center items-center">
                     <Spinner w="16" h="16" />

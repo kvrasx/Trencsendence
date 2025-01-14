@@ -1,38 +1,29 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import local from "@/assets/local.jpg"
-import remote from "@/assets/remote.jpg"
-import Spinner from "@/components/ui/spinner";
-import {Button} from "@/components/ui/button";
-import Cookies from 'js-cookie';
-import connect_websocket from "../lib/connect_websocket";
 
-export function TicTacToe() {
+export function TicTacToe({ websocket, setWinner, setOpponent }) {
 
     const [symbol, setSymbol] = useState(null);
     const [isMyTurn, setIsMyTurn] = useState(false);
-    const [socket, setSocket] = useState(null);
     const [board, setBoard] = useState({});
-    const [waiting, setWaiting] = useState(false);
-    const [started, setStarted] = useState(false);
-    const [winner, setWinner] = useState(null);
+
+    const [bg, setBg] = useState("#000000");
+    useEffect(() => {
+        let choosenTheme = localStorage.getItem('theme');
+
+        switch (choosenTheme) {
+            case "theme1":
+                setBg("#ff7f50");
+                break;
+            case "theme2":
+                setBg("#006400");
+                break;
+        }
+    }, [])
 
     useEffect(() => {
-        if (!waiting)
-            return;
 
-        const newSocket = connect_websocket('ws://localhost:8000/ws/game/random/', () => {
-            setWaiting(false);
-            setStarted(false);
-            setSocket(null);
-        });
-
-        newSocket.onopen = () => {
-            console.log('WebSocket connection established');
-            setSocket(newSocket);
-        };
-       
-        newSocket.onmessage = (event) => {
+        websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
 
             console.log(data);
@@ -41,6 +32,7 @@ export function TicTacToe() {
                 case "assign_symbol":
                     setSymbol(data.symbol);
                     setIsMyTurn(data.symbol === "X"); // X always starts
+                    setOpponent(data.opponent);
                     break;
 
                 case "update_board":
@@ -60,22 +52,13 @@ export function TicTacToe() {
                     // document.getElementById("winner-dialog")?.click();
                     break;
 
-                case "game_start":
-                    // Optional: Add any game start logic
-                    waiting && setStarted(true);
-                    console.log("Game is ready to begin");
-                    break;
 
                 default:
                     console.log("Unknown action:", data.action);
             }
         };
 
-        return () => {
-            newSocket.close()
-        };
-
-    }, [waiting]);
+    }, []);
 
     const handleCellClick = (event) => {
         // Ensure it's the player's turn and the cell is not already occupied
@@ -84,12 +67,12 @@ export function TicTacToe() {
 
         setIsMyTurn(false);
 
-        if (socket == null) {
+        if (websocket == null) {
             console.log("the socket is null");
             return;
         }
 
-        socket.send(
+        websocket.send(
             JSON.stringify({
                 "action": "move",
                 cellId,
@@ -104,7 +87,7 @@ export function TicTacToe() {
         for (let i = 0; i < 9; i++) {
             cells.push(
                 <div
-                    className="border border-white min-w-20 min-h-20 flex justify-center"
+                    className="border-2 border-white w-28 h-28 flex justify-center"
                     id={`${i}`}
                     key={i}
                     onClick={handleCellClick}
@@ -117,51 +100,96 @@ export function TicTacToe() {
     };
 
     return (
-        <>
-            <div className="flex gap-6">
+        <Card className={`p-8 bg-transparent border-white border-4`} style={{ backgroundColor: bg }} >
+            <div className={`grid grid-cols-3 gap-5 m-auto w-full`}>{renderBoard()}</div>
+        </Card>
+    );
+}
 
-                <div className="p-5 flex-1 glass flex flex-row justify-center items-center h-[50vh]">
-                    {!winner ? (
-                        waiting ? (
-                            started ? (
-                                <Card className="p-5 bg-transparent border-gray-500">
-                                    <div className="grid grid-cols-3 gap-5 m-auto w-full">{renderBoard()}</div>
-                                </Card>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center">
-                                    <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...</div>
-                                    <Spinner />
-                                </div>
-                            )
-                        ) : (
-                            <>
-                                <div onClick={(prev) => { setWaiting(true) }} className="cursor-pointer relative border-2 border-secondary rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105">
-                                    <img src={remote} alt="Remote Matchmaking Mode" className="h-[600px] w-[250px] object-cover shadow-lg" />
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-gray-300 text-3xl text-center font-bold" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                                        <span className="px-6">Join a Game</span>
-                                    </div>
-                                </div>
-                            </>
-                        )
-                    ) : (
-                        <div className="flex flex-col items-center justify-center">
-                            <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
-                            <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner}</div>
-                                <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket.close(); setBoard({}) }}>
-                                    New Game
-                                </Button>
-                        </div>
-                    )}
+export function LocalTicTacToe({ setWinner, setOpponent }) {
+    const [bg, setBg] = useState("#000000");
+    useEffect(() => {
+        let choosenTheme = localStorage.getItem('theme');
+
+        switch (choosenTheme) {
+            case "theme1":
+                setBg("#ff7f50");
+                break;
+            case "theme2":
+                setBg("#006400");
+                break;
+        }
+
+        setOpponent({avatar: null, username: "Self", id: null});
+    }, [])
+
+    const winningCombinations = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+    const [symbol, setSymbol] = useState("X");
+    const [board, setBoard] = useState({});
+
+    const checkWinning = (arr) => {
+        return winningCombinations.some((combination) => {
+            return combination.every((value) => arr.includes(value));
+        });
+    };
+
+    const handleCellClick = (event) => {
+
+        const cellId = Number(event.currentTarget.id);
+        if (board[cellId])
+            return;
+
+
+        let updatedBoard = { ...board };
+        updatedBoard[cellId] = symbol;
+
+        setBoard(updatedBoard)
+
+        let tmp = []
+        Object.keys(updatedBoard).forEach((key, index) => {
+            if (updatedBoard[key] === symbol) {
+                tmp.push(Number(key));
+            }
+        });
+
+        if (checkWinning(tmp))
+            setWinner(`Player using ${symbol}`);
+        else if (Object.keys(updatedBoard).length === 9)
+            setBoard({});
+
+        setSymbol((prev) => prev === "X" ? "O" : "X");
+
+    };
+
+    const renderBoard = () => {
+        const cells = [];
+        for (let i = 0; i < 9; i++) {
+            cells.push(
+                <div
+                    className="border-2 border-white w-28 h-28 flex justify-center"
+                    id={`${i}`}
+                    key={i}
+                    onClick={handleCellClick}
+                >
+                    <span className="text-center flex justify-center items-center text-3xl font-bold">{board[i]}</span>
                 </div>
+            );
+        }
+        return cells;
+    };
 
-
-                <Card className="glass w-1/4 p-6 space-y-6">
-                    user info
-                </Card>
-
-            </div>
-
-        </>
-
+    return (
+        <Card className={`p-8 bg-transparent border-white border-4`} style={{ backgroundColor: bg }} >
+            <div className={`grid grid-cols-3 gap-5 m-auto w-full`}>{renderBoard()}</div>
+        </Card>
     );
 }

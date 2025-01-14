@@ -11,12 +11,14 @@ import { UserContext } from "@/contexts";
 import { toast } from "react-toastify";
 import OldMessages from "../components/custom/old_messages";
 import NewMessages from "../components/custom/new_messages";
-import Spinner from "@/components/ui/spinner"
+import Spinner from "@/components/ui/spinner"  
 import { Link } from "react-router-dom";
 import defaultAvatar from "@/assets/profile.jpg";
 import InviteButton from "../components/custom/invite-button";
+import { useSearchParams } from 'react-router-dom';
 
 export function Chat() {
+    
     const user = useContext(UserContext);
     const [socket, setSocket] = useState(null);
     const [chats, setChats] = useState(null);
@@ -24,19 +26,33 @@ export function Chat() {
     const isWsOpened = useRef(false);
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef(null);
-    
+
+    const [searchParams] = useSearchParams();
+    const chat_id = !(Number(searchParams.get("chat_id"))) ? null : Number(searchParams.get("chat_id"));
+
+    const [searchResults, setSearchResults] = useState(chats);
+    const [userSearch, setUserSearch] = useState("");
+
+
     const fetchChats = async () => {
         try {
             const res = await get('/getChats/');
             const chatPromises = res.map(async (chat) => {
-                const userRes = await get(`/api/user/get-info?user_id=${chat.user2}`);
+                const userRes = await get(`user/get-info?user_id=${chat.user2}`);
                 chat.user2 = userRes;
                 return chat;
             });
     
             const cchats = await Promise.all(chatPromises);
             setChats(cchats);
-            cchats.length !== 0 ? setCurrentChat(cchats[0]) : setCurrentChat("nothing");
+            setSearchResults(cchats);
+
+            if (cchats.length !== 0 && chat_id) {
+                let targetedCurrentChat = cchats.find(c => c.chat_id === chat_id);
+                setCurrentChat(targetedCurrentChat);
+            }
+            else
+                cchats.length !== 0 ? setCurrentChat(cchats[0]) : setCurrentChat("nothing");
     
         } catch (error) {
             console.log('Error fetching chats:', error);
@@ -71,22 +87,30 @@ export function Chat() {
         }
     }
 
-
     useEffect(() => {
-
         fetchChats();
     }, []);
+
+
+    useEffect(() => {        
+        if (!userSearch || userSearch.trim() === ""){
+            setSearchResults(chats);
+            return ;
+        };
+        setSearchResults(chats.filter(friend => friend.user2.username.match(new RegExp(`\\b${userSearch}`, 'i'))));
+        
+    }, [userSearch])
 
 
     return (
         <div className="flex gap-6 h-[calc(100vh-8rem)]">
             {/* Chat List */}
             <Card className="glass w-64 p-4 flex flex-col gap-3">
-                <Input type="text flex-initial" placeholder="Search chats..." />
+                <Input type="text flex-initial" placeholder="Search chats..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
 
-                {chats ? (
-                    chats.length !== 0 ? (
-                        chats.map((chat, index) => {
+                {searchResults ? (
+                    searchResults.length !== 0 ? (
+                        searchResults.map((chat, index) => {
                             return (
                                 <div
                                     key={index}
@@ -166,7 +190,7 @@ export function Chat() {
                                         <span>{currentChat?.user2?.username}</span>
                                     </Link>
                                 </h3>
-                                <p className="text-sm text-gray-500">Online</p>
+                                <p className="text-sm text-gray-500">{currentChat?.user2?.online ? "Online" : "Offline"}</p>
                             </div>
                             <div className="space-y-2">
 

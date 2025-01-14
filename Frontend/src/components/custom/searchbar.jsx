@@ -32,7 +32,7 @@ export default function SearchBar({count, socket, setCount}) {
 
     setIsLoading(true);
     try {
-      const response = await get(`/api/user/get-all?search=${query}`);
+      const response = await get(`user/get-all?search=${query}`);
       setUsers(response);
     } catch (error) {
       console.error("Error fetching users:", error);

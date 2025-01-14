@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
 export default function connect_websocket(url, closeOrError) {
 
     const token = Cookies.get('access_token');
+    console.log(url + `?token=${token}`);
+    
     const newSocket = new WebSocket(url + `?token=${token}`);
     
     newSocket.onerror = (error) => {

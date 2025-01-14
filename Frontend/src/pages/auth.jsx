@@ -4,8 +4,10 @@ import Logo42 from "@/assets/42.svg"
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import auth_img from "@/assets/auth.png"
 
-const intraApiUrl = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-130a1202541bd6319e459cf8ad6a3b5974e3e6390afce2a70f081a497e7f8bbe&redirect_uri=http%3A%2F%2Flocalhost%3A8000%2Fapi%2Fauth%2FOAuth&response_type=code'
+
+const intraApiUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${import.meta.env.VITE_42_OAUTH_ID}&redirect_uri=http://${import.meta.env.VITE_HOST}/api/auth/OAuth&response_type=code`
 
 export default function Auth({ setUser }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -25,7 +27,7 @@ export default function Auth({ setUser }) {
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
-      let res = await axios.post('http://localhost:8000/api/OTP/verify', {
+      let res = await axios.post(`http://${import.meta.env.VITE_HOST}/OTP/verify`, {
         username: username,
         code: e.target.otp.value
       }, {withCredentials: true});
@@ -46,6 +48,7 @@ export default function Auth({ setUser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const formData = new FormData(e.target);
     const username = formData.get("username");
     const email = formData.get("email");
@@ -63,7 +66,7 @@ export default function Auth({ setUser }) {
         ? { username, email, password }
         : { username, password };
 
-      const response = await axios.post(`http://localhost:8000/${endpoint}`, payload, { withCredentials: true });
+      const response = await axios.post(`http://${import.meta.env.VITE_HOST}/${endpoint}`, payload, { withCredentials: true });
       isSignup ? toast.success("You've created an account successfully!") : toast.success("You've logged in successfully!");
       setIsSignup(false);
 
@@ -186,7 +189,7 @@ export default function Auth({ setUser }) {
         <div className="hidden md:flex flex-col w-[44%]">
           <img
             // loading="lazy"
-            src="https://cdn.builder.io/api/v1/image/assets/6cf02da4bad24179a51f8a7eecbdc347/22567e203d7fccc709b8fdb4363ed7dd90b445c3bdff983c0814e065fd27302f?apiKey=6cf02da4bad24179a51f8a7eecbdc347&"
+            src={auth_img}
             alt=""
             className="object-contain grow w-full rounded-none aspect-[0.84]"
           />

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import datetime
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,16 +22,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x+y&n_p00q=d^tb_)wujkjj*(di-0*2)0&&38+cv!9lkae&tw7'
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-JWT_SECRET_KEY = 'django-insecure-x+y&n_p00q=d^tb_)wujkjj*(di-0*2)0&&38+cv!9lkae&tw7'
-JWT_ALGORITHM = 'HS256'  
+# JWT_SECRET_KEY = 'django-insecure-x+y&n_p00q=d^tb_)wujkjj*(di-0*2)0&&38+cv!9lkae&tw7'
+# JWT_ALGORITHM = 'HS256'  
 JWT_ACCESS_EXPIRATION_TIME = datetime.timedelta(minutes=15)  # Access Token expiration time
 JWT_REFRESH_EXPIRATION_TIME = datetime.timedelta(days=7)  # Refresh Token expiration time
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = eval(os.getenv("DJANGO_DEBUG_MODE"))
 DEBUG = True
-
 
 
 # Application definition
@@ -182,11 +183,10 @@ SIMPLE_JWT = {
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
 }
 
-OAUTH_CLIENT_ID="u-s4t2ud-130a1202541bd6319e459cf8ad6a3b5974e3e6390afce2a70f081a497e7f8bbe"
-OAUTH_CLIENT_SECRET="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"
-OAUTH_CLIENT_ID="u-s4t2ud-130a1202541bd6319e459cf8ad6a3b5974e3e6390afce2a70f081a497e7f8bbe"
-OAUTH_CLIENT_SECRET="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"
-OAUTH_REDIRECT_URI="http://localhost:8000/api/auth/OAuth"
+OAUTH_CLIENT_ID=os.getenv("VITE_42_OAUTH_ID")
+OAUTH_CLIENT_SECRET=os.getenv("DJANGO_42_OAUTH_SECRET")
+
+OAUTH_REDIRECT_URI=f"http://{os.getenv('VITE_HOST')}/api/auth/OAuth"
 # OAUTH_REDIRECT_URI="http://localhost:80/api/auth/OAuth"
 
 PUBLIC_PATHS = [

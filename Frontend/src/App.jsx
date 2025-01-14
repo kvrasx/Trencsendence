@@ -1,6 +1,6 @@
 import { Layout } from '@/components/custom/layout'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { TicTacToe } from './pages/tic-tac-toe'
+import { LocalTicTacToe, TicTacToe } from './pages/tic-tac-toe'
 import { Chat } from './pages/chat'
 import { Leaderboard } from './pages/leaderboard'
 import Error404 from './pages/error404';
@@ -12,10 +12,30 @@ import Logout from './pages/logout';
 import Spinner from '@/components/ui/spinner';
 import { get } from '@/lib/ft_axios';
 import OtherProfile from './pages/other-profile';
-import PingPong from './pages/ping-pong';
+// import PingPong from './pages/ping-pong';
 import InvitePingPong from './pages/invite-ping-pong';
 
 import { toast, ToastContainer } from 'react-toastify';
+import { Game } from './pages/game';
+import PingPongGame from './components/custom/ping-pong-game';
+import Tournament from './pages/tournament';
+
+function PingPongPage() {
+  return <Game
+    key="ping-pong"
+    RemoteGameComponent={PingPongGame}
+    websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`}
+  />
+}
+
+function TicTacToePage() {
+  return <Game
+    key="tic-tac-toe"
+    RemoteGameComponent={TicTacToe}
+    websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/game/random/`}
+    LocalGameComponent={LocalTicTacToe}
+  />
+}
 
 function App() {
 
@@ -27,15 +47,15 @@ function App() {
     const starting = async () => {
       if (!user) {
         try {
-          const storedUser = await get('/api/user/get-info');
+          const storedUser = await get('user/get-info');
           if (storedUser) {
             setUser(storedUser);
           }
         } catch (e) {
-          
+
           if (e === 401)
             setUser(null);
-          
+
         } finally {
           setReady(true);
         }
@@ -58,8 +78,9 @@ function App() {
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
-                <Route path="/ping-pong" element={<Layout><PingPong /></Layout>} />
-                <Route path="/tic-tac-toe" element={<Layout><TicTacToe /></Layout>} />
+                <Route path="/ping-pong" element={<Layout><PingPongPage /></Layout>} />
+                <Route path="/tic-tac-toe" element={<Layout><TicTacToePage /></Layout>} />
+                <Route path="/tournament" element={<Layout><Tournament /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />
               </>
             ) : (

@@ -128,9 +128,6 @@ const Canvas = () => {
     ball = new Ball(canvasWidth * 0.5, canvasHeight * 0.5, ballRadius, ballSpeed, 0, initAngle, canvasWidth, ballSpeed);
     p5.frameRate(60);
   };
-  // if (leftPaddle.score === 10 || rightPaddle.score === 5){
-  //   return ;
-  // }
 
   const handlePaddleMovement = (p5) => {
     // console.log("whach dkhel be3da");

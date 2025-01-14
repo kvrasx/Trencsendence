@@ -15,19 +15,20 @@ import { ProgressDemo } from '@/components/ui/progress'
 import { useEffect, useState } from 'react';
 
 export default function Profile({ user, setUser }) {
+
     const [matches, setMatches] = useState(null);
     const [matchesData, setMatchesData] = useState(null);
-
+    
     useEffect(() => {
         const fetchMatches = async () => {
             try {
-                let res = await get('/api/match/get-all');
+                let res = await get(setUser ? 'match/get-all' : 'match/get-all?user_id='+user.id);
                 setMatchesData({
                     playedPong: res.filter(match => match.game_type === 1).length,
+                    winsPong: res.filter(match => match.game_type === 1 && match.winner_user.username === user.username).length,
+                    lossesPong: res.filter(match => match.game_type === 1 && match.loser_user.username === user.username).length,
+                    goalsPong: res.filter(match => match.game_type === 1).reduce((acc, match) => acc + parseInt(match.score.split(':')[0]), 0),
                     playedXO: res.filter(match => match.game_type === 2).length,
-                    winsPong: res.filter(match => match.winner_user.username === user.username).length,
-                    lossesPong: res.filter(match => match.loser_user.username === user.username).length,
-                    goalsPong: res.reduce((acc, match) => acc + parseInt(match.score.split(':')[0]), 0),
                     winsXO: res.filter(match => match.game_type === 2 && match.winner_user.username === user.username).length,
                     lossesXO: res.filter(match => match.game_type === 2 && match.loser_user.username === user.username).length
                 })
@@ -45,7 +46,7 @@ export default function Profile({ user, setUser }) {
     console.log(user);
 
     const updateProfile = async (data, successMsg) => {
-        let res = await post('/api/user/update', data, {
+        let res = await post('user/update', data, {
             'Content-Type': 'multipart/form-data',
         })
         if (res?.user) {
@@ -131,9 +132,9 @@ export default function Profile({ user, setUser }) {
                 <div className="grid md:grid-cols-2 md:grid-rows-2  gap-x-20 pt-7  gap-4 flex-1 ">
 
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl flex-auto flex-col flex ">
-                        <h2 className="text-xl font-semibold text-gray-400">Stats</h2>
-                        <div className="md:flex justify-center gap-4 items-center h-full w-full">
-                            <div className="flex flex-col flex-1 gap-2 text-lg font-bold">
+                        <h2 className="text-md font-semibold text-gray-400">Stats</h2>
+                        <div className="md:flex justify-center gap-4 items-center h-full w-full overflow-y-auto themed-scrollbar">
+                            <div className="flex flex-col flex-1 gap-2 text-md font-bold ">
                                 <div className="flex flex-row justify-center items-center gap-3">
                                     <span>Score</span>
                                     <ProgressDemo value={user.score} className="" />
@@ -175,10 +176,13 @@ export default function Profile({ user, setUser }) {
                                     <span className='font-semibold text-sm'>{matchesData.lossesXO}</span>
                                 </div>
                             </div>
+                            <div className="flex-initial w-2/6">
+                                
                             <DonutChart
                                 wins={matchesData.winsPong + matchesData.winsXO}
                                 losses={matchesData.lossesPong + matchesData.lossesXO}
-                            />
+                                />
+                                </div>
                         </div>
                     </div>
 
@@ -186,38 +190,12 @@ export default function Profile({ user, setUser }) {
                         <h2 className="text-xl font-semibold text-gray-400">Summary</h2>
                         <div className="">
                             <div className="-ml-8">
-
+    
                                 <MultiLineChart matches={matches} />
                             </div>
                         </div>
 
                     </div>
-
-                    {/* <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none overflow-y-auto themed-scrollbar flex-col flex gap-2">
-                        <h2 className="text-xl font-semibold text-gray-400">My Friends</h2>
-                        <div className="space-y-3">
-                            {Array.from({ length: 10 }).map((_, index) => (
-                                <div key={index} className="overflow-x-auto flex justify-between items-center p-4 rounded-lg glass hover:shadow-lg transition-shadow duration-300 space-x-4">
-                                    <div className="flex items-center gap-3 cursor-pointer">
-                                        <Avatar className="flex-none w-10 h-10">
-                                            <AvatarImage src={null} alt="user avatar" />
-                                            <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
-                                        </Avatar>
-                                        <span className="text-md font-medium">{"test"}</span>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Button variant="ghost" className="rounded-xl border border-gray-500 hover:bg-secondary px-2" size="lg">
-                                            <MessageSquare className="" />
-                                        </Button>
-                                        <Button variant="ghost" className="rounded-xl border border-gray-500  hover:bg-secondary px-3" size="lg">
-                                            <Swords className="w-6 h-6 mr-2" />
-                                            <span className='hidden md:block'>Challenge</span>
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div> */}
 
 
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none flex-initial overflow-y-auto themed-scrollbar flex-col flex gap-2">
@@ -229,7 +207,7 @@ export default function Profile({ user, setUser }) {
                                     className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
                                 >
                                     <div>
-                                        <div className="font-medium"> <span className='text-xs'>vs</span> {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
+                                        <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
                                         <div className="text-sm text-muted-foreground">
                                             {match.match_date}
                                         </div>

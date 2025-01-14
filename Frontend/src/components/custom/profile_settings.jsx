@@ -27,7 +27,7 @@ export default function ProfileSettings({ updateProfile, user }) {
 
     const getTwoFactorSecret = async () => {
       try {
-        let res = await get('/api/OTP/get-qr');
+        let res = await get('OTP/get-qr');
         setTwoFactorSecret(res.qr_code);        
       } catch (e) {
         toast.error("Failed to get 2FA QR code. Please try again.");

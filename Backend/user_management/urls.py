@@ -1,6 +1,7 @@
 from django.urls import path
 from user_management.views import UserTableViewSet, MatchTableViewSet, OTPViewSet
 from user_management.viewset_auth import authViewSet
+from chat.urls import urlpatterns as urls
 
 urlpatterns = [
     # User table endpoints
@@ -27,3 +28,5 @@ urlpatterns = [
     path('match/get-all', MatchTableViewSet.getAllMatchEntries),
     path('match/delete', MatchTableViewSet.deleteMatchEntry),
 ]
+
+urlpatterns += urls

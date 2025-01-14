@@ -7,6 +7,7 @@ from user_management.models import User
 from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
 from django.shortcuts import get_object_or_404
+from user_management.serializers import UserSerializer
 
 winningCombinations = [
     [0, 1, 2],
@@ -80,36 +81,11 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.close(code=4007)
             return
 
-        # else:
-        #     try:
-        #         inviteId = self.scope['url_route']['kwargs']['room_name']
-        #     except:
-        #         await self.accept()
-        #         await self.close(code=4007)
-        #         return
-        #     invite = get_object_or_404(Invitations, id=inviteId)
-        #     if invite.user1.id != user.id or invite.user2.id != user.id or invite.status != "accepted":
-        #         await self.accept()
-        #         await self.close(code=4006)
-        #         return
-        #     self.room_group_name = f"xo_{inviteId}"
-        #     await self.channel_layer.group_add(
-        #         self.room_group_name,
-        #         self.channel_name
-        #     )
-
-        #     if self.room_group_name not in self.matchs:
-        #         self.matchs[ self.room_group_name ].append(self.user_id)
-        #     else:
-        #         self.matchs[ self.room_group_name ] = [ self.user_id ]
-
-        #     if (len(self.matchs[ self.room_group_name ]) == 2):
-        #         await self.game_started()
-
         current_players.add(self.user.id)
         print(current_players)
         await self.accept()
         
+
 
 
     async def receive(self, text_data=None):
@@ -178,6 +154,25 @@ class GameConsumer(AsyncWebsocketConsumer):
         if close_code == 4008 or close_code == 4009 or close_code == 4007:
             return
 
+        if hasattr(self, 'match'):
+            await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
+                    "game_type": 2,
+                    "winner": self.match.player1.id if self.match.player2.id == self.user.id else self.match.player2.id,
+                    "loser": self.user.id,
+                    "score": "01:00"
+                })
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "group_message",
+                    "message": {
+                        "action": "game_over",
+                        "status": "finished",
+                        "winner": self.match.player1.username if self.match.player2.id == self.user.id else self.match.player2.username,
+                        "loser": self.user.username
+                    }
+                }
+            )
         try:
             current_players.remove(self.user.id)
         except:
@@ -194,6 +189,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         # discard the channel from the group
         if self.room_group_name:
             await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
         
         
     async def game_started(self):
@@ -217,14 +213,17 @@ class GameConsumer(AsyncWebsocketConsumer):
         ))
 
     async def start_group_match(self, event):
-        print("grp name :" , self.room_group_name)
         self.match = self.matchs[self.room_group_name]
         await self.send(text_data=json.dumps({
-            "action": "game_start"
+            "action": "game_start",
         }))
+
 
         await self.send(text_data=json.dumps({
             "action": "assign_symbol",
-            "symbol": self.match.roles[self.user.id]
+            "symbol": self.match.roles[self.user.id],
+            "opponent": UserSerializer(instance=self.match.player1).data if self.match.player1.id != self.user.id else UserSerializer(instance=self.match.player2).data
         }))
+
+
                 

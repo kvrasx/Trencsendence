@@ -19,7 +19,8 @@ class UserTableViewSet:
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({"user": serializer.data})
+        # return Response({"user": serializer.data})
+        return Response({"success": "Account created successfully."}, status=200)
 
     ######################
 

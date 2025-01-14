@@ -7,7 +7,6 @@ import { Send, X, UserPlus, Swords, Ban, BellOff, LogIn, BellDot, Target } from 
 import { get } from '@/lib/ft_axios';
 import { post } from '@/lib/ft_axios';
 import { Layout } from '@/components/custom/layout'
-import  PingPong  from './ping-pong.jsx'
 
 
 import {
@@ -26,10 +25,10 @@ export function Notifications({ setShowNotifications, socket }) {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        let res = await get('/getNotifications/');  // Fetch notifications
+        let res = await get('getNotifications/');  // Fetch notifications
         let chatPromises = res.map(async (d) => {
           // Fetch user info for each notification
-          let userRes = await get(`/api/user/get-info?user_id=${d.user1}`);
+          let userRes = await get(`user/get-info?user_id=${d.user1}`);
           d.user2 = userRes;  // Attach user info to the notification object
           return d;  // Return the updated notification
         });
