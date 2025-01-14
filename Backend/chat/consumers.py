@@ -43,7 +43,7 @@ class ChatConsumer(WebsocketConsumer):
             }
             serializer = MessageSerializer(data=full_data)
             # print(message)
-            if serializer.is_valid(raise_exception=True):
+            if serializer.is_valid():
                 serializer.save()
             else:
                 return
