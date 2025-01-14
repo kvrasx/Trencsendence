@@ -127,7 +127,7 @@ export default function Profile({ user, setUser }) {
 
             {matchesData && matches && 
             
-            <div className="flex max-h-[50vh] flex-row justify-center min-w-full ">
+            <div className="flex h-2/5 flex-row justify-center min-w-full ">
 
                 <div className="grid md:grid-cols-2 md:grid-rows-2  gap-x-20 pt-7  gap-4 flex-1 ">
 

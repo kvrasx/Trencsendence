@@ -17,6 +17,7 @@ import { get } from "../lib/ft_axios";
 import { toast } from "react-toastify";
 import InviteButton from "../components/custom/invite-button";
 import { UserContext } from "@/contexts"
+import Canvas from '../components/custom/localgame'
 
 export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, ...o }) {
 
@@ -27,17 +28,20 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
     const [winner, setWinner] = useState(null);
     const [socket, setSocket] = useState(null);
     const [gamePongStartData, setPongGameStartData] = useState(null);
-    const [friends, setFriends] = useState([])
+    const [friends, setFriends] = useState([]);
 
     const [searchResults, setSearchResults] = useState(friends);
     const [userSearch, setUserSearch] = useState("");
 
     const [opponent, setOpponent] = useState(null);
     const [recentMathces, setRecentMatches] = useState([]);
+    const [location, setLocation] = useState(null);
 
     useEffect(() => {
 
-        console.log(waiting);
+        
+        setLocation(window.location);
+
 
         if (!waiting) {
             if (socket) {
@@ -96,6 +100,8 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
                 try {
                     let res = await get('/match/get-all?with_id=' + opponent.id);
+                    console.log("sdfds", res);
+                    
                     setRecentMatches(res);
                 } catch (e) {
                     toast.error("Error fetching recent matches. Please try again.")
@@ -152,7 +158,9 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                 :
                                 <RemoteGameComponent websocket={socket} setWinner={setWinner} setOpponent={setOpponent} />
                         ) : (
-                            <LocalGameComponent setWinner={setWinner} setOpponent={setOpponent} />
+                            !opponent && setOpponent({avatar: null, username: "Self", id: null}),
+                            <LocalGameComponent setWinner={setWinner} />
+
                         )) : (
 
                             <div className="flex flex-col items-center justify-center">

@@ -14,6 +14,7 @@ import { get } from '@/lib/ft_axios';
 import OtherProfile from './pages/other-profile';
 // import PingPong from './pages/ping-pong';
 import InvitePingPong from './pages/invite-ping-pong';
+import Canvas from './components/custom/localgame';
 
 import { toast, ToastContainer } from 'react-toastify';
 import { Game } from './pages/game';
@@ -25,6 +26,7 @@ function PingPongPage() {
     key="ping-pong"
     RemoteGameComponent={PingPongGame}
     websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`}
+    LocalGameComponent={Canvas}
   />
 }
 
@@ -78,7 +80,7 @@ function App() {
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
-                <Route path="/ping-pong" element={<Layout><PingPongPage /></Layout>} />
+                <Route path="/ping-pong" element={<Layout><PingPongPage  /></Layout>} />
                 <Route path="/tic-tac-toe" element={<Layout><TicTacToePage /></Layout>} />
                 <Route path="/tournament" element={<Layout><Tournament /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />

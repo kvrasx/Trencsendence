@@ -154,7 +154,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         if close_code == 4008 or close_code == 4009 or close_code == 4007:
             return
 
-        if hasattr(self, 'match'):
+        if self.match:
             await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                     "game_type": 2,
                     "winner": self.match.player1.id if self.match.player2.id == self.user.id else self.match.player2.id,

@@ -110,6 +110,8 @@ function PingPongGame({ websocket, setWinner, gameStartData }) {
 
   useEffect(() => {
     // data received when game started
+    console.log(gameStartData);
+    
     setPlayerNmber(gameStartData['information']['player_number'])
     setPlayerName(gameStartData['information']['player_name'])
     canvasH = gameStartData.paddleLeft.canvasHeight

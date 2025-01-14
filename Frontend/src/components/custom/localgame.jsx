@@ -100,13 +100,30 @@ class Ball {
 
   
 
-const Canvas = () => {
+const Canvas = ({setWinner}) => {
   let leftPaddle, rightPaddle, ball;
   let paddleWidth = 0;//= p5.width * 0.02; // 2% of canvas width
   let paddleHeight = 0;// = p5.height * 0.2; // 20% of canvas height
   let ballRadius = 0;// p5.width * 0.02; // 2% of canvas width
   let initAngle = 0;
   // let constBallSpeed = ballSpeed;
+  
+
+let bg = 0;
+  // useEffect(() => {
+        let choosenTheme = localStorage.getItem('theme');
+
+        switch (choosenTheme) {
+            case "theme1":
+                bg = ("#ff7f50");
+                break;
+            case "theme2":
+                bg = ("#006400");
+                break;
+        }
+
+    //     setOpponent({avatar: null, username: "Self", id: null});
+    // }, [])
   
   const setup = (p5, canvasParentRef) => {
     const canvasWidth = 600; // 80% of window width
@@ -154,7 +171,7 @@ const Canvas = () => {
     const dashHeight = 2;        // Height of each dash
     const gapHeight = 5;         // Gap between dashes
     
-    p5.background('#000000');
+    p5.background(bg);
     p5.stroke(255);               // Set line color to white
     p5.strokeWeight(2);           // Set line thickness
     // Loop to draw dashes
@@ -173,6 +190,10 @@ const Canvas = () => {
     p5.text(leftPaddle.score, p5.width * 0.25, p5.height * 0.2); // Left score at 25% width
     p5.text(rightPaddle.score, p5.width * 0.75, p5.height * 0.2); // Right score at 75% width
     ball.show(p5);
+    if (rightPaddle.score == 5 || leftPaddle.score == 5){
+        setWinner(rightPaddle.score == 5 ? "right" : "left")
+        p5.noloop();
+    }
   };
 
   return <Sketch setup={setup}   draw={draw} />;

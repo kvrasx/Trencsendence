@@ -9,6 +9,7 @@ from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
 from tic_tac_toe.consumers import current_players
 import math
+from user_management.serializers import UserSerializer
 
 class Match:
     def __init__(self, player_1, player_2, group_name):
@@ -101,6 +102,7 @@ class GameClient(AsyncWebsocketConsumer):
                 'player_number': '',
                 'player_username': self.user.username,
                 'user_id': self.user.id,
+                'user': UserSerializer(self.user).data
             },
             "match": None
         }
@@ -275,7 +277,7 @@ class GameClient(AsyncWebsocketConsumer):
                         "score":  score
                     }
                 )
-                return ;
+                return
             
             await self.channel_layer.group_send(
                 self.group_name,
@@ -374,5 +376,6 @@ class GameClient(AsyncWebsocketConsumer):
             'started': 'yes',
             'paddleRight': self.new_match.paddleRight.to_dict(),
             'paddleLeft': self.new_match.paddleLeft.to_dict(),
-            'ball': self.new_match.ball.to_dict()
+            'ball': self.new_match.ball.to_dict(),
+            'opponent': self.new_match.player1['user'] if self.new_match.player2['user_id'] == self.user.id else self.new_match.player2['user']
         }))

@@ -106,7 +106,7 @@ export function TicTacToe({ websocket, setWinner, setOpponent }) {
     );
 }
 
-export function LocalTicTacToe({ setWinner, setOpponent }) {
+export function LocalTicTacToe({ setWinner }) {
     const [bg, setBg] = useState("#000000");
     useEffect(() => {
         let choosenTheme = localStorage.getItem('theme');
@@ -119,8 +119,6 @@ export function LocalTicTacToe({ setWinner, setOpponent }) {
                 setBg("#006400");
                 break;
         }
-
-        setOpponent({avatar: null, username: "Self", id: null});
     }, [])
 
     const winningCombinations = [
