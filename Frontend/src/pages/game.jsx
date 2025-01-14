@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 import InviteButton from "../components/custom/invite-button";
 import { UserContext } from "@/contexts"
 
-export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false }) {
+export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, key }) {
 
     const user = useContext(UserContext);
 
@@ -78,12 +78,13 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                 setPongGameStartData(data);
                 setStarted("remote");
             };
-
-
-            return () => {
-                websocket.close();
-            };
         }
+
+        return () => {
+            websocket.close();
+            setSocket(null);
+        };
+
     }, [waiting]);
 
 
@@ -92,7 +93,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
             const fetchRecentMatches = async () => {
                 if (!opponent || !opponent.id) return;
                 console.log(opponent);
-                
+
                 try {
                     let res = await get('/match/get-all?with_id=' + opponent.id);
                     setRecentMatches(res);
@@ -138,165 +139,164 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
     }, [userSearch])
 
     return (
-        <>
-            <div className="flex gap-6 h-[75vh]">
 
-                <div className="p-5 flex-1 glass flex flex-row justify-center items-center">
+        <div className="flex gap-6 h-[75vh]" key={key} >
 
-                    {!winner ? (
-                        waiting ? (
-                            started ? (started === "remote" ? (
-                                gamePongStartData ?
-                                    <RemoteGameComponent websocket={socket} setWinner={setWinner} gameStartData={gamePongStartData} />
-                                    :
-                                    <RemoteGameComponent websocket={socket} setWinner={setWinner} setOpponent={setOpponent} />
-                            ) : (
-                                <LocalGameComponent setWinner={setWinner} setOpponent={setOpponent} />
-                            )) : (
+            <div className="p-5 flex-1 glass flex flex-row justify-center items-center">
 
-                                <div className="flex flex-col items-center justify-center">
-                                    <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...</div>
-                                    <Spinner />
-                                </div>
-                            )
+                {!winner ? (
+                    waiting ? (
+                        started ? (started === "remote" ? (
+                            gamePongStartData ?
+                                <RemoteGameComponent websocket={socket} setWinner={setWinner} gameStartData={gamePongStartData} />
+                                :
+                                <RemoteGameComponent websocket={socket} setWinner={setWinner} setOpponent={setOpponent} />
                         ) : (
-                            <div className="flex gap-3">
-                                <div className='inline space-y-4 space-x-'>
-                                    <div className='border-y-2 border-white border-opacity-40 rounded-lg white w-72 h-80 flex justify-center items-center'>
-                                        <RiWifiOffLine className='size-44 animate-pulse' />
-                                    </div>
-                                    <div className='flex justify-center items-center'>
-                                        <button onClick={() => { setWaiting(true); setStarted("local") }} className='border-y-4 border-red-700 w-48 h-14 rounded-lg text-2xl hover:border-y-4 hover:border-blue-600 '>
-                                            local mode
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className='inline space-y-4'>
-                                    <div className='border-y-2 p-3 flex space-x-3 justify-center items-center border-white border-opacity-40 rounded-lg white w-72 h-80'>
-                                        <div className='w-28 h-full flex justify-center items-center'><GiPerspectiveDiceSixFacesRandom className='size-28 hover:animate-spin' /></div>
-                                    </div>
-                                    <div className='flex justify-center items-center space-x-7'>
-                                        <button onClick={() => setWaiting(true)} className='border-y-4 border-green-700 w-32 h-14 rounded-lg text-lg hover:border-y-4 hover:border-blue-600 '>
-                                            random match
-                                        </button>
-                                    </div>
-                                </div>
+                            <LocalGameComponent setWinner={setWinner} setOpponent={setOpponent} />
+                        )) : (
+
+                            <div className="flex flex-col items-center justify-center">
+                                <div className="text-3xl font-bold text-center mb-4 text-gray-300">Waiting for opponent...</div>
+                                <Spinner />
                             </div>
                         )
                     ) : (
-                        <div className="flex flex-col items-center justify-center">
-                            <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
-                            <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner}</div>
-                            <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket && socket.close(); }}>
-                                New Game
-                            </Button>
+                        <div className="flex gap-3">
+                            <div className='inline space-y-4 space-x-'>
+                                <div className='border-y-2 border-white border-opacity-40 rounded-lg white w-72 h-80 flex justify-center items-center'>
+                                    <RiWifiOffLine className='size-44 animate-pulse' />
+                                </div>
+                                <div className='flex justify-center items-center'>
+                                    <button onClick={() => { setWaiting(true); setStarted("local") }} className='border-y-4 border-red-700 w-48 h-14 rounded-lg text-2xl hover:border-y-4 hover:border-blue-600 '>
+                                        local mode
+                                    </button>
+                                </div>
+                            </div>
+                            <div className='inline space-y-4'>
+                                <div className='border-y-2 p-3 flex space-x-3 justify-center items-center border-white border-opacity-40 rounded-lg white w-72 h-80'>
+                                    <div className='w-28 h-full flex justify-center items-center'><GiPerspectiveDiceSixFacesRandom className='size-28 hover:animate-spin' /></div>
+                                </div>
+                                <div className='flex justify-center items-center space-x-7'>
+                                    <button onClick={() => setWaiting(true)} className='border-y-4 border-green-700 w-32 h-14 rounded-lg text-lg hover:border-y-4 hover:border-blue-600 '>
+                                        random match
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    )}
+                    )
+                ) : (
+                    <div className="flex flex-col items-center justify-center">
+                        <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
+                        <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner}</div>
+                        <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket && socket.close(); }}>
+                            New Game
+                        </Button>
+                    </div>
+                )}
 
 
 
 
 
-                </div>
+            </div>
 
-                <Card className="glass w-1/4 px-5 py-8 space-y-6 flex flex-col ">
-                    {!started ? (
-                        <div className="flex flex-col gap-4">
-                            <h2 className="text-xl font-semibold text-center text-gray-400">Challenge Friends</h2>
-                            <Input type="text flex-initial" placeholder="Search friends..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
-                            <div className="space-y-3 overflow-auto themed-scrollbar max-h-[63.4vh]">
-                                {searchResults.map((friend, index) => (
-                                    <div key={index} className=" flex justify-between items-center p-3 rounded-lg border-secondary border hover:shadow-lg transition-shadow duration-300 space-x-4">
-                                        <div className="flex items-center gap-3 cursor-pointer">
-                                            <Avatar className="flex-none w-11 h-11">
-                                                <AvatarImage src={friend.user2.avatar} alt="user avatar" />
-                                                <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
-                                            </Avatar>
-                                            <span className="text-md font-medium">{friend.user2.username}</span>
+            <Card className="glass w-1/4 px-5 py-8 space-y-6 flex flex-col ">
+                {!started ? (
+                    <div className="flex flex-col gap-4">
+                        <h2 className="text-xl font-semibold text-center text-gray-400">Challenge Friends</h2>
+                        <Input type="text flex-initial" placeholder="Search friends..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} />
+                        <div className="space-y-3 overflow-auto themed-scrollbar max-h-[63.4vh]">
+                            {searchResults.map((friend, index) => (
+                                <div key={index} className=" flex justify-between items-center p-3 rounded-lg border-secondary border hover:shadow-lg transition-shadow duration-300 space-x-4">
+                                    <div className="flex items-center gap-3 cursor-pointer">
+                                        <Avatar className="flex-none w-11 h-11">
+                                            <AvatarImage src={friend.user2.avatar} alt="user avatar" />
+                                            <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
+                                        </Avatar>
+                                        <span className="text-md font-medium">{friend.user2.username}</span>
+                                    </div>
+                                    <div className="flex gap-3">
+
+                                        <Link to={"/chat?chat_id=" + friend.chat_id}>
+                                            <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
+                                                <MessageSquare className="" />
+                                            </Button>
+                                        </Link>
+
+                                        <InviteButton type={"game"} defaultStatus={""} user_id={friend.user2.id} variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg" />
+
+
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-2">
+                            <h2 className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
+                            <div className="flex justify-between border border-gray-700 rounded-xl px-2 py-3">
+                                <div className="flex flex-col items-center gap-3 cursor-pointer">
+                                    <Avatar className="flex-none w-16 h-16">
+                                        <AvatarImage src={user.avatar} alt="user avatar" />
+                                        <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-md font-medium">{user.username}</span>
+                                </div>
+                                <div className="text-center text-2xl font-bold text-gray-300 my-5">
+                                    vs
+                                </div>
+                                <div className="flex flex-col items-center gap-3 cursor-pointer">
+                                    <Avatar className="flex-none w-16 h-16">
+                                        <AvatarImage src={opponent?.avatar} alt="user avatar" />
+                                        <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-md font-medium">{opponent?.username}</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div className="flex flex-col gap-2">
+
+                            <h3 className="text-md text-left font-semibold text-gray-300">Matches history</h3>
+                            <div className="space-y-3 w-full  overflow-auto themed-scrollbar">
+
+                                {recentMathces.map((match, index) => (
+                                    <div
+                                        key={match.match_id}
+                                        className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
+                                    >
+                                        <div>
+                                            <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
+                                            <div className="text-sm text-muted-foreground">
+                                                {match.match_date}
+                                            </div>
                                         </div>
-                                        <div className="flex gap-3">
 
-                                            <Link to={"/chat?chat_id=" + friend.chat_id}>
-                                                <Button variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg">
-                                                    <MessageSquare className="" />
-                                                </Button>
-                                            </Link>
+                                        {match.game_type === 1 && <div className="text-lg font-semibold">
+                                            {match.score.split(':').map(num => parseInt(num, 10)).join(' : ')}
+                                        </div>}
 
-                                            <InviteButton type={"game"} defaultStatus={""} user_id={friend.user2.id} variant="ghost" className="rounded-md border border-gray-500 hover:bg-secondary px-3" size="lg" />
-
-
-                                        </div>
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-sm font-medium ${match.winner_user.id === user.id
+                                                ? "bg-green-500/20 text-green-500"
+                                                : "bg-red-500/20 text-red-500"
+                                                }`}
+                                        >
+                                            {match.winner_user.id === user.id ? "Win" : "Loss"}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    ) : (
-                        <div className="flex flex-col gap-6">
-                            <div className="flex flex-col gap-2">
-                                <h2 className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
-                                <div className="flex justify-between border border-gray-700 rounded-xl px-2 py-3">
-                                    <div className="flex flex-col items-center gap-3 cursor-pointer">
-                                        <Avatar className="flex-none w-16 h-16">
-                                            <AvatarImage src={user.avatar} alt="user avatar" />
-                                            <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
-                                        </Avatar>
-                                        <span className="text-md font-medium">{user.username}</span>
-                                    </div>
-                                    <div className="text-center text-2xl font-bold text-gray-300 my-5">
-                                        vs
-                                    </div>
-                                    <div className="flex flex-col items-center gap-3 cursor-pointer">
-                                        <Avatar className="flex-none w-16 h-16">
-                                            <AvatarImage src={opponent?.avatar} alt="user avatar" />
-                                            <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
-                                        </Avatar>
-                                        <span className="text-md font-medium">{opponent?.username}</span>
-                                    </div>
-                                </div>
-                            </div>
+                    </div>
+                )}
 
+            </Card>
 
-                            <div className="flex flex-col gap-2">
+        </div>
 
-                                <h3 className="text-md text-left font-semibold text-gray-300">Matches history</h3>
-                                <div className="space-y-3 w-full  overflow-auto themed-scrollbar">
-
-                                    {recentMathces.map((match, index) => (
-                                        <div
-                                            key={match.match_id}
-                                            className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
-                                        >
-                                            <div>
-                                                <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    {match.match_date}
-                                                </div>
-                                            </div>
-
-                                            {match.game_type === 1 && <div className="text-lg font-semibold">
-                                                {match.score.split(':').map(num => parseInt(num, 10)).join(' : ')}
-                                            </div>}
-
-                                            <span
-                                                className={`px-3 py-1 rounded-full text-sm font-medium ${match.winner_user.id === user.id
-                                                    ? "bg-green-500/20 text-green-500"
-                                                    : "bg-red-500/20 text-red-500"
-                                                    }`}
-                                            >
-                                                {match.winner_user.id === user.id ? "Win" : "Loss"}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                </Card>
-
-            </div>
-
-        </>
 
     );
 }

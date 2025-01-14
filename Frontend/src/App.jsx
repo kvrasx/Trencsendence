@@ -21,11 +21,20 @@ import PingPongGame from './components/custom/ping-pong-game';
 import Tournament from './pages/tournament';
 
 function PingPongPage() {
-  return <Game RemoteGameComponent={PingPongGame} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`} />
+  return <Game
+    key="ping-pong"
+    RemoteGameComponent={PingPongGame}
+    websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`}
+  />
 }
 
 function TicTacToePage() {
-  return <Game RemoteGameComponent={TicTacToe} websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/game/random/`} LocalGameComponent={LocalTicTacToe} />
+  return <Game
+    key="tic-tac-toe"
+    RemoteGameComponent={TicTacToe}
+    websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/game/random/`}
+    LocalGameComponent={LocalTicTacToe}
+  />
 }
 
 function App() {
@@ -43,10 +52,10 @@ function App() {
             setUser(storedUser);
           }
         } catch (e) {
-          
+
           if (e === 401)
             setUser(null);
-          
+
         } finally {
           setReady(true);
         }

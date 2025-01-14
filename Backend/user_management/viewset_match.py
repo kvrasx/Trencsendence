@@ -58,8 +58,9 @@ class MatchTableViewSet:
 
         try:
             user_id = int(user_id)
-            with_user_id = int(with_user_id)
-        except:
+            if with_user_id is not None:
+                with_user_id = int(with_user_id)
+        except ValueError:
             return Response({"error": "user_id and with_user_id must be integers."}, status=status.HTTP_400_BAD_REQUEST)
 
         winner = request.GET.get('winner')
