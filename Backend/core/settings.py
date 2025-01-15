@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'user_management.apps.UserManagementConfig',
     'chat.apps.ChatConfig',
+    'ping_pong.apps.PingPongConfig',
     'corsheaders',
 ]
 

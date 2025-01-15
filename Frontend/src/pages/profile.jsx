@@ -13,6 +13,7 @@ import MultiLineChart from '@/components/ui/multiline-chart';
 import InviteButton from '../components/custom/invite-button';
 import { ProgressDemo } from '@/components/ui/progress'
 import { useEffect, useState } from 'react';
+import {formatDate} from '@/lib/utils';
 
 export default function Profile({ user, setUser }) {
 
@@ -201,7 +202,7 @@ export default function Profile({ user, setUser }) {
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none flex-initial overflow-y-auto themed-scrollbar flex-col flex gap-2">
                         <h2 className="text-xl font-semibold text-gray-400">Last Matches</h2>
                         <div className="space-y-3">
-                            {matches.map((match, index) => (
+                            {matches.length !== 0 ? matches.map((match, index) => (
                                 <div
                                     key={match.match_id}
                                     className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
@@ -209,7 +210,7 @@ export default function Profile({ user, setUser }) {
                                     <div>
                                         <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
                                         <div className="text-sm text-muted-foreground">
-                                            {match.match_date}
+                                            {formatDate(match.match_date)}
                                         </div>
                                     </div>
 
@@ -226,7 +227,7 @@ export default function Profile({ user, setUser }) {
                                         {match.winner_user.id === user.id ? "Win" : "Loss"}
                                     </span>
                                 </div>
-                            ))}
+                            )) : <div className="text-center mt-8 text-md text-muted-foreground">You haven't played any matches yet.</div>}
 
                         </div>
                     </div>

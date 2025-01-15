@@ -294,7 +294,8 @@ class GameClient(AsyncWebsocketConsumer):
             'type': event['type'], 
             'ball': event['ball'] 
         }))
-
+ className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
+                            <di
     async def _check_paddle_collision(self, paddle, lORr):
 
         if (lORr == "left"):
@@ -305,7 +306,8 @@ class GameClient(AsyncWebsocketConsumer):
                 if (self.new_match.ball.x > (self.new_match.ball.canvas_width / 2)):
                     direction = -1
                 else:
-                    direction = 1
+                    direction = 1 className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
+                            <di
                 self.new_match.ball.speedX = direction * self.new_match.ball.constSpeed * math.cos(self.new_match.ball.angle)
                 self.new_match.ball.speedY = self.new_match.ball.constSpeed * math.sin(self.new_match.ball.angle)
                 if (self.new_match.ball.constSpeed < 25):
@@ -349,11 +351,13 @@ class GameClient(AsyncWebsocketConsumer):
             'type': event['type'],
             'playerNumber': event['playerNumber'],
             'updateY': event['updateY']
-        }))
+        })) className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
+                            <di
     
     async def game_finished(self, event):
         await self.send(json.dumps({
-            'type': event['type'],
+            'type': event['type'], className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
+                            <di
             'winner': event['winner'],
             'score': event['score']
         }))
@@ -379,3 +383,5 @@ class GameClient(AsyncWebsocketConsumer):
             'ball': self.new_match.ball.to_dict(),
             'opponent': self.new_match.player1['user'] if self.new_match.player2['user_id'] == self.user.id else self.new_match.player2['user']
         }))
+ className="text-xl text-center font-semibold text-gray-400">Match Recap</h2>
+                            <di

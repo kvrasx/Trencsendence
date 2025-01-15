@@ -3,12 +3,9 @@ import { get } from "@/lib/ft_axios";
 import Message from "@/components/ui/message";
 import Cookies from 'js-cookie';
 import connect_websocket from "@/lib/connect_websocket";
+import { formatDate } from "@/lib/utils";
 
 export default function NewMessages({ currentChat, user, socket, setSocket, isWsOpened, messagesEndRef }) {
-    const formatDate = (timestamp) => {
-        const date = new Date(timestamp);
-        return date.toLocaleString();
-    };
 
     const [newMessages, setNewMessages] = useState(null); // should start with the messages from the database
 

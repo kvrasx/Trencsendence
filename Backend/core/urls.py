@@ -26,6 +26,10 @@ urlpatterns = [
     
     path("api/", include('user_management.urls')),
     path("api/", include('chat.urls')),
+<<<<<<< HEAD
+=======
+    path("api/", include('ping_pong.urls')),
+>>>>>>> master
 
 ]
 

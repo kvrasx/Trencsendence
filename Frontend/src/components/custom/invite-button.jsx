@@ -6,12 +6,16 @@ import { toast } from "react-toastify";
 
 export default function InviteButton({ user_id, type, defaultStatus, ...props }) {
 
+    console.log(user_id);
+    
     const [status, setStatus] = useState(defaultStatus);
 
 
     useEffect(() => {
         const fetchStatus = async () => {
             try {
+                console.log("tsiftat req");
+                
                 const response = await get(`/invitation-status/${type}/${user_id}`);
                 console.log("invite button", response);
                 if (response.status === "blocked") {
@@ -29,7 +33,7 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
         }
 
         fetchStatus();
-    }, [])
+    }, [user_id])
 
     const sendInvite = async (target) => {
         try {

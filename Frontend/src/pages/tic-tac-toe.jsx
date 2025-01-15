@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 
 export function TicTacToe({ websocket, setWinner, setOpponent }) {
+export function TicTacToe({ websocket, setWinner, setOpponent }) {
 
     const [symbol, setSymbol] = useState(null);
     const [isMyTurn, setIsMyTurn] = useState(false);
@@ -21,8 +22,23 @@ export function TicTacToe({ websocket, setWinner, setOpponent }) {
         }
     }, [])
 
+    const [bg, setBg] = useState("#000000");
+    useEffect(() => {
+        let choosenTheme = localStorage.getItem('theme');
+
+        switch (choosenTheme) {
+            case "theme1":
+                setBg("#ff7f50");
+                break;
+            case "theme2":
+                setBg("#006400");
+                break;
+        }
+    }, [])
+
     useEffect(() => {
 
+        websocket.onmessage = (event) => {
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
 
@@ -32,6 +48,7 @@ export function TicTacToe({ websocket, setWinner, setOpponent }) {
                 case "assign_symbol":
                     setSymbol(data.symbol);
                     setIsMyTurn(data.symbol === "X"); // X always starts
+                    setOpponent(data.opponent);
                     setOpponent(data.opponent);
                     break;
 
@@ -59,6 +76,7 @@ export function TicTacToe({ websocket, setWinner, setOpponent }) {
         };
 
     }, []);
+    }, []);
 
     const handleCellClick = (event) => {
         // Ensure it's the player's turn and the cell is not already occupied
@@ -68,10 +86,12 @@ export function TicTacToe({ websocket, setWinner, setOpponent }) {
         setIsMyTurn(false);
 
         if (websocket == null) {
+        if (websocket == null) {
             console.log("the socket is null");
             return;
         }
 
+        websocket.send(
         websocket.send(
             JSON.stringify({
                 "action": "move",
@@ -87,6 +107,7 @@ export function TicTacToe({ websocket, setWinner, setOpponent }) {
         for (let i = 0; i < 9; i++) {
             cells.push(
                 <div
+                    className="border-2 border-white w-28 h-28 flex justify-center"
                     className="border-2 border-white w-28 h-28 flex justify-center"
                     id={`${i}`}
                     key={i}

@@ -26,7 +26,10 @@ function PingPongPage() {
     key="ping-pong"
     RemoteGameComponent={PingPongGame}
     websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`}
+<<<<<<< HEAD
     LocalGameComponent={Canvas}
+=======
+>>>>>>> master
   />
 }
 
@@ -80,7 +83,11 @@ function App() {
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
                 <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
+<<<<<<< HEAD
                 <Route path="/ping-pong" element={<Layout><PingPongPage  /></Layout>} />
+=======
+                <Route path="/ping-pong" element={<Layout><PingPongPage /></Layout>} />
+>>>>>>> master
                 <Route path="/tic-tac-toe" element={<Layout><TicTacToePage /></Layout>} />
                 <Route path="/tournament" element={<Layout><Tournament /></Layout>} />
                 <Route path="*" element={<Layout><Error404 /></Layout>} />

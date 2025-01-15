@@ -11,6 +11,7 @@ from user_management.models import User
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.shortcuts import get_object_or_404
+from ping_pong.views import userAcceptedTournament
 
 
 @api_view(['POST'])
@@ -95,6 +96,9 @@ def acceptFriend(request):
     query.save()
     if (query.type == "game"):
             return Response(query.friendship_id, status=status.HTTP_200_OK)
+    if query.type == "tournament":
+        userAcceptedTournament(sender, request.user)
+
     return Response("detail: Invitation accepted successfuly", status=status.HTTP_200_OK)        
     
 @api_view(['POST'])
@@ -215,5 +219,6 @@ def invitationStatus(request, type=None, target=None):
         invite = Invitations.objects.get((Q(user1=request.user.id, user2=target) | Q(user1=target, user2=request.user.id)) & Q(type=type))
         serializer = GlobalFriendSerializer(invite)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    except:
+    except Exception as e:
+        print(e)
         return Response("Detail: Invitation not found", status=status.HTTP_404_NOT_FOUND)

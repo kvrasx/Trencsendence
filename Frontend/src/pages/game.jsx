@@ -43,9 +43,9 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
         setLocation(window.location);
 
 
-        if (!waiting) {
-            if (socket) {
-                socket.close();
+if (!waiting) {
+    if (socket) {
+        socket.close();
                 setSocket(null);
             }
         }
@@ -83,7 +83,6 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                 setStarted("remote");
             };
         }
-
         return () => {
             websocket.close();
             setSocket(null);
@@ -236,7 +235,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
                                     </div>
                                 </div>
-                            ))}
+                            )) : <div className="text-center mt-4 text-gray-300">No friends found</div>}
                         </div>
                     </div>
                 ) : (
@@ -278,7 +277,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                                         <div>
                                             <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
                                             <div className="text-sm text-muted-foreground">
-                                                {match.match_date}
+                                                {formatDate(match.match_date)}
                                             </div>
                                         </div>
 

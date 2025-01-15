@@ -2,10 +2,19 @@ import React, { useState, useEffect } from 'react';
 import Sketch from 'react-p5';
 
 const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ballY, leftPaddle, rightPaddle, websocket, scoreR, scoreL }) => {
+const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ballY, leftPaddle, rightPaddle, websocket, scoreR, scoreL }) => {
   const [bg, setBg] = useState("#000000");
   useEffect(() => {
     let choosenTheme = localStorage.getItem('theme');
 
+    switch (choosenTheme) {
+      case "theme1":
+        setBg("#ff7f50");
+        break;
+      case "theme2":
+        setBg("#006400");
+        break;
+    }
     switch (choosenTheme) {
       case "theme1":
         setBg("#ff7f50");
@@ -19,6 +28,7 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
   const handlePaddleMovement = (p5) => {
     if (p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW)) {
       websocket.send(JSON.stringify({
+      websocket.send(JSON.stringify({
         'type': 'paddleMove',
         'direction': 'up',
         'playerNumber': playerNumber,
@@ -27,6 +37,7 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
       }))
     }
     if (p5.keyIsDown(83) || p5.keyIsDown(p5.DOWN_ARROW)) {
+      websocket.send(JSON.stringify({
       websocket.send(JSON.stringify({
         'type': 'paddleMove',
         'direction': 'down',
@@ -94,9 +105,22 @@ let canvasW = 0
 function PingPongGame({ websocket, setWinner, gameStartData }) {
 
 
+function PingPongGame({ websocket, setWinner, gameStartData }) {
+
+
   const [playerNumber, setPlayerNmber] = useState('')
   const [playerName, setPlayerName] = useState('')
   const [gameG, setGame] = useState('')
+  const [gameData, setGameData] = useState({
+    ballX: 0,
+    ballY: 0,
+    leftPaddle: '',
+    rightPaddle: '',
+    ball: '',
+    scoreL: 0,
+    scoreR: 0
+  })
+
   const [gameData, setGameData] = useState({
     ballX: 0,
     ballY: 0,

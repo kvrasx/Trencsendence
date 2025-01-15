@@ -6,6 +6,7 @@ local:
 all :
 	COMPOSE_DOCKER_CLI_BUILD=0 docker-compose build --parallel
 	docker-compose up --build -d
+<<<<<<< HEAD
 
 
 attached:
@@ -14,7 +15,17 @@ attached:
 
 clean :
 	docker-compose down
+=======
+>>>>>>> master
 
+
+attached:
+	COMPOSE_DOCKER_CLI_BUILD=0 docker-compose build --parallel
+	docker-compose up --build
+
+clean :
+	docker-compose down 
+	docker volume ls -q | xargs -r docker volume rm -f
 fclean :
 	docker-compose down -v --rmi all
 	docker volume rm -f $(docker volume ls -q)
