@@ -82,14 +82,14 @@ class authViewSet:
             }
         )
         clientInfo = res.json()
-        print(clientInfo)
+        # print(clientInfo)
         if res.status_code != 200:
             return Response({'error': 'Failed to fetch client data from 42.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         login = clientInfo.get('login')
         email = clientInfo.get('email')
         avatar = clientInfo.get('image').get('link')
-        print(avatar)
+        # print(avatar)
         user, isCreated = User.objects.get_or_create(username=login, email=email, password=None)
         if isCreated and avatar:
             user.avatar = avatar

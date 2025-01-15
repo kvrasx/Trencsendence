@@ -8,6 +8,7 @@ add theme colors in xo
 
 fix date in profile page
 
+disable button creat tourna,ent when already created
 
 
 HANDLE WHEN SOMEONE DISCONNECT IN XO
@@ -17,3 +18,5 @@ curl -s -k -X POST "http://localhost:5601/api/saved_objects/_import" \
 -H "kbn-xsrf: true" \
 -H "Content-Type: multipart/form-data" \
 --form file=@/dashboard.ndjson
+invitaion tournament makatla3ch fnotif
+check wach luser mcree tournament gbal maysift  invitation
