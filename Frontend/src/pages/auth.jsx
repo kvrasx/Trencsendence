@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import auth_img from "@/assets/auth.png"
 
 
-const intraApiUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${import.meta.env.VITE_42_OAUTH_ID}&redirect_uri=http://${import.meta.env.VITE_HOST}/api/auth/OAuth&response_type=code`
+const intraApiUrl = `https://api.intra.42.fr/oauth/authorize?client_id=${import.meta.env.VITE_42_OAUTH_ID}&redirect_uri=https://${import.meta.env.VITE_HOST}/api/auth/OAuth&response_type=code`
 
 export default function Auth({ setUser }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -27,7 +27,7 @@ export default function Auth({ setUser }) {
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
-      let res = await axios.post(`http://${import.meta.env.VITE_HOST}/OTP/verify`, {
+      let res = await axios.post(`https://${import.meta.env.VITE_HOST}/OTP/verify`, {
         username: username,
         code: e.target.otp.value
       }, {withCredentials: true});
@@ -66,7 +66,7 @@ export default function Auth({ setUser }) {
         ? { username, email, password }
         : { username, password };
 
-      const response = await axios.post(`http://${import.meta.env.VITE_HOST}/${endpoint}`, payload, { withCredentials: true });
+      const response = await axios.post(`https://${import.meta.env.VITE_HOST}/${endpoint}`, payload, { withCredentials: true });
       isSignup ? toast.success("You've created an account successfully!") : toast.success("You've logged in successfully!");
       setIsSignup(false);
 

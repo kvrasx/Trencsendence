@@ -24,7 +24,7 @@ function PingPongPage() {
   return <Game
     key="ping-pong"
     RemoteGameComponent={PingPongGame}
-    websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`}
+    websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`}
   />
 }
 
@@ -32,7 +32,7 @@ function TicTacToePage() {
   return <Game
     key="tic-tac-toe"
     RemoteGameComponent={TicTacToe}
-    websocketUrl={`ws://${import.meta.env.VITE_HOST}/ws/game/random/`}
+    websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/game/random/`}
     LocalGameComponent={LocalTicTacToe}
   />
 }

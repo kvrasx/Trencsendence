@@ -50,31 +50,20 @@ services:
         container_name: redis
         build: ./Deployment/redis/
         restart: unless-stopped
+
     nginx:
         container_name: nginx
-        image: nginx:latest
+        build:
+          context: ./Deployment/nginx/
         restart: unless-stopped
         volumes:
-          - ./Deployment/conf/nginx.conf:/etc/nginx/nginx.conf
           - logs:/var/log/nginx/
           - ./Deployment/access.log:/var/log/nginx/access.log
         depends_on:
-          - filebeat
           - frontend
           - elasticsearch
         ports:
-          - "80:80"
-  
-    filebeat:
-        container_name: filebeat
-        image: docker.elastic.co/beats/filebeat:8.17.0
-        restart: unless-stopped
-        volumes:
-          - ./Deployment/conf/filebeat.yml:/usr/share/filebeat/filebeat.yml
-          - logs:/var/log/nginx/
-        command: filebeat -e
-        depends_on:
-          - logstash
+          - "443:443"
    
     logstash:
         container_name: logstash
@@ -108,4 +97,22 @@ services:
         depends_on:
           - elasticsearch
         restart: unless-stopped
+        entrypoint: >
+          /bin/bash -c "
+          /usr/local/bin/kibana-docker &
+          echo 'Attempting to upload dashboard...';
+          while true; do
+            if curl -s -o /dev/null -w '%{http_code}' -X POST 'http://localhost:5601/api/saved_objects/_import' \
+              -H 'kbn-xsrf: true' \
+              -H 'Content-Type: multipart/form-data' \
+              --form file=@/dashboard.ndjson | grep -q '200'; then
+              echo 'Dashboard uploaded successfully.';
+              break;
+            else
+              echo 'Retrying dashboard upload...';
+              sleep 5;
+            fi
+          done;
+          fg
+          "
 
