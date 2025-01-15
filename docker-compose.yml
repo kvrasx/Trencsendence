@@ -92,27 +92,28 @@ services:
           - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
         volumes:
           - ./Deployment/export.ndjson:/dashboard.ndjson
+          - ./Deployment/kibana.sh:/kibana.sh
         ports:
           - "5601:5601"
         depends_on:
           - elasticsearch
         restart: unless-stopped
-        entrypoint: >
-          /bin/bash -c "
-          /usr/local/bin/kibana-docker &
-          echo 'Attempting to upload dashboard...';
-          while true; do
-            if curl -s -o /dev/null -w '%{http_code}' -X POST 'http://localhost:5601/api/saved_objects/_import' \
-              -H 'kbn-xsrf: true' \
-              -H 'Content-Type: multipart/form-data' \
-              --form file=@/dashboard.ndjson | grep -q '200'; then
-              echo 'Dashboard uploaded successfully.';
-              break;
-            else
-              echo 'Retrying dashboard upload...';
-              sleep 5;
-            fi
-          done;
-          fg
-          "
-
+        entrypoint: ["/bin/bash", "/kibana.sh"]
+        # entrypoint: >
+        #   /bin/bash -c "
+        #   /usr/local/bin/kibana-docker &
+        #   KIBANA_PID=$!
+        #   echo 'Attempting to upload dashboard...';
+        #   while true; do
+        #     if curl -s -o /dev/null -w '%{http_code}' -X POST 'http://localhost:5601/api/saved_objects/_import' \
+        #       -H 'kbn-xsrf: true' \
+        #       -H 'Content-Type: multipart/form-data' \
+        #       --form file=@/dashboard.ndjson | grep 'success'; then
+        #       echo 'Dashboard uploaded successfully.';
+        #       break;
+        #     else
+        #       echo 'Retrying dashboard upload...';
+        #       sleep 5;
+        #     fi
+        #   done;
+        #   "
