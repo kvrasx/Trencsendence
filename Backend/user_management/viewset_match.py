@@ -54,11 +54,22 @@ class MatchTableViewSet:
         user_id = request.GET.get('user_id')
         if not user_id:
             user_id = request.user.id
+        with_user_id = request.GET.get('with_id')
+
+        try:
+            user_id = int(user_id)
+            if with_user_id is not None:
+                with_user_id = int(with_user_id)
+        except ValueError:
+            return Response({"error": "user_id and with_user_id must be integers."}, status=status.HTTP_400_BAD_REQUEST)
+
         winner = request.GET.get('winner')
         loser = request.GET.get('loser')
         query = Q()
         if user_id:
             query |= Q(winner=user_id) | Q(loser=user_id)
+        if with_user_id:
+            query &= Q(winner=with_user_id) | Q(loser=with_user_id)
         if winner:
             query &= Q(winner=winner)
         if loser:

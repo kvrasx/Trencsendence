@@ -13,6 +13,7 @@ import MultiLineChart from '@/components/ui/multiline-chart';
 import InviteButton from '../components/custom/invite-button';
 import { ProgressDemo } from '@/components/ui/progress'
 import { useEffect, useState } from 'react';
+import {formatDate} from '@/lib/utils';
 
 export default function Profile({ user, setUser }) {
 
@@ -22,13 +23,13 @@ export default function Profile({ user, setUser }) {
     useEffect(() => {
         const fetchMatches = async () => {
             try {
-                let res = await get('match/get-all');
+                let res = await get(setUser ? 'match/get-all' : 'match/get-all?user_id='+user.id);
                 setMatchesData({
                     playedPong: res.filter(match => match.game_type === 1).length,
+                    winsPong: res.filter(match => match.game_type === 1 && match.winner_user.username === user.username).length,
+                    lossesPong: res.filter(match => match.game_type === 1 && match.loser_user.username === user.username).length,
+                    goalsPong: res.filter(match => match.game_type === 1).reduce((acc, match) => acc + parseInt(match.score.split(':')[0]), 0),
                     playedXO: res.filter(match => match.game_type === 2).length,
-                    winsPong: res.filter(match => match.winner_user.username === user.username).length,
-                    lossesPong: res.filter(match => match.loser_user.username === user.username).length,
-                    goalsPong: res.reduce((acc, match) => acc + parseInt(match.score.split(':')[0]), 0),
                     winsXO: res.filter(match => match.game_type === 2 && match.winner_user.username === user.username).length,
                     lossesXO: res.filter(match => match.game_type === 2 && match.loser_user.username === user.username).length
                 })
@@ -132,9 +133,9 @@ export default function Profile({ user, setUser }) {
                 <div className="grid md:grid-cols-2 md:grid-rows-2  gap-x-20 pt-7  gap-4 flex-1 ">
 
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl flex-auto flex-col flex ">
-                        <h2 className="text-xl font-semibold text-gray-400">Stats</h2>
-                        <div className="md:flex justify-center gap-4 items-center h-full w-full">
-                            <div className="flex flex-col flex-1 gap-2 text-lg font-bold">
+                        <h2 className="text-md font-semibold text-gray-400">Stats</h2>
+                        <div className="md:flex justify-center gap-4 items-center h-full w-full overflow-y-auto themed-scrollbar">
+                            <div className="flex flex-col flex-1 gap-2 text-md font-bold ">
                                 <div className="flex flex-row justify-center items-center gap-3">
                                     <span>Score</span>
                                     <ProgressDemo value={user.score} className="" />
@@ -176,10 +177,13 @@ export default function Profile({ user, setUser }) {
                                     <span className='font-semibold text-sm'>{matchesData.lossesXO}</span>
                                 </div>
                             </div>
+                            <div className="flex-initial w-2/6">
+                                
                             <DonutChart
                                 wins={matchesData.winsPong + matchesData.winsXO}
                                 losses={matchesData.lossesPong + matchesData.lossesXO}
-                            />
+                                />
+                                </div>
                         </div>
                     </div>
 
@@ -187,7 +191,7 @@ export default function Profile({ user, setUser }) {
                         <h2 className="text-xl font-semibold text-gray-400">Summary</h2>
                         <div className="">
                             <div className="-ml-8">
-
+    
                                 <MultiLineChart matches={matches} />
                             </div>
                         </div>
@@ -198,7 +202,7 @@ export default function Profile({ user, setUser }) {
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none flex-initial overflow-y-auto themed-scrollbar flex-col flex gap-2">
                         <h2 className="text-xl font-semibold text-gray-400">Last Matches</h2>
                         <div className="space-y-3">
-                            {matches.map((match, index) => (
+                            {matches.length !== 0 ? matches.map((match, index) => (
                                 <div
                                     key={match.match_id}
                                     className={`flex items-center justify-between p-4 rounded-lg  ${match.game_type === 1 ? 'glass' : 'bg-secondary'}`}
@@ -206,7 +210,7 @@ export default function Profile({ user, setUser }) {
                                     <div>
                                         <div className="font-medium">vs {user.id === match.winner_user.id ? match.loser_user.username : match.winner_user.username}</div>
                                         <div className="text-sm text-muted-foreground">
-                                            {match.match_date}
+                                            {formatDate(match.match_date)}
                                         </div>
                                     </div>
 
@@ -223,7 +227,7 @@ export default function Profile({ user, setUser }) {
                                         {match.winner_user.id === user.id ? "Win" : "Loss"}
                                     </span>
                                 </div>
-                            ))}
+                            )) : <div className="text-center mt-8 text-md text-muted-foreground">You haven't played any matches yet.</div>}
 
                         </div>
                     </div>

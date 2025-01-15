@@ -57,9 +57,11 @@ services:
         volumes:
           - ./Deployment/conf/nginx.conf:/etc/nginx/nginx.conf
           - logs:/var/log/nginx/
+          - ./Deployment/access.log:/var/log/nginx/access.log
         depends_on:
           - filebeat
           - frontend
+          - elasticsearch
         ports:
           - "80:80"
   
@@ -80,6 +82,7 @@ services:
         restart: unless-stopped
         volumes:
         - ./Deployment/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+        - ./Deployment/access.log:/var/log/nginx/access.log
         depends_on:
           - elasticsearch
 
@@ -98,8 +101,11 @@ services:
         container_name: kibana
         environment:
           - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+        volumes:
+          - ./Deployment/export.ndjson:/dashboard.ndjson
         ports:
           - "5601:5601"
         depends_on:
           - elasticsearch
         restart: unless-stopped
+

@@ -64,3 +64,6 @@ class Match(models.Model):
     )
     # scoreboard = models.IntegerField()
     match_date = models.DateField(auto_now_add=True)
+
+    def formatted_match_date(self):
+        return self.sent_at.strftime('%Y-%m-%d %H:%M:%S')

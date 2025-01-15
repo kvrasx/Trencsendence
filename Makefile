@@ -13,8 +13,8 @@ attached:
 	docker-compose up --build
 
 clean :
-	docker-compose down
-
+	docker-compose down 
+	docker volume ls -q | xargs -r docker volume rm -f
 fclean :
 	docker-compose down -v --rmi all
 	docker volume rm -f $(docker volume ls -q)

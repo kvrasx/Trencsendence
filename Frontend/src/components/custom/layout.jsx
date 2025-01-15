@@ -30,12 +30,12 @@ export const Layout = ({ children }) => {
     };
   }, []);
   return (
-    <div className="min-h-screen bg-dark-image bg-cover bg-no-repeat bg-center relative flex flex-col">
+    <div className="min-h-screen bg-dark-image bg-cover bg-no-repeat bg-center relative flex flex-col ">
       <SearchBar count={count} socket={socket} setCount={setCount} />
       <div className="flex flex-1">
         <Navbar />
-        <main className="md:container pl-16 w-full h-full pt-16 overflow-auto">
-          <div className="p-8 mx-5 flex-1 h-full py-8 animate-fade-in scrollbar">
+        <main className="md:container pl-16 w-full h-full pt-16 overflow-auto themed-scrollbar">
+          <div className="p-8 mx-5 flex-1 h-full py-8 animate-fade-in scrollbar ">
             {children}
           </div>
         </main>

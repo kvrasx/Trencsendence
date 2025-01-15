@@ -3,11 +3,17 @@
 
 
 
-fi 7alat l invite m3a ybda lmatch m7i l invitation 
 
 add theme colors in xo
 
 fix date in profile page
 
 
-search bar in chat and in game card
+
+HANDLE WHEN SOMEONE DISCONNECT IN XO
+
+
+curl -s -k -X POST "http://localhost:5601/api/saved_objects/_import" \
+-H "kbn-xsrf: true" \
+-H "Content-Type: multipart/form-data" \
+--form file=@/dashboard.ndjson
