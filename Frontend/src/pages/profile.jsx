@@ -70,6 +70,7 @@ export default function Profile({ user, setUser }) {
             toast.error("Failed to change avatar. Please try again.")
         }
     };
+    user.avatar = "https://cdn.intra.42.fr/users/1e603c950edb076aaa6f236af2049d81/miguiji.jpg"
 
     return (
 
@@ -77,7 +78,7 @@ export default function Profile({ user, setUser }) {
             <div className="h-2/6 relative">
                 <div style={{ backgroundImage: `url(${banner})` }} className="rounded-lg h-full w-full flex flex-col justify-end items-center bg-cover bg-center bg-no-repeat"> </div>
                 <div className="absolute bottom-0 z-50 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-                    <Avatar className="w-32 h-32">
+                <Avatar className="w-32 h-32">
                         <AvatarImage src={(user?.avatar) ?? defaultAvatar} className="" />
                         <AvatarFallback>{"no avatar"}</AvatarFallback>
                         {setUser &&

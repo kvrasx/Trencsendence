@@ -35,3 +35,5 @@ typing-extensions==4.12.2
 urllib3==2.2.3
 zope.interface==7.2
 psycopg2-binary
+django-redis
+channels-redis

@@ -7,6 +7,8 @@ from django.contrib.auth.models import AbstractUser
 
 
 def generate_avatar_path(instance, filename):
+    if filename.startswith('http://') or filename.startswith('https://'):
+        return filename
     ext = filename.split('.')[-1]
     filename = f"avatars/{d.now().strftime('%Y/%m/%d')}/{str(uuid.uuid4())}.{ext}"
     return filename
