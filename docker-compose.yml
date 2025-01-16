@@ -99,21 +99,3 @@ services:
           - elasticsearch
         restart: unless-stopped
         entrypoint: ["/bin/bash", "/kibana.sh"]
-        # entrypoint: >
-        #   /bin/bash -c "
-        #   /usr/local/bin/kibana-docker &
-        #   KIBANA_PID=$!
-        #   echo 'Attempting to upload dashboard...';
-        #   while true; do
-        #     if curl -s -o /dev/null -w '%{http_code}' -X POST 'http://localhost:5601/api/saved_objects/_import' \
-        #       -H 'kbn-xsrf: true' \
-        #       -H 'Content-Type: multipart/form-data' \
-        #       --form file=@/dashboard.ndjson | grep 'success'; then
-        #       echo 'Dashboard uploaded successfully.';
-        #       break;
-        #     else
-        #       echo 'Retrying dashboard upload...';
-        #       sleep 5;
-        #     fi
-        #   done;
-        #   "
