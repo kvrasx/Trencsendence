@@ -13,7 +13,7 @@ from .models import Tournament
 
 def advanceTournament(tournamentId, matchEntry):
     try:
-        tournament = Tournament.objects.get(tournamentID=tournamentId, status="ongoing")
+        tournament = Tournament.objects.get(id=tournamentId, status="ongoing")
     except Exception as e:
         print("advance tournament: ", e)
         return None
@@ -29,6 +29,7 @@ def advanceTournament(tournamentId, matchEntry):
                 tournament.position5 = matchEntry.winner
             elif tournament.position6 is None:
                 tournament.position6 = matchEntry.winner
+                tournament.current_round += 1
             
         elif tournament.current_round == 2:
             if tournament.match3 is None:
@@ -36,9 +37,9 @@ def advanceTournament(tournamentId, matchEntry):
             
             if tournament.position7 is None:
                 tournament.position7 = matchEntry.winner
-            tournament.status = "finished"
+                tournament.current_round += 1
+                tournament.status = "finished"
 
-        tournament.current_round += 1
         tournament.save()
 
 class Match:
@@ -199,43 +200,57 @@ class GameClient(AsyncWebsocketConsumer):
             asyncio.create_task(self.start_ball_movement())
     
     async def invite_mode(self):
-            inviteId = int(self.scope['url_route']['kwargs']['room_name'])
-            if self.scope['url_route']['kwargs'].get('tournament_id'):
-                # check if the tournament id is valid and check if this match invitation is part of the tournament
-                self.tournament_id = self.scope['url_route']['kwargs']['tournament_id']
-            invite = await database_sync_to_async(get_object_or_404)(Invitations, friendship_id=inviteId, type='join', status="accepted")
-            if invite.user1 != self.user.id and invite.user2 != self.user.id:
-                raise Exception("You are not invited to this match")
-            self.group_name = f"xo_{inviteId}"
-            
-            if self.group_name in self.invite_matches:
-                self.invite_matches[ self.group_name ].append( self.player )
-            else:
-                self.invite_matches[ self.group_name ] = [ self.player ]
+        inviteId = int(self.scope['url_route']['kwargs']['room_name'])
+        if self.scope['url_route']['kwargs'].get('tournament_id'):
+            # check if the tournament id is valid and check if this match invitation is part of the tournament
+            self.tournament_id = self.scope['url_route']['kwargs']['tournament_id']
+        invite = await database_sync_to_async(get_object_or_404)(Invitations, friendship_id=inviteId, type='join')
+        if invite.user1 != self.user.id and invite.user2 != self.user.id:
+            raise Exception("You are not invited to this match")
+        
+        if invite.status == "pending":
+            await database_sync_to_async(self.check_tournamnet)()
 
-            await self.channel_layer.group_add(
+        self.group_name = f"xo_{inviteId}"
+        
+        if self.group_name in self.invite_matches:
+            self.invite_matches[ self.group_name ].append( self.player )
+        else:
+            self.invite_matches[ self.group_name ] = [ self.player ]
+
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
+        invitedPlayers = self.invite_matches[ self.group_name ]
+        if (len(invitedPlayers) == 1):
+            self.player["p"]['player_number'] = '1'
+        else:
+            self.player["p"]['player_number'] = '2'
+            self.new_match = Match(invitedPlayers[0]['p'], invitedPlayers[1]['p'], self.group_name)
+            invitedPlayers[0]['match'] = self.new_match
+            invitedPlayers[1]['match'] = self.new_match
+            # self.active_matches.append(self.new_match)
+            await self.channel_layer.group_send(
                 self.group_name,
-                self.channel_name
+                {
+                    "type": "start_match",
+                }
             )
-            invitedPlayers = self.invite_matches[ self.group_name ]
-            if (len(invitedPlayers) == 1):
-                self.player["p"]['player_number'] = '1'
-            else:
-                self.player["p"]['player_number'] = '2'
-                self.new_match = Match(invitedPlayers[0]['p'], invitedPlayers[1]['p'], self.group_name)
-                invitedPlayers[0]['match'] = self.new_match
-                invitedPlayers[1]['match'] = self.new_match
-                # self.active_matches.append(self.new_match)
-                await self.channel_layer.group_send(
-                    self.group_name,
-                    {
-                        "type": "start_match",
-                    }
-                )
-                await database_sync_to_async(invite.delete)()
-                self.new_match.is_active = True
-                asyncio.create_task(self.start_ball_movement()) # need to be cleaned 
+            await database_sync_to_async(invite.delete)()
+            self.new_match.is_active = True
+            asyncio.create_task(self.start_ball_movement()) # need to be cleaned 
      
+
+    def check_tournamnet(self):
+        if hasattr(self, 'tournament_id') == False:
+            raise Exception("This match is part from a tournament, please provide the tournament id")
+        try:
+            tournament = get_object_or_404(Tournament, id=self.tournament_id, status="ongoing")
+        except Exception as e:
+            print(e)
+            raise Exception("Tournament not found or not ongoing")
+
 
     def safe_operation(self, operation):
         try:
@@ -299,7 +314,8 @@ class GameClient(AsyncWebsocketConsumer):
                     "loser": self.new_match.player1["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player2["user_id"],
                     "score": score
                 })
-                await database_sync_to_async(advanceTournament)(self.tournament_id, matchEntry)
+                if hasattr(self, 'tournament_id'):
+                    await database_sync_to_async(advanceTournament)(self.tournament_id, matchEntry)
                 await self.channel_layer.group_send(
                     self.group_name,
                     {
@@ -409,3 +425,8 @@ class GameClient(AsyncWebsocketConsumer):
             'paddleLeft': self.new_match.paddleLeft.to_dict(),
             'ball': self.new_match.ball.to_dict()
         }))
+
+    async def close_game(self, event):
+        message = event['message']
+        print("Closing game: ", message)
+        await self.close()

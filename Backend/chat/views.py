@@ -13,7 +13,7 @@ from channels.layers import get_channel_layer
 from django.shortcuts import get_object_or_404
 from ping_pong.views import userAcceptedTournament
 import asyncio
-
+from ping_pong.models import Tournament
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -97,8 +97,21 @@ def acceptFriend(request):
     query.save()
     if (query.type == "game"):
             return Response(query.friendship_id, status=status.HTTP_200_OK)
+    
     if query.type == "tournament":
-        async_to_sync(userAcceptedTournament)(sender, user)
+        print("entered here channel")
+        # Get the channel layer
+        channel_layer = get_channel_layer()
+        
+        # Send to a background worker
+        async_to_sync(channel_layer.send)(
+            "tournament-background",
+            {
+                "type": "tournament_accept",
+                "tournament_id": sender,
+                "user_id": user.id
+            }
+        )
 
     return Response("detail: Invitation accepted successfuly", status=status.HTTP_200_OK)        
     
@@ -204,15 +217,19 @@ def getNotifications(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def isValidMatch(request, matchId=None):
+def isValidMatch(request, matchId=None, tournamentId=None):
     user_id = request.user.id
-    print(user_id)
     try:
-        notif = Invitations.objects.get(Q(friendship_id=matchId) & (Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="join"))
-        return Response(GlobalFriendSerializer(notif).data, status=status.HTTP_200_OK) 
-    except Exception as e:
-        return Response({"error": "Game not found."}, status=404)
-    
+        notif = Invitations.objects.get(Q(friendship_id=matchId) & (Q(user1=user_id) | Q(user2=user_id)) & Q(type="join"))
+        if notif.status == "pending":
+            if tournamentId is None:
+                return Response({"error": "Tournament ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+            tournament = get_object_or_404(Tournament, id=tournamentId)
+            print("notif:", tournament)
+        return Response(GlobalFriendSerializer(notif).data, status=status.HTTP_200_OK)
+    except:
+        return Response({"error": "Invitation not found."}, status=status.HTTP_404_NOT_FOUND)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def invitationStatus(request, type=None, target=None):

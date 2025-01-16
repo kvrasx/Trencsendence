@@ -14,7 +14,7 @@ class MatchTableViewSet:
     def createMatchEntry(matchData):
         serializer = MatchSerializer(data=matchData)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        matchInstance = serializer.save()
         gain_factor = 2
         loss_factor = 1
         
@@ -44,7 +44,7 @@ class MatchTableViewSet:
         winner.save()
         print("id -> ",loser.id ,"score => ",loser.score)
         print("id -> ",winner.id ,"score => ",winner.score)
-        return Response(serializer.data)
+        return matchInstance
     
     ########################
 

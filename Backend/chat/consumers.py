@@ -1,11 +1,14 @@
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
+from channels.db import database_sync_to_async
 # from .views import async_to_sync
 from .serializer import ChatsSerializer, MessageSerializer, NotifCount
 from .models import Invitations, NotifCountmodel
 import json
 from django.db.models import Q
 from user_management.models import User
+from .views import userAcceptedTournament
+from channels.consumer import AsyncConsumer, SyncConsumer
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -146,4 +149,20 @@ class onlineStatus(WebsocketConsumer):
             self.user.online = False
             self.user.save()
 
-            
+    
+
+# consumer.py
+class TournamentBackgroundConsumer(AsyncConsumer):
+    # Remove the __init__ method - it's not needed
+    async def tournament_accept(self, message):
+        tournament_id = message["tournament_id"]
+        user = await self.get_user(message["user_id"])        
+        if user:
+            await userAcceptedTournament(tournament_id, user)
+    
+    @database_sync_to_async
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return None

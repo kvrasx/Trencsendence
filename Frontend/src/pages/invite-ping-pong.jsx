@@ -23,7 +23,7 @@ export default function InvitePingPong({}) {
     useEffect(() => {
         const getMatch = async () => {
             try {
-                let res = await get('/check-match/' + id);
+                let res = await get('/check-match/' + id + (tournament_id !== undefined ? '/' + tournament_id : ""));
                 setMatch(res);
             } catch (e) {
                 if (e?.response?.status === 404) {

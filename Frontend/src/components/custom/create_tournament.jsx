@@ -80,11 +80,12 @@ export default function CreateTournament() {
             <DialogHeader>
               <DialogTitle>Manage tournament</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2  gap-4 py-4">
+            <div className="grid grid-cols-3  gap-4 py-4">
 
               <p className="border border-accent p-2">Joinded players: <span className="text-green-400">{ongoingTournament.available_players}/4</span></p>
               <p className="border border-accent p-2">Played matches: <span className="text-green-400">2/3</span></p>
-              <p className="border border-accent p-2 col-span-2">Tournament status: <span className="text-green-400">Waiting for players..</span></p>
+              <p className="border border-accent p-2">Current round: <span className="text-green-400">{ongoingTournament.current_round}/3</span></p>
+              <p className="border border-accent p-2 col-span-3">Tournament status: <span className="text-green-400">Waiting for players..</span></p>
 
 
 
