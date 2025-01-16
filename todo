@@ -12,3 +12,12 @@ disable button creat tourna,ent when already created
 
 invitaion tournament makatla3ch fnotif
 check wach luser mcree tournament gbal maysift  invitation
+
+
+tournament:
+    if user blocked: 
+        he cannot accept tournament invite
+        he is immediatly removed from the tournament
+
+
+remove invites when set to finished

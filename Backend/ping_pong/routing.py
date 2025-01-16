@@ -3,6 +3,6 @@ from .consumers import GameClient
 
 
 pong_urlpatterns = [
-    re_path(r'ws/ping_pong/(?P<room_name>\w+)/$', GameClient.as_asgi()),
+    re_path(r'ws/ping_pong/(?P<room_name>\w+)(?:/(?P<tournament_id>\d+))?/$', GameClient.as_asgi()),
 ]
 

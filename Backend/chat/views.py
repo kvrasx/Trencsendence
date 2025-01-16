@@ -8,10 +8,11 @@ from .models import Message,Invitations,NotifCountmodel
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
 from user_management.models import User
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 from django.shortcuts import get_object_or_404
 from ping_pong.views import userAcceptedTournament
+import asyncio
 
 
 @api_view(['POST'])
@@ -97,7 +98,7 @@ def acceptFriend(request):
     if (query.type == "game"):
             return Response(query.friendship_id, status=status.HTTP_200_OK)
     if query.type == "tournament":
-        userAcceptedTournament(sender, request.user)
+        async_to_sync(userAcceptedTournament)(sender, user)
 
     return Response("detail: Invitation accepted successfuly", status=status.HTTP_200_OK)        
     

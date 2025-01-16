@@ -9,6 +9,37 @@ from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
 from tic_tac_toe.consumers import current_players
 import math
+from .models import Tournament
+
+def advanceTournament(tournamentId, matchEntry):
+    try:
+        tournament = Tournament.objects.get(tournamentID=tournamentId, status="ongoing")
+    except Exception as e:
+        print("advance tournament: ", e)
+        return None
+    
+    if tournament.available_players == 4 and tournament.status == "ongoing":
+        if tournament.current_round == 1:
+            if tournament.match1 is None:
+                tournament.match1 = matchEntry
+            elif tournament.match2 is None:
+                tournament.match2 = matchEntry
+            
+            if tournament.position5 is None:
+                tournament.position5 = matchEntry.winner
+            elif tournament.position6 is None:
+                tournament.position6 = matchEntry.winner
+            
+        elif tournament.current_round == 2:
+            if tournament.match3 is None:
+                tournament.match3 = matchEntry
+            
+            if tournament.position7 is None:
+                tournament.position7 = matchEntry.winner
+            tournament.status = "finished"
+
+        tournament.current_round += 1
+        tournament.save()
 
 class Match:
     def __init__(self, player_1, player_2, group_name):
@@ -169,11 +200,12 @@ class GameClient(AsyncWebsocketConsumer):
     
     async def invite_mode(self):
             inviteId = int(self.scope['url_route']['kwargs']['room_name'])
+            if self.scope['url_route']['kwargs'].get('tournament_id'):
+                # check if the tournament id is valid and check if this match invitation is part of the tournament
+                self.tournament_id = self.scope['url_route']['kwargs']['tournament_id']
             invite = await database_sync_to_async(get_object_or_404)(Invitations, friendship_id=inviteId, type='join', status="accepted")
             if invite.user1 != self.user.id and invite.user2 != self.user.id:
-                await self.accept()
-                await self.close(code=4006)
-                return
+                raise Exception("You are not invited to this match")
             self.group_name = f"xo_{inviteId}"
             
             if self.group_name in self.invite_matches:
@@ -207,7 +239,7 @@ class GameClient(AsyncWebsocketConsumer):
 
     def safe_operation(self, operation):
         try:
-            eval(operation)
+            exec(operation)
         except:
             pass
 
@@ -261,12 +293,13 @@ class GameClient(AsyncWebsocketConsumer):
             if (self.new_match.ball.scoreRight == 5 or self.new_match.ball.scoreLeft == 5):
                 self.new_match.is_active = False
                 score = f"0{self.new_match.ball.scoreRight}:0{self.new_match.ball.scoreLeft}"
-                await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
+                matchEntry = await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                     "game_type": 1,
                     "winner": self.new_match.player2["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player1["user_id"],
                     "loser": self.new_match.player1["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player2["user_id"],
                     "score": score
                 })
+                await database_sync_to_async(advanceTournament)(self.tournament_id, matchEntry)
                 await self.channel_layer.group_send(
                     self.group_name,
                     {

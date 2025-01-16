@@ -17,7 +17,7 @@ class Invitations(models.Model):
     user2 = models.IntegerField()
     status = models.CharField(max_length=8, choices=TypeClass.choices, default=TypeClass.PENDING)
     type = models.CharField(max_length=10, choices=InvitationType.choices)
-    
+    created_at = models.DateTimeField(auto_now_add=True)
     
     # class Meta:
     #     constraints = [
