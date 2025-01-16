@@ -98,12 +98,12 @@ class authViewSet:
         r = handle_2fa(user)
         if r:
             r.status_code = 302
-            r['Location'] = f'http://{os.getenv("VITE_HOST")}/?otp=true&username=' + user.username
+            r['Location'] = f'https://{os.getenv("VITE_HOST")}/?otp=true&username=' + user.username
             return r
 
         response = generate_login_response(user)
         response.status_code = 302
-        response['Location'] = f'http://{os.getenv("VITE_HOST")}/'
+        response['Location'] = f'https://{os.getenv("VITE_HOST")}/'
         return response
 
 #########################

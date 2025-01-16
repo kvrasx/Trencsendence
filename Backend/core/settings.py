@@ -187,7 +187,7 @@ SIMPLE_JWT = {
 OAUTH_CLIENT_ID=os.getenv("VITE_42_OAUTH_ID")
 OAUTH_CLIENT_SECRET=os.getenv("DJANGO_42_OAUTH_SECRET")
 
-OAUTH_REDIRECT_URI=f"http://{os.getenv('VITE_HOST')}/api/auth/OAuth"
+OAUTH_REDIRECT_URI=f"https://{os.getenv('VITE_HOST')}/api/auth/OAuth"
 # OAUTH_REDIRECT_URI="http://localhost:80/api/auth/OAuth"
 
 PUBLIC_PATHS = [
