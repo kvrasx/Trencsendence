@@ -77,7 +77,7 @@ function App() {
                 <Route path="/profile" element={<Layout><Profile user={user} setUser={setUser} /></Layout>} />
                 <Route path="/chat" element={<Layout><Chat /></Layout>} />
                 <Route path="/leaderboard" element={<Layout><Leaderboard /></Layout>} />
-                <Route path="/ping-pong/:id" element={<Layout><InvitePingPong /></Layout>} />
+                <Route path="/ping-pong/:id/:tournament_id?" element={<Layout><InvitePingPong /></Layout>} />
                 <Route path="/ping-pong" element={<Layout><PingPongPage /></Layout>} />
                 <Route path="/tic-tac-toe" element={<Layout><TicTacToePage /></Layout>} />
                 <Route path="/tournament" element={<Layout><Tournament /></Layout>} />

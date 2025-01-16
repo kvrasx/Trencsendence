@@ -104,6 +104,7 @@ export function Notifications({ setShowNotifications, socket }) {
                           setNotifications={setNotifications}
                         />
                       ) : (
+                        notification.status === "accepted" &&
                         <JoinItem
                           key={index}
                           index={index}

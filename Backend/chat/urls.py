@@ -14,6 +14,7 @@ urlpatterns = [
     path('getChats/', getChats),
     path('getMessages/<int:chat>', getMessages),
 
+    path('check-match/<int:matchId>/<int:tournamentId>', isValidMatch),
     path('check-match/<int:matchId>', isValidMatch),
     path('invitation-status/<str:type>/<int:target>', invitationStatus),
 ]

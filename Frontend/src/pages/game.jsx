@@ -86,7 +86,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
             setSocket(null);
         };
 
-    }, [waiting]);
+    }, [waiting, websocketUrl]);
 
 
     useEffect(() => {

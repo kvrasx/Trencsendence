@@ -20,3 +20,12 @@ curl -s -k -X POST "http://localhost:5601/api/saved_objects/_import" \
 --form file=@/dashboard.ndjson
 invitaion tournament makatla3ch fnotif
 check wach luser mcree tournament gbal maysift  invitation
+
+
+tournament:
+    if user blocked: 
+        he cannot accept tournament invite
+        he is immediatly removed from the tournament
+
+
+remove invites when set to finished

@@ -12,8 +12,9 @@ import { Game } from "./game";
 
 export default function InvitePingPong({}) {
 
-    const { id } = useParams();
+    const { id, tournament_id } = useParams();
     
+    console.log("tourbament id", tournament_id);
     
     const [match, setMatch] = useState(null);
     const [error404, setError404] = useState(false);
@@ -22,7 +23,7 @@ export default function InvitePingPong({}) {
     useEffect(() => {
         const getMatch = async () => {
             try {
-                let res = await get('/check-match/' + id);
+                let res = await get('/check-match/' + id + (tournament_id !== undefined ? '/' + tournament_id : ""));
                 setMatch(res);
             } catch (e) {
                 if (e?.response?.status === 404) {
@@ -43,7 +44,7 @@ export default function InvitePingPong({}) {
     return (
         <>
             {match ? (
-                <Game RemoteGameComponent={PingPongGame} waitingstate={true} websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/ping_pong/` + id + '/'} />
+                <Game RemoteGameComponent={PingPongGame} waitingstate={true} websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/ping_pong/` + id + '/' + (tournament_id !== undefined ? tournament_id + '/' : "")} />
             ) : (
                 <div className="flex justify-center items-center">
                     <Spinner w="16" h="16" />
