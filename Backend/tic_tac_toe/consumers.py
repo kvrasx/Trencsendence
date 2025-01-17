@@ -25,8 +25,8 @@ class MatchXO:
         self.player1 = player1
         self.player2 = player2
         self.roles = {
-            self.player1.id: "X",
-            self.player2.id: "O"
+            str(self.player1.id): "X",
+            str(self.player2.id): "O"
         }
         self.turn = self.player1.id
         self.board = {}
@@ -94,11 +94,11 @@ class GameConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         print(self.match.roles, self.match.turn, self.user.id)
         if data.get("action") == "move":
-            if self.match.roles[self.user.id] != data.get("symbol") or self.match.turn != self.user.id:
+            if self.match.roles[str(self.user.id)] != data.get("symbol") or self.match.turn != self.user.id:
                 return
             if data.get("cellId") in self.match.board:
                 return
-            self.match.board[data.get("cellId")] = data.get("symbol")
+            self.match.board[str(data.get("cellId"))] = data.get("symbol")
             self.match.turn = self.match.player1.id if self.match.turn == self.match.player2.id else self.match.player2.id
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -154,7 +154,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         if close_code == 4008 or close_code == 4009 or close_code == 4007:
             return
 
-        if hasattr(self, 'match'):
+        if self.match:
             await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                     "game_type": 2,
                     "winner": self.match.player1.id if self.match.player2.id == self.user.id else self.match.player2.id,
@@ -203,7 +203,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     def check_winner(self):
         for combination in winningCombinations:
-            if self.match.board.get(combination[0]) == self.match.board.get(combination[1]) == self.match.board.get(combination[2]) != None:
+            if self.match.board.get(str(combination[0])) == self.match.board.get(str(combination[1])) == self.match.board.get(str(combination[2])) != None:
                 return True
         return False
 
@@ -221,7 +221,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         await self.send(text_data=json.dumps({
             "action": "assign_symbol",
-            "symbol": self.match.roles[self.user.id],
+            "symbol": self.match.roles[str(self.user.id)],
             "opponent": UserSerializer(instance=self.match.player1).data if self.match.player1.id != self.user.id else UserSerializer(instance=self.match.player2).data
         }))
 

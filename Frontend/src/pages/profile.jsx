@@ -193,7 +193,7 @@ export default function Profile({ user, setUser }) {
                         <div className="">
                             <div className="-ml-8">
     
-                                <MultiLineChart matches={matches} />
+                                <MultiLineChart matches={matches} user={user} />
                             </div>
                         </div>
 
