@@ -91,7 +91,7 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
 let canvasH = 0
 let canvasW = 0
 
-function PingPongGame({ websocket, setWinner, gameStartData }) {
+function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
 
 
   const [playerNumber, setPlayerNmber] = useState('')
@@ -109,6 +109,8 @@ function PingPongGame({ websocket, setWinner, gameStartData }) {
 
 
   useEffect(() => {
+    setOpponent(gameStartData.opponent)
+    
     // data received when game started
     setPlayerNmber(gameStartData['information']['player_number'])
     setPlayerName(gameStartData['information']['player_name'])

@@ -10,6 +10,7 @@ from user_management.viewset_match import MatchTableViewSet
 from tic_tac_toe.consumers import current_players
 import math
 from .models import Tournament
+from user_management.serializers import UserSerializer
 
 def advanceTournament(tournamentId, matchEntry):
     try:
@@ -133,6 +134,7 @@ class GameClient(AsyncWebsocketConsumer):
                 'player_number': '',
                 'player_username': self.user.username,
                 'user_id': self.user.id,
+                'user': UserSerializer(self.user).data
             },
             "match": None
         }
@@ -324,7 +326,7 @@ class GameClient(AsyncWebsocketConsumer):
                         "score":  score
                     }
                 )
-                return ;
+                return 
             
             await self.channel_layer.group_send(
                 self.group_name,
@@ -384,10 +386,8 @@ class GameClient(AsyncWebsocketConsumer):
         self.new_match.ball.y = self.new_match.ball.canvas_height // 2
         self.new_match.ball.speedX *= -1  # Reverse the horizontal direction
         if lorr == "Left":
-            print ("left")
             self.new_match.ball.scoreRight += 1
         if lorr == "Right":
-            print ("Right")
             self.new_match.ball.scoreLeft += 1
 
 
@@ -423,7 +423,8 @@ class GameClient(AsyncWebsocketConsumer):
             'started': 'yes',
             'paddleRight': self.new_match.paddleRight.to_dict(),
             'paddleLeft': self.new_match.paddleLeft.to_dict(),
-            'ball': self.new_match.ball.to_dict()
+            'ball': self.new_match.ball.to_dict(),
+            'opponent': self.new_match.player1['user'] if self.new_match.player2['user_id'] == self.user.id else self.new_match.player2['user']
         }))
 
     async def close_game(self, event):
