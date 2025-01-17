@@ -28,11 +28,17 @@ def inviteFriend(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     try:
+        try:
+            query = User.objects.get(Q(id=user1))
+        except:
+            return Response("Detail: cant invite the player doesnt existe", status=status.HTTP_400_BAD_REQUEST)
+        if _type != "friend":
+            try:
+                o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type="friend") | Q(user1=jwt_user,user2=user1,type="friend"))
+            except:
+                return Response("Detail: Not a friend", status=status.HTTP_400_BAD_REQUEST)
         o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type=_type) | Q(user1=jwt_user,user2=user1,type=_type))
-        #q = user1 <---- mn 3end sma3il
-            # return Response("cant invite the player doesnt existe", status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print(e)
         mydata = {
             "user1": jwt_user,
             "user2": user1,
@@ -43,14 +49,12 @@ def inviteFriend(request):
             newRecord.save()
             channel_layer = get_channel_layer()
             group_name = f"user_{user1}"
-            print(f"hada_dyl_lview___{group_name}")
             count = 1
             try :
                 query = NotifCountmodel.objects.get(Q(user_id=user1))
                 query.count = query.count + 1
                 query.save()
                 count = query.count
-                print("lcount ->z->"+ str(count))
             except Exception as e:
                 print(e)
                 mydata = {
@@ -153,8 +157,10 @@ def blockFriend(request):
 
     if (user1 == user2):
         return Response("Detail: Cant block", status=status.HTTP_400_BAD_REQUEST)
-
     try:
+        o = Invitations.objects.filter((Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)) & (Q(type='tournament') | Q(type='game') | Q(type='join')))
+        if o.exists():
+            raise Exception("error")
         query = Invitations.objects.get((Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)) & Q(status='accepted') & Q(type='friend'))
         query.status="blocked"
         query.save()

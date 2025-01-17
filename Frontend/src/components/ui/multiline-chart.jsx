@@ -2,7 +2,7 @@ import React from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { subDays, parseISO, isAfter, format } from 'date-fns';
 
-const MultiLineChart = ({ matches }) => {
+const MultiLineChart = ({ matches, user }) => {
   console.log(matches);
 
   // getting the date 7 days ago
@@ -23,9 +23,9 @@ const MultiLineChart = ({ matches }) => {
   // counting wins for each game type by day
   latestWeekMatches.forEach(match => {
     const day = format(parseISO(match.match_date), 'EEE'); // Get the day of the week where the match was played (in the same format as daysOfWeek)
-    if (match.game_type === 1) {
+    if (match.game_type === 1 && match.winner === user.id) {
       winsByDay[day].pingPong += 1;
-    } else if (match.game_type === 2) {
+    } else if (match.game_type === 2 && match.winner === user.id) {
       winsByDay[day].ticTacToe += 1;
     }
   });
@@ -38,7 +38,7 @@ const MultiLineChart = ({ matches }) => {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={370}>
       <LineChart data={data}>
         <XAxis dataKey="name" />
         <YAxis />
