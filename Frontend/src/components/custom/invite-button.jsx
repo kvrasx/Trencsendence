@@ -9,6 +9,7 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
     console.log(user_id);
     
     const [status, setStatus] = useState(defaultStatus);
+    const [disabled, setDisabled] = useState(false);
 
 
     useEffect(() => {
@@ -25,7 +26,12 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
                 }
             } catch (e) {
                 if (e.response && e.response.status === 404) {
-                    setStatus(defaultStatus);
+                    if (e.response?.data?.detail === "tournament") {
+                        setStatus(defaultStatus);
+                        setDisabled(true);
+                    } else {
+                        setStatus(defaultStatus);
+                    }
                 }
                 console.log(e);
             }
@@ -60,7 +66,7 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
 
 
     return (
-        <Button onClick={() => sendInvite(user_id)} variant="outline" {...props} disabled={status !== defaultStatus && status !== "Unblock User"}>
+        <Button onClick={() => sendInvite(user_id)} variant="outline" {...props} disabled={(status !== defaultStatus && status !== "Unblock User") || disabled}>
             {type === "game" ? <Swords /> : <UserPlus />} {defaultStatus === "" ? "" : status}
         </Button>
     )

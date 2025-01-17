@@ -32,7 +32,7 @@ class getTournament(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         try:
-            tournament = Tournament.objects.get(tournamentID=request.user.id, status="ongoing")
+            tournament = Tournament.objects.get(Q(tournamentID=request.user.id) | Q(position2=request.user.id) | Q(position3=request.user.id) | Q(position4=request.user.id), status="ongoing")
             return Response({"tournament": TournamentSerializer(tournament).data}, status=200)
         except Exception as e:
             print("getTournament", e)

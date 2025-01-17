@@ -18,6 +18,7 @@ from ping_pong.models import Tournament
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def inviteFriend(request):
+
     serializer = GlobalFriendSerializer(data=request.data)
     jwt_user = request.user.id
     if (serializer.is_valid()):
@@ -28,15 +29,26 @@ def inviteFriend(request):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     try:
+        query = User.objects.get(Q(id=user1))
+    except:
+        return Response("Detail: cant invite the player doesnt exist", status=status.HTTP_400_BAD_REQUEST)
+
+    if _type != "friend":
         try:
-            query = User.objects.get(Q(id=user1))
+            o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type="friend") | Q(user1=jwt_user,user2=user1,type="friend"))
         except:
-            return Response("Detail: cant invite the player doesnt existe", status=status.HTTP_400_BAD_REQUEST)
-        if _type != "friend":
-            try:
-                o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type="friend") | Q(user1=jwt_user,user2=user1,type="friend"))
-            except:
-                return Response("Detail: Not a friend", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Detail: Not a friend", status=status.HTTP_400_BAD_REQUEST)
+    
+    if _type == "tournament":
+        o = Tournament.objects.get(Q(tournamentID=user1) & Q(status="ongoing"))
+        if o is None:
+            return Response("Detail: Dont have an ongoing Tournament", status=status.HTTP_400_BAD_REQUEST)
+    # try:
+    #     o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type="friend") | Q(user1=jwt_user,user2=user1,type="friend"))
+    # except:
+    #     return Response("Detail: Not a friend", status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
         o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type=_type) | Q(user1=jwt_user,user2=user1,type=_type))
     except Exception as e:
         mydata = {
@@ -240,7 +252,15 @@ def isValidMatch(request, matchId=None, tournamentId=None):
 @permission_classes([IsAuthenticated])
 def invitationStatus(request, type=None, target=None):
     try:
+        if type == "tournament":
+            try:
+                tournament = Tournament.objects.get(tournamentID=request.user.id, status="ongoing")
+                print(tournament)
+            except:
+                print("User doesn't have a tournament.")
+                return Response({"detail": "tournament"}, status=404)
         invite = Invitations.objects.get((Q(user1=request.user.id, user2=target) | Q(user1=target, user2=request.user.id)) & Q(type=type))
+
         serializer = GlobalFriendSerializer(invite)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
