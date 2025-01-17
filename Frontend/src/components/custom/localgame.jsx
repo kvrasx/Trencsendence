@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Sketch from 'react-p5';
 
 class Paddle {
@@ -96,11 +96,24 @@ class Ball {
     }
   
   }
-
-
   
+  
+  
+  
+  const Canvas = ({setWinner}) => {
+    var bg = 0;
+   
+    let choosenTheme = localStorage.getItem('theme');
 
-const Canvas = ({setWinner}) => {
+    switch (choosenTheme) {
+      case "theme1":
+        bg = "#ff7f50";
+        break;
+      case "theme2":
+        bg = "#006400";
+        break;
+    }
+
   let leftPaddle, rightPaddle, ball;
   let paddleWidth = 0;//= p5.width * 0.02; // 2% of canvas width
   let paddleHeight = 0;// = p5.height * 0.2; // 20% of canvas height
@@ -158,7 +171,7 @@ const Canvas = ({setWinner}) => {
       setWinner(rightPaddle.score == 5 ? "right" : "left")
       p5.noLoop();
     }
-    p5.background('#000000');
+    p5.background(bg);
     p5.stroke(255);               // Set line color to white
     p5.strokeWeight(2);           // Set line thickness
     // Loop to draw dashes
