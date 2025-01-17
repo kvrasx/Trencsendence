@@ -1,6 +1,6 @@
 from .models import User, Match
 from rest_framework import serializers
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse, urlunparse
 from django.contrib.auth.hashers import make_password # for the password hashing
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,6 +42,8 @@ class UserSerializer(serializers.ModelSerializer):
         if representation['avatar'] and representation['avatar'].startswith(('/http', '/https')):
             representation['avatar'] = representation['avatar'][1:]
             representation['avatar'] = unquote(representation['avatar'])
+            representation['avatar'] = representation['avatar'].replace(':', ':/', 1)
+
         return representation
     
 

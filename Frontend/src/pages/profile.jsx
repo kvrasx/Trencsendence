@@ -70,7 +70,7 @@ export default function Profile({ user, setUser }) {
             toast.error("Failed to change avatar. Please try again.")
         }
     };
-    user.avatar = "https://cdn.intra.42.fr/users/1e603c950edb076aaa6f236af2049d81/miguiji.jpg"
+    // user.avatar = "https://cdn.intra.42.fr/users/7d461ee2980d992a56fd03e51ddaedd0/ijaija.jpg"
 
     return (
 
