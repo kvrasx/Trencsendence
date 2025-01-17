@@ -1,14 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { Card } from "@/components/ui/card";
-import local from "@/assets/local.jpg"
-import remote from "@/assets/remote.jpg"
 import Spinner from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
-import Cookies from 'js-cookie';
 import connect_websocket from "../lib/connect_websocket";
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Camera, UserPlus, Swords, MessageSquare, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import {MessageSquare} from 'lucide-react';
+import { Link, useParams , useNavigate } from 'react-router-dom';
 import defaultAvatar from '@/assets/profile.jpg';
 import { RiWifiOffLine } from "react-icons/ri";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
@@ -18,6 +15,8 @@ import { toast } from "react-toastify";
 import InviteButton from "../components/custom/invite-button";
 import { UserContext } from "@/contexts"
 import { formatDate } from "@/lib/utils";
+import {} from 'react-router-dom';
+
 
 export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, ...o }) {
 
@@ -28,18 +27,18 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
     const [winner, setWinner] = useState(null);
     const [socket, setSocket] = useState(null);
     const [gamePongStartData, setPongGameStartData] = useState(null);
-    const [friends, setFriends] = useState([])
+    const [friends, setFriends] = useState([]);
 
     const [searchResults, setSearchResults] = useState(friends);
     const [userSearch, setUserSearch] = useState("");
 
     const [opponent, setOpponent] = useState(null);
     const [recentMathces, setRecentMatches] = useState([]);
-
-    useEffect(() => {
-
-        console.log(waiting);
-
+    
+    let id = useParams()
+    let navigate = useNavigate()  
+    
+    useEffect(() => {   
         if (!waiting) {
             if (socket) {
                 socket.close();
@@ -149,10 +148,11 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                     waiting ? (
                         started ? (started === "remote" ? (
                             gamePongStartData ?
-                                <RemoteGameComponent websocket={socket} setWinner={setWinner} gameStartData={gamePongStartData} />
+                                <RemoteGameComponent websocket={socket} setWinner={setWinner} gameStartData={gamePongStartData} setOpponent={setOpponent} />
                                 :
                                 <RemoteGameComponent websocket={socket} setWinner={setWinner} setOpponent={setOpponent} />
                         ) : (
+                            !opponent && setOpponent({avatar: null, username: "Self", id: null}),
                             <LocalGameComponent setWinner={setWinner} setOpponent={setOpponent} />
                         )) : (
 
@@ -189,7 +189,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                     <div className="flex flex-col items-center justify-center">
                         <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
                         <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner}</div>
-                        <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket && socket.close(); }}>
+                        <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket && socket.close(); (id && navigate('/ping-pong', {replace: true})); }}>
                             New Game
                         </Button>
                     </div>

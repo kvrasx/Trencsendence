@@ -19,12 +19,14 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Game } from './pages/game';
 import PingPongGame from './components/custom/ping-pong-game';
 import Tournament from './pages/tournament';
+import Canvas from './components/custom/localgame'
 
 function PingPongPage() {
   return <Game
     key="ping-pong"
     RemoteGameComponent={PingPongGame}
     websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`}
+    LocalGameComponent={Canvas}
   />
 }
 

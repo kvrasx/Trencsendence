@@ -100,7 +100,7 @@ class Ball {
 
   
 
-const Canvas = () => {
+const Canvas = ({setWinner}) => {
   let leftPaddle, rightPaddle, ball;
   let paddleWidth = 0;//= p5.width * 0.02; // 2% of canvas width
   let paddleHeight = 0;// = p5.height * 0.2; // 20% of canvas height
@@ -154,6 +154,10 @@ const Canvas = () => {
     const dashHeight = 2;        // Height of each dash
     const gapHeight = 5;         // Gap between dashes
     
+    if (rightPaddle.score == 5 || leftPaddle.score == 5){
+      setWinner(rightPaddle.score == 5 ? "right" : "left")
+      p5.noLoop();
+    }
     p5.background('#000000');
     p5.stroke(255);               // Set line color to white
     p5.strokeWeight(2);           // Set line thickness
