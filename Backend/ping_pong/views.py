@@ -108,16 +108,16 @@ class tournamentControl:
         for i in range(1, 4):
             sendTournamentWarning(participants[0].id, participants[i].id, "Tournament is starting")
         
-        sendTournamentWarning(participants[0].id, participants[1].id, f"First round: <a href='http://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}' > Click here to play </a>")
-        sendTournamentWarning(participants[0].id, participants[2].id, f"First round: <a href='http://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}' > Click here to play </a>")
-        sendTournamentWarning(participants[0].id, participants[3].id, f"First round: <a href='http://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}' > Click here to play </a>")
+        sendTournamentWarning(participants[0].id, participants[1].id, f"First round: <a href='https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}' > Click here to play </a>")
+        sendTournamentWarning(participants[0].id, participants[2].id, f"First round: <a href='https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}' > Click here to play </a>")
+        sendTournamentWarning(participants[0].id, participants[3].id, f"First round: <a href='https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}' > Click here to play </a>")
 
 
     def someChecks(self):
         self.tournament.refresh_from_db()
         if len(self.matchInvites) == 0 and self.tournament.current_round == 2:
             self.matchInvites.append(Invitations.objects.create(user1=self.tournament.position5.id, user2=self.tournament.position6.id, type="join", status="pending"))
-            sendTournamentWarning(self.tournament.position5.id, self.tournament.position6.id, f"Second round: <a href='http://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}' > Click here to play the second round </a>")
+            sendTournamentWarning(self.tournament.position5.id, self.tournament.position6.id, f"Second round: <a href='https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}' > Click here to play the second round </a>")
         
         else:
             for invite in self.matchInvites:
