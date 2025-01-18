@@ -18,9 +18,22 @@ import {formatDate} from '@/lib/utils';
 export default function Profile({ user, setUser }) {
 
     const [matches, setMatches] = useState(null);
+    const [tournaments, setTournaments] = useState(null);
     const [matchesData, setMatchesData] = useState(null);
     
     useEffect(() => {
+        const fetchTournaments = async () => {
+            try {
+                let res = await get('tournament/get-all');
+                console.log(res);
+            }  catch (e) {
+                console.log(e);
+                if (e.response?.status !== 404) {
+                    toast.error("Failed to fetch tournaments. Please try again.")
+                }
+            }
+        }
+
         const fetchMatches = async () => {
             try {
                 let res = await get(setUser ? 'match/get-all' : 'match/get-all?user_id='+user.id);
@@ -41,7 +54,9 @@ export default function Profile({ user, setUser }) {
                 toast.error("Failed to fetch matches. Please try again.")
             }
         }
+
         fetchMatches();
+        fetchTournaments();
     }, [])
 
     console.log(user);
@@ -190,14 +205,12 @@ export default function Profile({ user, setUser }) {
 
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl ">
                         <h2 className="text-xl font-semibold text-gray-400">Summary</h2>
-                        {/* <div className="">
-                            <div className="-ml-8"> */}
+
                         <div className="md:flex justify-center gap-4 items-center h-full w-full overflow-y-auto themed-scrollbar">
     
                                 <MultiLineChart matches={matches} user={user} />
                             </div>
-                            {/* </div>
-                        </div> */}
+
 
                     </div>
 
@@ -239,13 +252,13 @@ export default function Profile({ user, setUser }) {
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl min-h-[400px] md:min-h-none flex-initial overflow-y-auto themed-scrollbar flex-col flex gap-2">
                         <h2 className="text-xl font-semibold text-gray-400">Last Tournaments</h2>
                         <div className="space-y-3">
-                            {Array.from({ length: 10 }).map((_, index) => (
+                            {tournaments ? tournaments.map((tournament, index) => (
                                 <div
                                     key={index}
                                     className="flex items-center justify-between p-4 rounded-lg glass"
                                 >
                                     <div className='overflow-hidden'>
-                                        <div className="font-medium overflow-hidden">vs {"Opponesgsdgsdgdsgdsgdsdgdsgdsgdsgfkdsjgkjdslkgjdkssddsnt"}</div>
+                                        <div className="font-medium overflow-hidden">vs {tournament.tournament_name}</div>
                                         <div className="text-sm text-muted-foreground">
                                             {"10-4"}
                                         </div>
@@ -259,7 +272,7 @@ export default function Profile({ user, setUser }) {
                                         {"Loss"}
                                     </span>
                                 </div>
-                            ))}
+                            )) : <div className="text-center mt-8 text-md text-muted-foreground">You haven't played any tournaments yet.</div>}
 
                         </div>
                     </div>
