@@ -57,11 +57,9 @@ services:
         restart: unless-stopped
         volumes:
           - logs:/var/log/nginx/
-          # - ./Deployment/access.log:/var/log/nginx/access.log
         depends_on:
           - frontend
           - backend
-          # - elasticsearch
         ports:
           - "4433:443"
    

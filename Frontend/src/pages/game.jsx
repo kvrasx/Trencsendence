@@ -188,7 +188,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                 ) : (
                     <div className="flex flex-col items-center justify-center">
                         <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
-                        <div className="text-2xl font-bold text-center mb-4 text-gray-300">{winner}</div>
+                        <div className="text-2xl font-bold text-center mb-4 text-gray-300">Winner: {winner}</div>
                         <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket && socket.close(); (id && navigate('/ping-pong', {replace: true})); }}>
                             New Game
                         </Button>

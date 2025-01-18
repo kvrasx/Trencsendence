@@ -40,8 +40,8 @@ def inviteFriend(request):
             return Response("Detail: Not a friend", status=status.HTTP_400_BAD_REQUEST)
     
     if _type == "tournament":
-        o = Tournament.objects.get(Q(tournamentID=user1) & Q(status="ongoing"))
-        if o is None:
+        o = Tournament.objects.filter(Q(tournamentID=jwt_user) & Q(status="ongoing"))
+        if not o.exists() :
             return Response("Detail: Dont have an ongoing Tournament", status=status.HTTP_400_BAD_REQUEST)
     # try:
     #     o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type="friend") | Q(user1=jwt_user,user2=user1,type="friend"))
