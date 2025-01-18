@@ -35,7 +35,7 @@ def inviteFriend(request):
 
     if _type != "friend":
         try:
-            o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type="friend") | Q(user1=jwt_user,user2=user1,type="friend"))
+            o = Invitations.objects.get(Q(user1=user1,user2=jwt_user,type="friend", status="accepted") | Q(user1=jwt_user,user2=user1,type="friend", status="accepted"))
         except:
             return Response("Detail: Not a friend", status=status.HTTP_400_BAD_REQUEST)
     
