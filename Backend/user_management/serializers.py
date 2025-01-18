@@ -19,8 +19,8 @@ class UserSerializer(serializers.ModelSerializer):
         return make_password(value)
 
     def validate_username(self, value):
-        if len(value) < 5:
-            raise serializers.ValidationError("Username must be at least 5 characters long")
+        if len(value) < 5 or len(value) > 14:
+            raise serializers.ValidationError("Username must be at least 5 characters long and at most 14 characters long")
         return value
 
     def update(self, instance, validated_data):

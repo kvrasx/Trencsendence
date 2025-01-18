@@ -17,7 +17,7 @@ def generate_avatar_path(instance, filename):
 class User(AbstractUser):
     id = models.AutoField(primary_key=True, unique=True)
     display_name = models.CharField(
-        max_length=24, 
+        max_length=14, 
         null=True, 
         unique=True, 
         blank=True, 
