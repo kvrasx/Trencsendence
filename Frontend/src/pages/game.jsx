@@ -15,8 +15,6 @@ import { toast } from "react-toastify";
 import InviteButton from "../components/custom/invite-button";
 import { UserContext } from "@/contexts"
 import { formatDate } from "@/lib/utils";
-import {} from 'react-router-dom';
-
 
 export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, k}) {
 

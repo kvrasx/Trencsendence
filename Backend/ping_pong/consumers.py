@@ -156,7 +156,7 @@ class GameClient(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        if close_code == 4008 or close_code == 4009:
+        if close_code == 4009:
             return
         # self.safe_operation("current_players.remove(self.user.id)")
         if self.user.id in current_players:

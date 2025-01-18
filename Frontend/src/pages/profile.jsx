@@ -255,10 +255,10 @@ export default function Profile({ user, setUser }) {
                         <div className="space-y-3">
                             {tournaments ? tournaments.map((tournament, index) => (
                                 tournament.status === "finished" &&
-                                <div className='p-4 rounded-lg glass'>
+                                <div className='p-4 rounded-lg glass' key={index}>
 
                                 <div
-                                    key={index}
+                       
                                     className="flex items-center justify-between "
                                     >
                                     <div className='overflow-hidden'>

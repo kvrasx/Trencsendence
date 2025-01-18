@@ -140,7 +140,7 @@ class tournamentControl:
                 self.tournament.refresh_from_db()
                 print("Checking invite: ", invite.created_at, "---" , timezone.now())
                 if Invitations.objects.filter(friendship_id=invite.friendship_id).exists():
-                    if timezone.now() - invite.created_at > timezone.timedelta(minutes=1):
+                    if timezone.now() - invite.created_at > timezone.timedelta(minutes=5):
                         print("removing match invite automatically")
                         winner = GameClient.invite_matches[f"xo_{invite.friendship_id}"][0].get('p').get('user_id') if f"xo_{invite.friendship_id}" in GameClient.invite_matches else invite.user1
                         if winner is None:
