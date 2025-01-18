@@ -14,6 +14,8 @@ attached:
 	docker-compose up --build
 
 clean :
+	rm -rf Backend/**/__pycache__/
+	rm -rf Backend/**/migrations/
 	docker-compose down 
 	docker volume ls -q | xargs -r docker volume rm -f
 fclean :

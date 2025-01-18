@@ -122,7 +122,7 @@ class tournamentControl:
         self.finished = False
         
         for i in range(1, 4):
-            sendTournamentWarning(participants[0].id, participants[i].id, "The {self.tournament.tournament_name} tournament has started.")
+            sendTournamentWarning(participants[0].id, participants[i].id, f"The {self.tournament.tournament_name} tournament has started.")
         
         sendTournamentWarning(participants[0].id, participants[1].id, f"<a href=\"https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}\" > Tournament: Click to play your first round </a>")
         sendTournamentWarning(participants[0].id, participants[2].id, f"<a href=\"https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}\" > Tournament: Click to play your first round </a>")

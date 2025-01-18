@@ -325,7 +325,7 @@ class GameClient(AsyncWebsocketConsumer):
                     self.group_name,
                     {
                         "type" : "game_finished",
-                        "winner": self.new_match.player2 if self.new_match.ball.scoreLeft == 5 else self.new_match.player1,
+                        "winner": self.new_match.player2 if self.new_match.ball.scoreRight == 5 else self.new_match.player1,
                         "score":  score
                     }
                 )
