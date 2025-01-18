@@ -70,10 +70,13 @@ services:
         image: docker.elastic.co/logstash/logstash:8.17.0
         restart: unless-stopped
         volumes:
-        - ./Deployment/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-        - logs:/var/log/nginx/
+          - ./Deployment/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+          - logs:/var/log/nginx/
+        group_add:
+          - adm 
         depends_on:
           - elasticsearch
+          - nginx
 
     elasticsearch:
         container_name: elasticsearch
