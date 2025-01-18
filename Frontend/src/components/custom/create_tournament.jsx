@@ -12,15 +12,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Edit, Swords } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { post, get } from '@/lib/ft_axios';
 import { Link } from 'react-router-dom';
+import { UserContext } from "@/contexts";
 
 export default function CreateTournament() {
 
   const [tournamentName, setTournamentName] = useState('')
   const [ongoingTournament, setOngoingTournament] = useState(null);
+  const user = useContext(UserContext);
 
   const handleSubmit = async () => {
     try {
@@ -69,7 +71,7 @@ export default function CreateTournament() {
 
   return (
     <>
-      {ongoingTournament ? (
+      {ongoingTournament && ongoingTournament.tournamentID === user.id && ongoingTournament.status === "ongoing" ? (
         <Dialog>
 
           <DialogTrigger asChild>
@@ -86,11 +88,6 @@ export default function CreateTournament() {
               {/* <p className="border border-accent p-2">Played matches: <span className="text-green-400">2/3</span></p> */}
               <p className="border border-accent p-2">Current round: <span className="text-green-400">{ongoingTournament.current_round}/3</span></p>
               <p className="border border-accent p-2 col-span-2">Tournament status: <span className="text-green-400">{ongoingTournament.current_round !== 4 ? "Waiting for players.." : "Tournament started.."}</span></p>
-
-
-
-
-
 
             </div>
             <DialogFooter>

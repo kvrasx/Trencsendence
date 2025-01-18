@@ -23,6 +23,11 @@ class Tournament(models.Model):
     match2 = models.ForeignKey(Match, on_delete=models.CASCADE, null=True, blank=True, related_name='match2')
     match3 = models.ForeignKey(Match, on_delete=models.CASCADE, null=True, blank=True, related_name='match3')
 
+    created_at = models.DateField(auto_now_add=True)
+
+    def formatted_created_at(self):
+        return self.sent_at.strftime('%Y-%m-%d %H:%M:%S')
+
     def __str__(self):
         return f"Tournament {self.tournamentID}: name of tournament is {self.tournament_name},  {self.available_players} players available"
     
