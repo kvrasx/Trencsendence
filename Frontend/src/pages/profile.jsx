@@ -119,8 +119,8 @@ export default function Profile({ user, setUser }) {
                         </>
                     ) : (
                         <>
-                            <InviteButton user_id={user.id} type={"friend"} defaultStatus={"Invite Friend"} className="capitalize p-6 w-64 border-accent disabled:opacity-100 disabled:bg-accent" />
-                            <InviteButton user_id={user.id} type={"game"} defaultStatus={"Challenge to Game"} className="capitalize p-6 w-64 border-accent disabled:opacity-100 disabled:bg-accent" />
+                            <InviteButton user_id={user.id} type={"friend"} defaultStatus={"Invite Friend"} className="capitalize p-6 w-64 border-accent disabled:opacity-100 disabled:bg-secondary disabled:border-none disabled:text-gray-400" />
+                            <InviteButton user_id={user.id} type={"game"} defaultStatus={"Challenge to Game"} className="capitalize p-6 w-64 border-accent disabled:opacity-100 disabled:bg-secondary disabled:border-none disabled:text-gray-400" />
                         </>
                     )}
                 </div>
@@ -242,8 +242,8 @@ export default function Profile({ user, setUser }) {
                                     key={index}
                                     className="flex items-center justify-between p-4 rounded-lg glass"
                                 >
-                                    <div>
-                                        <div className="font-medium">vs {"Opponent"}</div>
+                                    <div className='overflow-hidden'>
+                                        <div className="font-medium overflow-hidden">vs {"Opponesgsdgsdgdsgdsgdsdgdsgdsgdsgfkdsjgkjdslkgjdkssddsnt"}</div>
                                         <div className="text-sm text-muted-foreground">
                                             {"10-4"}
                                         </div>
