@@ -2,19 +2,26 @@ import React, { useState, useEffect } from 'react';
 import Sketch from 'react-p5';
 
 const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ballY, leftPaddle, rightPaddle, websocket, scoreR, scoreL }) => {
-  const [bg, setBg] = useState("#000000");
-  useEffect(() => {
-    let choosenTheme = localStorage.getItem('theme');
+  const [bg, setBg] = useState(0);
+  const [padle, setPadle] = useState("#F8F8FF");
 
+  
+  useEffect(() => {
+
+    let choosenTheme = localStorage.getItem('theme');
+    
     switch (choosenTheme) {
-      case "theme1":
-        setBg("#ff7f50");
-        break;
+    case "theme1":
+      setBg("#2F4F4F");
+      setPadle("#7FFF00");
+      break;
       case "theme2":
-        setBg("#006400");
+        setBg("#FFA07A");
+        setPadle("#FFFF00");
         break;
-    }
-  }, [])
+      }
+      
+    }, [])
 
   const handlePaddleMovement = (p5) => {
     if (p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW)) {
@@ -67,17 +74,14 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
     // Loop to draw dashes
     p5.line(centerX, 0, centerX, heightT); // Draw each dash
     // Set up text properties
-    p5.fill(255); // White color for the text
     p5.noStroke(); // No border around the text
-    p5.textSize(canvasW * 0.1); // Text size relative to canvas width
-    p5.textAlign(p5.CENTER, p5.CENTER); // Center align text
     handlePaddleMovement(p5);
+    p5.fill(padle);
+    p5.textAlign(p5.CENTER, p5.CENTER); // Center align text
+    p5.textSize(canvasW * 0.1); // Text size relative to canvas width
+    p5.ellipse(ballX, ballY, 20 * 2);
     show(p5, leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height, 10);
     show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height, 10);
-    p5.fill(255);
-    p5.ellipse(ballX, ballY, 20);
-    p5.fill(255);
-
     p5.text(scoreR, canvasW * 0.25, canvasH * 0.2); // Left score at 25% width
     p5.text(scoreL, canvasW * 0.75, canvasH * 0.2);
   };
@@ -88,15 +92,15 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
 };
 
 
-let canvasH = 0
-let canvasW = 0
+var canvasH = 0
+var canvasW = 0
 
 function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
 
 
-  const [playerNumber, setPlayerNmber] = useState('')
-  const [playerName, setPlayerName] = useState('')
-  const [gameG, setGame] = useState('')
+  const [playerNumber, setPlayerNmber] = useState('');
+  const [playerName, setPlayerName] = useState('');
+  const [gameG, setGame] = useState('');
   const [gameData, setGameData] = useState({
     ballX: 0,
     ballY: 0,
@@ -105,11 +109,11 @@ function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
     ball: '',
     scoreL: 0,
     scoreR: 0
-  })
+  });
 
 
   useEffect(() => {
-    setOpponent(gameStartData.opponent)
+    // setOpponent(gameStartData.opponent)
     
     // data received when game started
     setPlayerNmber(gameStartData['information']['player_number'])
@@ -165,11 +169,6 @@ function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
           scoreL: data.ball.scoreLeft,
           scoreR: data.ball.scoreRight,
         }));
-
-        // ballX = data.ball.x;
-        // ballY = data.ball.y;
-        // scoreL = data.ball.scoreLeft;
-        // scoreR = data.ball.scoreRight;
       }
       else if (data.type === 'game_finished') {
         console.log(data.type);
@@ -188,7 +187,7 @@ function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
 
 
   return (
-    <Canvas playerName={playerName} playerNumber={playerNumber} gameG={gameG} canvasH={400} canvasW={600} ballX={gameData.ballX} ballY={gameData.ballY} leftPaddle={gameData.leftPaddle} rightPaddle={gameData.rightPaddle} scoreL={gameData.scoreL} scoreR={gameData.scoreR} websocket={websocket} />
+    <Canvas playerName={playerName} playerNumber={playerNumber} gameG={gameG} canvasH={800} canvasW={1300} ballX={gameData.ballX} ballY={gameData.ballY} leftPaddle={gameData.leftPaddle} rightPaddle={gameData.rightPaddle} scoreL={gameData.scoreL} scoreR={gameData.scoreR} websocket={websocket} />
   );
 }
 
