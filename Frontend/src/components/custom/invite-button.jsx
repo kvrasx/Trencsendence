@@ -14,8 +14,27 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
 
     useEffect(() => {
         const fetchStatus = async () => {
+            if (type === "game") {
+                try {
+
+                    let res = await get(`/invitation-status/friend/${user_id}`);
+                    console.log("resu:", res);
+                    if (res.status !== "accepted") {
+                        setDisabled(true);
+                        return ;
+                    }
+                    
+                } catch (e) {
+                    if (e?.response?.status === 404) {
+                        setDisabled(true);
+                        return ;
+                    } else {
+                        toast.error("Failed to fetch friend status. Please try again.");
+                    }
+                    console.log(e);
+                }
+            }
             try {
-                console.log("tsiftat req");
                 
                 const response = await get(`/invitation-status/${type}/${user_id}`);
                 console.log("invite button", response);
@@ -66,7 +85,7 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
 
 
     return (
-        <Button onClick={() => sendInvite(user_id)} variant="outline" {...props} disabled={(status !== defaultStatus && status !== "Unblock User") || disabled}>
+        <Button onClick={() => sendInvite(user_id)} variant="outline"  {...props} disabled={(status !== defaultStatus && status !== "Unblock User") || disabled}>
             {type === "game" ? <Swords /> : <UserPlus />} {defaultStatus === "" ? "" : status}
         </Button>
     )

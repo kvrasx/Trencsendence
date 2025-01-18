@@ -40,22 +40,22 @@ export default function Tournament() {
                             <div className="w-full h-1/3 border rounded-lg border-opacity-45 p-2 bg-white bg-opacity-15 border-white mt-16">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
                                     <Avatar className="w-20 h-20">
-                                        <AvatarImage src={tournament?.position1?.avatar} />
+                                        <AvatarImage src={tournament?.position1_user?.avatar} />
                                         <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                     </Avatar>
                                 </div>
-                                <div className="w-full h-1/2 flex justify-center items-center overflow-hidden">{tournament?.position1?.username}</div>
-                                <div className="w-full h-1/2 flex justify-center items-center overflow-hidden">{tournament?.position1?.display_name}</div>
+                                <div className="w-full h-1/2 flex justify-center items-center overflow-hidden">{tournament?.position1_user?.username}</div>
+                                <div className="w-full h-1/2 flex justify-center items-center overflow-hidden">{tournament?.position1_user?.display_name}</div>
                             </div>
                             <div className="w-full h-1/3 border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
                                     <Avatar className="w-20 h-20">
-                                        <AvatarImage src={tournament?.position2?.avatar} />
+                                        <AvatarImage src={tournament?.position2_user?.avatar} />
                                         <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                     </Avatar>
                                 </div>
-                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position2?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position2?.display_name}</div>
+                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position2_user?.username ?? "Not known yet"}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position2_user?.display_name}</div>
                             </div>
                         </div>
 
@@ -63,22 +63,22 @@ export default function Tournament() {
                             <div className="w-full h-1/3 border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white mt-10">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
                                     <Avatar className="w-20 h-20">
-                                        <AvatarImage src={tournament?.position3?.avatar} />
+                                        <AvatarImage src={tournament?.position3_user?.avatar} />
                                         <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                     </Avatar>
                                 </div>
-                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position3?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position3?.display_name}</div>
+                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position3_user?.username ?? "Not known yet"}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position3_user?.display_name}</div>
                             </div>
                             <div className="w-full h-1/3 border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
                                     <Avatar className="w-20 h-20">
-                                        <AvatarImage src={tournament?.position4?.avatar} />
+                                        <AvatarImage src={tournament?.position4_user?.avatar} />
                                         <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                     </Avatar>
                                 </div>
-                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position4?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position4?.display_name}</div>
+                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position4_user?.username ?? "Not known yet"}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position4_user?.display_name}</div>
                             </div>
                         </div>
                     </div>
@@ -88,22 +88,22 @@ export default function Tournament() {
                             <div className="w-full h-1/2 border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
                                     <Avatar className="w-20 h-20">
-                                        <AvatarImage src={tournament?.position5?.avatar} />
+                                        <AvatarImage src={tournament?.position5_user?.avatar} />
                                         <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                     </Avatar>
                                 </div>
-                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position5?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position5?.display_name}</div>
+                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position5_user?.username ?? "Not known yet"}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position5_user?.display_name}</div>
                             </div>
                             <div className="w-full h-1/2 border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
                                     <Avatar className="w-20 h-20">
-                                        <AvatarImage src={tournament?.position6?.avatar} />
+                                        <AvatarImage src={tournament?.position6_user?.avatar} />
                                         <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                     </Avatar>
                                 </div>
-                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position6?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position6?.display_name}</div>
+                                <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position6_user?.username ?? "Not known yet"}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position6_user?.display_name}</div>
                             </div>
                         </div>
                     </div>
@@ -112,12 +112,12 @@ export default function Tournament() {
                         <div className='border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white h-1/6 w-full'>
                             <div className="w-full h-1/3 flex justify-center text-sm">
                                 <Avatar className="w-20 h-20">
-                                    <AvatarImage src={tournament?.position7?.avatar} />
+                                    <AvatarImage src={tournament?.position7_user?.avatar} />
                                     <AvatarFallback><img src={defaultAvatar} alt="default avatar" /></AvatarFallback>
                                 </Avatar>
                             </div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position7?.username ?? "Not known yet"}</div>
-                        <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position7?.display_name}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position7_user?.username ?? "Not known yet"}</div>
+                        <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position7_user?.display_name}</div>
                         </div>
                     </div>
 

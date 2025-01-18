@@ -38,6 +38,18 @@ class getTournament(APIView):
             print("getTournament", e)
             return Response({"error": "You don't have any ongoing tournament."}, status=404)
         
+class getTournamentsData(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            tournament = Tournament.objects.filter(Q(tournamentID=request.user.id) | Q(position2=request.user.id) | Q(position3=request.user.id) | Q(position4=request.user.id), status="finished")
+            if tournament.count() == 0:
+                raise Exception("No tournament found")
+            return Response({"tournament": TournamentSerializer(tournament, many=True).data}, status=200)
+        except Exception as e:
+            print("getTournament", e)
+            return Response({"error": "You don't have any ongoing tournament."}, status=404)
+        
 class cancelTournament(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
@@ -108,16 +120,16 @@ class tournamentControl:
         for i in range(1, 4):
             sendTournamentWarning(participants[0].id, participants[i].id, "The {self.tournament.tournament_name} tournament has started.")
         
-        sendTournamentWarning(participants[0].id, participants[1].id, f"<a href='https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}' > Tournament: Click to play your first round </a>")
-        sendTournamentWarning(participants[0].id, participants[2].id, f"<a href='https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}' > Tournament: Click to play your first round </a>")
-        sendTournamentWarning(participants[0].id, participants[3].id, f"<a href='https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}' > Tournament: Click to play your first round </a>")
+        sendTournamentWarning(participants[0].id, participants[1].id, f"<a href=\"https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}\" > Tournament: Click to play your first round </a>")
+        sendTournamentWarning(participants[0].id, participants[2].id, f"<a href=\"https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}\" > Tournament: Click to play your first round </a>")
+        sendTournamentWarning(participants[0].id, participants[3].id, f"<a href=\"https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[1].friendship_id}/{self.tournament.id}\" > Tournament: Click to play your first round </a>")
 
 
     def someChecks(self):
         self.tournament.refresh_from_db()
         if len(self.matchInvites) == 0 and self.tournament.current_round == 2:
             self.matchInvites.append(Invitations.objects.create(user1=self.tournament.position5.id, user2=self.tournament.position6.id, type="join", status="pending"))
-            sendTournamentWarning(self.tournament.position5.id, self.tournament.position6.id, f"<a href='https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}' > Tournament: Click to play your second round </a>")
+            sendTournamentWarning(self.tournament.position5.id, self.tournament.position6.id, f"<a href=\"https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}\" > Tournament: Click to play your second round </a>")
         
         else:
             for invite in self.matchInvites:

@@ -108,15 +108,18 @@ export function TicTacToe({ websocket, setWinner, setOpponent }) {
 
 export function LocalTicTacToe({ setWinner, setOpponent }) {
     const [bg, setBg] = useState("#000000");
+    const [txt, setTxt] = useState("#F8F8FF");
     useEffect(() => {
         let choosenTheme = localStorage.getItem('theme');
 
         switch (choosenTheme) {
             case "theme1":
-                setBg("#ff7f50");
+                setBg("#2F4F4F");
+                setTxt("#7FFF00");
                 break;
             case "theme2":
-                setBg("#006400");
+                setBg("#FFA07A");
+                setTxt("#FFFF00");
                 break;
         }
 
@@ -180,7 +183,7 @@ export function LocalTicTacToe({ setWinner, setOpponent }) {
                     key={i}
                     onClick={handleCellClick}
                 >
-                    <span className="text-center flex justify-center items-center text-3xl font-bold">{board[i]}</span>
+                    <span className={`text-center flex justify-center items-center text-3xl font-bold text-[${txt}]`}>{board[i]}</span>
                 </div>
             );
         }

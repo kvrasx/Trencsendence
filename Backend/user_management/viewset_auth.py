@@ -27,6 +27,8 @@ class authViewSet:
             return Response({"error": "one field or more are missing."}, status=status.HTTP_400_BAD_REQUEST)
         user = get_object_or_404(User, username=username)
         user.pass_to_2fa = False
+        if user.password == None:
+            return Response({"error": "Use OAuth."}, status=400)
         if not check_password(encoded=user.password, password=request.data["password"]):
             return Response({"error": "wrong account credentials."}, status=status.HTTP_400_BAD_REQUEST)
 

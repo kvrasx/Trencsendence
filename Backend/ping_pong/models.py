@@ -4,7 +4,7 @@ from user_management.models import User, Match
 class Tournament(models.Model):
     # tournamentID = models.PositiveIntegerField(primary_key=True)  # Unique ID for the tournament
     tournamentID = models.PositiveIntegerField()  # Unique ID for the tournament
-    tournament_name = models.CharField(max_length=100)  # Name of the tournament
+    tournament_name = models.CharField(max_length=14)  # Name of the tournament
     available_players = models.IntegerField(default=1)  # Number of players available
 
     # Positions for users in the tournament
