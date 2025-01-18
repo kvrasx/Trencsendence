@@ -59,7 +59,7 @@ class Ball:
         self.canvas_width = 600
         self.x = 600 // 2
         self.y = 400 // 2
-        self.radius = 10
+        self.radius = 20
         self.speedX = 3
         self.speedY = 0
         self.angle = 0
