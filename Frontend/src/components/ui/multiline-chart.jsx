@@ -38,7 +38,9 @@ const MultiLineChart = ({ matches, user }) => {
   }));
 
   return (
-    <ResponsiveContainer width="100%" height={370}>
+    <div className="flex-1 w-full h-full p-4 -ml-12">
+
+    <ResponsiveContainer width="100%" height={"100%"}>
       <LineChart data={data}>
         <XAxis dataKey="name" />
         <YAxis />
@@ -48,6 +50,7 @@ const MultiLineChart = ({ matches, user }) => {
         <Line type="monotone" dataKey="ticTacToe" stroke="#82ca9d" />
       </LineChart>
     </ResponsiveContainer>
+    </div>
   );
 };
 
