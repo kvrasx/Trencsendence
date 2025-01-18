@@ -86,9 +86,10 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
         return () => {
             websocket.close();
             setSocket(null);
+            setStarted(false);
         };
 
-    }, [waiting, websocketUrl]);
+    }, [waiting, websocketUrl, k]);
 
 
     useEffect(() => {

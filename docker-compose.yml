@@ -61,7 +61,7 @@ services:
           - frontend
           - backend
         ports:
-          - "4433:443"
+          - "443:443"
    
     # logstash:
     #     container_name: logstash
