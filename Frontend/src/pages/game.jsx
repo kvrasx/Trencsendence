@@ -18,7 +18,7 @@ import { formatDate } from "@/lib/utils";
 import {} from 'react-router-dom';
 
 
-export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, ...o }) {
+export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, waitingstate = false, k}) {
 
     const user = useContext(UserContext);
 
@@ -34,9 +34,12 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
     const [opponent, setOpponent] = useState(null);
     const [recentMathces, setRecentMatches] = useState([]);
+    const [score, setScore] = useState(null);
     
     let id = useParams()
     let navigate = useNavigate()  
+    console.log(k);
+    
     
     useEffect(() => {   
         if (!waiting) {
@@ -140,7 +143,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
     return (
 
-        <div className="flex gap-6 h-[75vh]" {...o} >
+        <div className="flex gap-6 h-[75vh]" key={k} >
 
             <div className="p-5 flex-1 glass flex flex-row justify-center items-center">
 
@@ -148,12 +151,12 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                     waiting ? (
                         started ? (started === "remote" ? (
                             gamePongStartData ?
-                                <RemoteGameComponent websocket={socket} setWinner={setWinner} gameStartData={gamePongStartData} setOpponent={setOpponent} />
-                                :
+                                <RemoteGameComponent websocket={socket} setWinner={setWinner} setScore={setScore} gameStartData={gamePongStartData} setOpponent={setOpponent} />
+                            :
                                 <RemoteGameComponent websocket={socket} setWinner={setWinner} setOpponent={setOpponent} />
-                        ) : (
+                          ) : (
                             !opponent && setOpponent({avatar: null, username: "Self", id: null}),
-                            <LocalGameComponent setWinner={setWinner} setOpponent={setOpponent} />
+                            <LocalGameComponent setWinner={setWinner} setOpponent={setOpponent} setScore={setScore} />
                         )) : (
 
                             <div className="flex flex-col items-center justify-center">
@@ -162,8 +165,8 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                             </div>
                         )
                     ) : (
-                        <div className="flex gap-3">
-                            <div className='inline space-y-4 space-x-'>
+                        <div className="flex gap-3 space-x-14 w-full h-full flex justify-center items-center">
+                            <div className='inline space-y-4 '>
                                 <div className='border-y-2 border-white border-opacity-40 rounded-lg white w-72 h-80 flex justify-center items-center'>
                                     <RiWifiOffLine className='size-44 animate-pulse' />
                                 </div>
@@ -186,10 +189,11 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                         </div>
                     )
                 ) : (
-                    <div className="flex flex-col items-center justify-center">
-                        <div className="text-3xl font-bold text-center mb-4 text-gray-300">Game Over!</div>
-                        <div className="text-2xl font-bold text-center mb-4 text-gray-300">Winner: {winner}</div>
-                        <Button variant="outline" className="w-full hover:bg-secondary" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket && socket.close(); (id && navigate('/ping-pong', {replace: true})); }}>
+                    <div className="flex flex-col items-center justify-center space-y-10">
+                        <div className="text-5xl font-bold text-center mb-4 text-gray-300 animate-bounce ">Game Over!</div>
+                        <div className="text-4xl font-bold text-center mb-4 text-gray-300">Winner is {winner}</div>
+                        {score && <div className="text-4xl font-bold text-center mb-4 text-gray-300">Score is {score}</div>}
+                        <Button variant="outline" className="w-60 hover:bg-secondary h-20 text-2xl" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket && socket.close(); (id && navigate('/' + k, {replace: true})); }}>
                             New Game
                         </Button>
                     </div>

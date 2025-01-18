@@ -44,7 +44,7 @@ export default function InvitePingPong({}) {
     return (
         <>
             {match ? (
-                <Game RemoteGameComponent={PingPongGame} waitingstate={true} websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/ping_pong/` + id + '/' + (tournament_id !== undefined ? tournament_id + '/' : "")} />
+                <Game RemoteGameComponent={PingPongGame} waitingstate={true} websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/ping_pong/` + id + '/' + (tournament_id !== undefined ? tournament_id + '/' : "")} k="ping-pong" />
             ) : (
                 <div className="flex justify-center items-center">
                     <Spinner w="16" h="16" />

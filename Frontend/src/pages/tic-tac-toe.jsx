@@ -165,7 +165,7 @@ export function LocalTicTacToe({ setWinner, setOpponent }) {
         });
 
         if (checkWinning(tmp))
-            setWinner(`Player using ${symbol}`);
+            setWinner(`Player using '${symbol}' symbol`);
         else if (Object.keys(updatedBoard).length === 9)
             setBoard({});
 

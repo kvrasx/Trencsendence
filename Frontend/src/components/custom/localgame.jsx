@@ -99,7 +99,7 @@ class Ball {
   
   
   
-  const Canvas = ({setWinner}) => {
+  const Canvas = ({setWinner, setScore}) => {
     var bg = 0;
     var padle = "#F8F8FF";
     var bal = "#F8F8FF";
@@ -171,6 +171,7 @@ class Ball {
     
     if (rightPaddle.score == 5 || leftPaddle.score == 5){
       setWinner(rightPaddle.score == 5 ? "right" : "left")
+      setScore(`${leftPaddle.score}:${rightPaddle.score}`);
       p5.noLoop();
     }
     p5.background(bg);
