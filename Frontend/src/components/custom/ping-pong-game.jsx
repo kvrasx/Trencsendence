@@ -2,21 +2,26 @@ import React, { useState, useEffect } from 'react';
 import Sketch from 'react-p5';
 
 const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ballY, leftPaddle, rightPaddle, websocket, scoreR, scoreL }) => {
-  var bg = 0;
-  var padle = "#F8F8FF";
- 
-  let choosenTheme = localStorage.getItem('theme');
+  const [bg, setBg] = useState(0);
+  const [padle, setPadle] = useState("#F8F8FF");
 
-  switch (choosenTheme) {
+  
+  useEffect(() => {
+
+    let choosenTheme = localStorage.getItem('theme');
+    
+    switch (choosenTheme) {
     case "theme1":
-      bg = "#2F4F4F";
-      padle = "#7FFF00";
+      setBg("#2F4F4F");
+      setPadle("#7FFF00");
       break;
-    case "theme2":
-      bg = "#FFA07A";
-      padle = "#FFFF00"
-      break;
-  }
+      case "theme2":
+        setBg("#FFA07A");
+        setPadle("#FFFF00");
+        break;
+      }
+      
+    }, [])
 
   const handlePaddleMovement = (p5) => {
     if (p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW)) {
@@ -74,7 +79,7 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
     p5.fill(padle);
     p5.textAlign(p5.CENTER, p5.CENTER); // Center align text
     p5.textSize(canvasW * 0.1); // Text size relative to canvas width
-    p5.ellipse(ballX, ballY, 20);
+    p5.ellipse(ballX, ballY, 20 * 2);
     show(p5, leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height, 10);
     show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height, 10);
     p5.text(scoreR, canvasW * 0.25, canvasH * 0.2); // Left score at 25% width
@@ -108,7 +113,7 @@ function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
 
 
   useEffect(() => {
-    setOpponent(gameStartData.opponent)
+    // setOpponent(gameStartData.opponent)
     
     // data received when game started
     setPlayerNmber(gameStartData['information']['player_number'])
@@ -182,7 +187,7 @@ function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
 
 
   return (
-    <Canvas playerName={playerName} playerNumber={playerNumber} gameG={gameG} canvasH={canvasH} canvasW={canvasW} ballX={gameData.ballX} ballY={gameData.ballY} leftPaddle={gameData.leftPaddle} rightPaddle={gameData.rightPaddle} scoreL={gameData.scoreL} scoreR={gameData.scoreR} websocket={websocket} />
+    <Canvas playerName={playerName} playerNumber={playerNumber} gameG={gameG} canvasH={800} canvasW={1300} ballX={gameData.ballX} ballY={gameData.ballY} leftPaddle={gameData.leftPaddle} rightPaddle={gameData.rightPaddle} scoreL={gameData.scoreL} scoreR={gameData.scoreR} websocket={websocket} />
   );
 }
 

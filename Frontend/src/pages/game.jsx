@@ -57,7 +57,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
 
         websocket.onopen = (event) => {
-            console.log("connected to websocket: ", event);
+            console.log("connected to websocket");
 
             setSocket(websocket)
         }

@@ -62,9 +62,8 @@ services:
           - frontend
           - backend
           # - elasticsearch
-          # - elasticsearch
         ports:
-          - "443:443"
+          - "4433:443"
    
     # logstash:
     #     container_name: logstash

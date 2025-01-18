@@ -55,15 +55,15 @@ class Match:
 
 class Ball:
     def __init__(self):
-        self.canvas_height = 400
-        self.canvas_width = 600
-        self.x = 600 // 2
-        self.y = 400 // 2
+        self.canvas_height = 800
+        self.canvas_width = 1300
+        self.x = 1300 // 2
+        self.y = 800 // 2
         self.radius = 20
         self.speedX = 3
         self.speedY = 0
         self.angle = 0
-        self.constSpeed = 9 
+        self.constSpeed = 14
         self.scoreRight = 0
         self.scoreLeft = 0
     def to_dict(self):
@@ -83,18 +83,18 @@ class Ball:
         
 class Paddle:
     def __init__(self, paddle):
-        self.canvasHeight = 400
-        self.canvasWidth = 600
-        self.paddleWidth = 10
-        self.paddleHeight = 100
+        self.canvasHeight = 800
+        self.canvasWidth = 1300
+        self.paddleWidth = 17
+        self.paddleHeight = 180
         self.paddleY = 100
         self.paddleSpeed = 10
         self.paddleBord = 10
         self.paddleScore = 0
         if paddle == "right":
-            self.paddleX = 600 * 0.98
+            self.paddleX = 1300 * 0.98
         else:
-            self.paddleX = 600 * 0.003
+            self.paddleX = 1300 * 0.006
 
     def to_dict(self):
         return {
@@ -158,7 +158,9 @@ class GameClient(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         if close_code == 4008 or close_code == 4009:
             return
-        self.safe_operation("current_players.remove(self.user.id)")
+        # self.safe_operation("current_players.remove(self.user.id)")
+        if self.user.id in current_players:
+            current_players.remove(self.user.id)
         if hasattr(self, 'group_name'):
             self.safe_operation("self.connected_sockets.remove(self.player)")
             if hasattr(self, "new_match"):
@@ -308,6 +310,7 @@ class GameClient(AsyncWebsocketConsumer):
                 await self._reset_ball(self.new_match.paddleLeft, "Left")
 
             if (self.new_match.ball.scoreRight == 5 or self.new_match.ball.scoreLeft == 5):
+                print("d5lat hna")
                 self.new_match.is_active = False
                 score = f"0{self.new_match.ball.scoreRight}:0{self.new_match.ball.scoreLeft}"
                 matchEntry = await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
