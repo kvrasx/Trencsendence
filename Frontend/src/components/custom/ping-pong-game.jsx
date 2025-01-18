@@ -95,7 +95,7 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
 var canvasH = 0
 var canvasW = 0
 
-function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
+function PingPongGame({ websocket, setWinner, gameStartData, setScore }) {
 
 
   const [playerNumber, setPlayerNmber] = useState('');
@@ -171,9 +171,7 @@ function PingPongGame({ websocket, setWinner, gameStartData, setOpponent }) {
         }));
       }
       else if (data.type === 'game_finished') {
-        console.log(data.type);
-        console.log(data.winner);
-        
+        setScore(data.score);
         setWinner(data.winner.player_username);
       }
       else if (data.type === "freee_match") {

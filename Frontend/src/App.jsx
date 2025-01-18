@@ -23,19 +23,19 @@ import Canvas from './components/custom/localgame'
 
 function PingPongPage() {
   return <Game
-    key="ping-pong"
     RemoteGameComponent={PingPongGame}
     websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/ping_pong/random/`}
     LocalGameComponent={Canvas}
+    k="ping-pong"
   />
 }
 
 function TicTacToePage() {
   return <Game
-    key="tic-tac-toe"
     RemoteGameComponent={TicTacToe}
     websocketUrl={`wss://${import.meta.env.VITE_HOST}/ws/game/random/`}
     LocalGameComponent={LocalTicTacToe}
+    k="tic-tac-toe"
   />
 }
 
