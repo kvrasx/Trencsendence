@@ -284,9 +284,9 @@ class GameClient(AsyncWebsocketConsumer):
                 
                 
     def _move_paddle(self, paddle, direction):
-        if direction == 'up' and paddle.paddleY > 0:
+        if direction == 'up' and paddle.paddleY > 10:
             paddle.paddleY -= 10
-        elif direction == 'down' and paddle.paddleY < (paddle.canvasHeight - paddle.paddleHeight):
+        elif direction == 'down' and paddle.paddleY < (paddle.canvasHeight - paddle.paddleHeight) - 10:
             paddle.paddleY += 10
                 
     
