@@ -68,7 +68,7 @@ export default function ProfileSettings({ updateProfile, user }) {
 
       await updateProfile(updatedProfile, "Profile has been updated successfully!");      
     } catch (e) {
-      // console.log(e);
+      console.log(e);
       toast.error(e?.response?.data?.password?.[0] ?? e?.response?.data?.display_name?.[0] ?? e?.response?.data?.email?.[0] ?? "Failed to update profile. Please try again.");
     }
   };

@@ -26,8 +26,9 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if 'username' in validated_data:
             raise serializers.ValidationError({"username": "Username cannot be changed"})
-        # if not validated_data.get('password'):
-        #     raise serializers.ValidationError({"password": "Invalid password"})
+        
+        if instance.password is None:
+            raise serializers.ValidationError({"password": ["Password cannot be changed for OAuth users"]})
         
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
