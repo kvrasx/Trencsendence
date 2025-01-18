@@ -38,6 +38,18 @@ class getTournament(APIView):
             print("getTournament", e)
             return Response({"error": "You don't have any ongoing tournament."}, status=404)
         
+class getTournamentsData(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            tournament = Tournament.objects.filter(Q(tournamentID=request.user.id) | Q(position2=request.user.id) | Q(position3=request.user.id) | Q(position4=request.user.id), status="finished")
+            if tournament.count() == 0:
+                raise Exception("No tournament found")
+            return Response({"tournament": TournamentSerializer(tournament, many=True).data}, status=200)
+        except Exception as e:
+            print("getTournament", e)
+            return Response({"error": "You don't have any ongoing tournament."}, status=404)
+        
 class cancelTournament(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):

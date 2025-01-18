@@ -190,12 +190,14 @@ export default function Profile({ user, setUser }) {
 
                     <div className="glass border border-secondary p-4 rounded-lg shadow-2xl ">
                         <h2 className="text-xl font-semibold text-gray-400">Summary</h2>
-                        <div className="">
-                            <div className="-ml-8">
+                        {/* <div className="">
+                            <div className="-ml-8"> */}
+                        <div className="md:flex justify-center gap-4 items-center h-full w-full overflow-y-auto themed-scrollbar">
     
                                 <MultiLineChart matches={matches} user={user} />
                             </div>
-                        </div>
+                            {/* </div>
+                        </div> */}
 
                     </div>
 
