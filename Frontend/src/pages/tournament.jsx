@@ -45,7 +45,7 @@ export default function Tournament() {
                                     </Avatar>
                                 </div>
                                 <div className="w-full h-1/2 flex justify-center items-center overflow-hidden">{tournament?.position1_user?.username}</div>
-                                <div className="w-full h-1/2 flex justify-center items-center overflow-hidden">{tournament?.position1_user?.display_name}</div>
+                                <div className="w-full h-1/2 flex justify-center items-center text-muted-foreground text-sm overflow-hidden">{tournament?.position1_user?.display_name}</div>
                             </div>
                             <div className="w-full h-1/3 border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
@@ -55,7 +55,7 @@ export default function Tournament() {
                                     </Avatar>
                                 </div>
                                 <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position2_user?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position2_user?.display_name}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center text-muted-foreground text-sm overflow-hidden">{tournament?.position2_user?.display_name}</div>
                             </div>
                         </div>
 
@@ -68,7 +68,7 @@ export default function Tournament() {
                                     </Avatar>
                                 </div>
                                 <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position3_user?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position3_user?.display_name}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center text-muted-foreground text-sm overflow-hidden">{tournament?.position3_user?.display_name}</div>
                             </div>
                             <div className="w-full h-1/3 border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
@@ -78,7 +78,7 @@ export default function Tournament() {
                                     </Avatar>
                                 </div>
                                 <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position4_user?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position4_user?.display_name}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center text-muted-foreground text-sm overflow-hidden">{tournament?.position4_user?.display_name}</div>
                             </div>
                         </div>
                     </div>
@@ -93,7 +93,7 @@ export default function Tournament() {
                                     </Avatar>
                                 </div>
                                 <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position5_user?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position5_user?.display_name}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center text-muted-foreground text-sm overflow-hidden">{tournament?.position5_user?.display_name}</div>
                             </div>
                             <div className="w-full h-1/2 border rounded-lg border-opacity-45 bg-white bg-opacity-15 p-2 border-white">
                                 <div className="w-full h-1/3 flex justify-center text-sm">
@@ -103,7 +103,7 @@ export default function Tournament() {
                                     </Avatar>
                                 </div>
                                 <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position6_user?.username ?? "Not known yet"}</div>
-                            <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position6_user?.display_name}</div>
+                            <div className="w-full h-1/2 flex justify-center items-center text-muted-foreground text-sm overflow-hidden">{tournament?.position6_user?.display_name}</div>
                             </div>
                         </div>
                     </div>
@@ -117,7 +117,7 @@ export default function Tournament() {
                                 </Avatar>
                             </div>
                             <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position7_user?.username ?? "Not known yet"}</div>
-                        <div className="w-full h-1/2 flex justify-center items-center">{tournament?.position7_user?.display_name}</div>
+                        <div className="w-full h-1/2 flex justify-center items-center text-muted-foreground text-sm overflow-hidden">{tournament?.position7_user?.display_name}</div>
                         </div>
                     </div>
 

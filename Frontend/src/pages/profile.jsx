@@ -25,7 +25,8 @@ export default function Profile({ user, setUser }) {
         const fetchTournaments = async () => {
             try {
                 let res = await get('tournament/get-all');
-                console.log(res);
+                setTournaments(res);
+                console.log("hmm:", res);
             }  catch (e) {
                 console.log(e);
                 if (e.response?.status !== 404) {
@@ -55,8 +56,8 @@ export default function Profile({ user, setUser }) {
             }
         }
 
-        fetchMatches();
         fetchTournaments();
+        fetchMatches();
     }, [])
 
     console.log(user);
@@ -253,25 +254,31 @@ export default function Profile({ user, setUser }) {
                         <h2 className="text-xl font-semibold text-gray-400">Last Tournaments</h2>
                         <div className="space-y-3">
                             {tournaments ? tournaments.map((tournament, index) => (
+                                tournament.status === "finished" &&
+                                <div className='p-4 rounded-lg glass'>
+
                                 <div
                                     key={index}
-                                    className="flex items-center justify-between p-4 rounded-lg glass"
-                                >
+                                    className="flex items-center justify-between "
+                                    >
                                     <div className='overflow-hidden'>
-                                        <div className="font-medium overflow-hidden">vs {tournament.tournament_name}</div>
-                                        <div className="text-sm text-muted-foreground">
-                                            {"10-4"}
-                                        </div>
+                                        <div className="font-medium overflow-hidden "><span className='text-muted-foreground text-sm'>won by</span> {tournament?.position7_user?.username}</div>
                                     </div>
+                                    <div className='overflow-hidden'>
+                                        <div className="font-semibold overflow-hidden text-lg">{tournament?.tournament_name}</div>
+                                    </div>
+                                        
                                     <span
-                                        className={`px-3 py-1 rounded-full text-sm font-medium ${false
+                                        className={`px-3 py-1 rounded-full text-sm font-medium ${tournament.position7 === user.id
                                             ? "bg-green-500/20 text-green-500"
                                             : "bg-red-500/20 text-red-500"
-                                            }`}
-                                    >
-                                        {"Loss"}
+                                        }`}
+                                        >
+                                        {tournament.position7 === user.id ? "Won" : (tournament.position6 === user.id || tournament.position5 === user.id ? "round 2" : "round 1")}
                                     </span>
                                 </div>
+                                    {/* <div className="text-sm text-muted-foreground">{"10-4"}</div> */}
+                                        </div>
                             )) : <div className="text-center mt-8 text-md text-muted-foreground">You haven't played any tournaments yet.</div>}
 
                         </div>

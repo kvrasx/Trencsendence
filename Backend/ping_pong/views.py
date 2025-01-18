@@ -35,8 +35,12 @@ class getTournament(APIView):
             tournament = Tournament.objects.get(Q(tournamentID=request.user.id) | Q(position2=request.user.id) | Q(position3=request.user.id) | Q(position4=request.user.id), status="ongoing")
             return Response({"tournament": TournamentSerializer(tournament).data}, status=200)
         except Exception as e:
-            print("getTournament", e)
-            return Response({"error": "You don't have any ongoing tournament."}, status=404)
+            try:
+                tournament = Tournament.objects.latest('created_at')
+                return Response({"tournament": TournamentSerializer(tournament).data}, status=200)
+            except Exception as e:
+                print("getTournament", e)
+                return Response({"error": "You don't have any ongoing tournament."}, status=404)
         
 class getTournamentsData(APIView):
     permission_classes = [IsAuthenticated]
@@ -45,7 +49,7 @@ class getTournamentsData(APIView):
             tournament = Tournament.objects.filter(Q(tournamentID=request.user.id) | Q(position2=request.user.id) | Q(position3=request.user.id) | Q(position4=request.user.id), status="finished")
             if tournament.count() == 0:
                 raise Exception("No tournament found")
-            return Response({"tournament": TournamentSerializer(tournament, many=True).data}, status=200)
+            return Response(TournamentSerializer(tournament, many=True).data, status=200)
         except Exception as e:
             print("getTournament", e)
             return Response({"error": "You don't have any ongoing tournament."}, status=404)
@@ -56,7 +60,7 @@ class cancelTournament(APIView):
         try:
             tournament = Tournament.objects.get(tournamentID=request.user.id, status="ongoing")
             Invitations.objects.filter(user1=request.user.id, type="tournament").delete()
-            tournament.status = "finished"
+            tournament.status = "canceled"
             tournament.save()
             return Response({"success": "Deleted tournament successfully."}, status=200)
         except Exception as e:
@@ -171,7 +175,7 @@ class tournamentControl:
                 else:
                     self.matchInvites.remove(invite)
         
-        if self.tournament.status == "finished" or self.tournament.current_round >= 3:
+        if self.tournament.status == "finished" or self.tournament.status == "canceled" or self.tournament.current_round >= 3:
             Invitations.objects.filter(user1=self.tournament.position1.id, type="tournament").delete()
             sendTournamentWarning(self.tournament.position1.id, self.tournament.position2.id, f"Tournament ended: {self.tournament.position7.username} has won the {self.tournament.tournament_name} tournament.")
             sendTournamentWarning(self.tournament.position1.id, self.tournament.position3.id, f"Tournament ended: {self.tournament.position7.username} has won the {self.tournament.tournament_name} tournament.")
