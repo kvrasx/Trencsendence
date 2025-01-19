@@ -27,7 +27,7 @@ export default function Auth({ setUser }) {
   const handleOTP = async (e) => {
     e.preventDefault();
     try {
-      let res = await axios.post(`https://${import.meta.env.VITE_HOST}/OTP/verify`, {
+      let res = await axios.post(`https://${import.meta.env.VITE_HOST}/api/OTP/verify`, {
         username: username,
         code: e.target.otp.value
       }, {withCredentials: true});
