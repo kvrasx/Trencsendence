@@ -18,7 +18,7 @@ winningCombinations = [
     [2, 5, 8],
     [0, 4, 8],
     [2, 4, 6],
-];
+]
 
 class MatchXO:
     def __init__(self, player1: User, player2: User):

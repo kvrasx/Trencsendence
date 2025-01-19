@@ -4,7 +4,7 @@ touch $SERVER_SSL_KEY
 touch $SERVER_SSL_CERTIFICATE
 chmod -R 777 $CERT_DIR/*
 apt update && apt upgrade -y && apt install -y nginx openssl
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $SERVER_SSL_KEY -out $SERVER_SSL_CERTIFICATE -subj "/C=US/ST=State/L=City/O=Organization/CN=jidev.xyz"
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout $SERVER_SSL_KEY -out $SERVER_SSL_CERTIFICATE -subj "/C=US/ST=State/L=City/O=Organization/CN=$VITE_HOST"
   /usr/local/bin/kibana-docker &
   KIBANA_PID=$! 
   echo "Attempting to upload dashboard...";

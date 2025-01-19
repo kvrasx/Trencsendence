@@ -28,6 +28,7 @@ export default function connect_websocket(url, closeOrError) {
         }
         else if (event.code == 4009) {
             console.log('User already in another game');
+            toast.error('User already in another game');
         }
         else
             console.log('WebSocket connection closed', event.code);

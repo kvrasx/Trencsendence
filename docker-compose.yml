@@ -57,6 +57,8 @@ services:
         restart: unless-stopped
         volumes:
           - logs:/var/log/nginx/
+        env_file:
+          - .env
         depends_on:
           - frontend
           - backend
@@ -82,8 +84,6 @@ services:
         volumes:
           - elastic:/usr/share/elasticsearch/data
           - ./Deployment/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-        ports:
-          - "9200:9200"
         restart: unless-stopped
 
     kibana:

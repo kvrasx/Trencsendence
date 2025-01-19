@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from django.http import HttpResponse
 from rest_framework.views import APIView
-from .serializer import ChatsSerializer, MessageSerializer,GlobalFriendSerializer,InviteFriendSerializer, NotifCount
+from .serializer import ChatsSerializer, MessageSerializer,GlobalFriendSerializer,InviteFriendSerializer, NotifCount, NotificationSerializer
 from .models import Message,Invitations,NotifCountmodel
 from django.db.models import Q
 from rest_framework.permissions import IsAuthenticated
@@ -230,7 +230,7 @@ def getNotifications(request):
     user: User = request.user
     user_id = user.id
     notifs = Invitations.objects.filter((Q(user2=user_id) & Q(status="pending")) | ((Q(user2=user_id) | Q(user1=user_id)) & Q(type="join")))
-    serializer = GlobalFriendSerializer(notifs, many=True)
+    serializer = NotificationSerializer(notifs, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK) 
 
 @api_view(['GET'])
@@ -264,5 +264,11 @@ def invitationStatus(request, type=None, target=None):
         serializer = GlobalFriendSerializer(invite)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
+        if type == "game":
+            try:
+                invite = Invitations.objects.get((Q(user1=request.user.id, user2=target) | Q(user1=target, user2=request.user.id)) & Q(type="join"))  
+                return Response(GlobalFriendSerializer(invite).data, status=status.HTTP_200_OK)
+            except:
+                return Response({"detail": "join"}, status=404)
         print(e)
         return Response("Detail: Invitation not found", status=status.HTTP_404_NOT_FOUND)

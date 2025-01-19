@@ -3,11 +3,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Send, X, UserPlus, Swords, Ban, BellOff, LogIn, BellDot, Target } from "lucide-react";
+import { Send, X, UserPlus, Swords, Ban, BellOff, LogIn, BellDot, Target, User } from "lucide-react";
 import { get } from '@/lib/ft_axios';
 import { post } from '@/lib/ft_axios';
 import { Layout } from '@/components/custom/layout'
-
+import {UserContext} from '@/contexts';
 
 import {
   Sheet,
@@ -18,17 +18,20 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
 
 export function Notifications({ setShowNotifications, socket }) {
   const [isSheetOpen, setIsSheetOpen] = useState(true);
   const [notifications, setNotifications] = useState([])
+  const user = useContext(UserContext);
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         let res = await get('getNotifications/');  // Fetch notifications
         let chatPromises = res.map(async (d) => {
           // Fetch user info for each notification
-          let userRes = await get(`user/get-info?user_id=${d.user1}`);
+          let id = d.user1 !== user.id ? d.user1 : d.user2 ;
+          let userRes = await get(`user/get-info?user_id=${id}`);
           d.user2 = userRes;  // Attach user info to the notification object
           return d;  // Return the updated notification
         });
@@ -111,6 +114,7 @@ export function Notifications({ setShowNotifications, socket }) {
                           notifications={notifications}
                           notification={notification}
                           setNotifications={setNotifications}
+                          user={user}
                         />
                       )
                     )
@@ -409,8 +413,8 @@ const TournamentItem = ({ notifications, notification, index, setNotifications }
 
 
 
-const JoinItem = ({ notifications, notification, index, setNotifications }) => {
-  let userId = notification.user2.id
+const JoinItem = ({ notifications, notification, index, setNotifications, user }) => {
+  let userId = notification.user2.id;
   let picture = notification.user2.avatar
   let name = notification.user2.username
   const defaultPicture =
