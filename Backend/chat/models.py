@@ -19,11 +19,6 @@ class Invitations(models.Model):
     type = models.CharField(max_length=10, choices=InvitationType.choices)
     created_at = models.DateTimeField(auto_now_add=True)
     
-    # class Meta:
-    #     constraints = [
-    #         models.UniqueConstraint(fields=['user1', 'user2'], name='unique_user_pair')
-    #     ]
-
 
 class Message(models.Model):
     chat_id = models.ForeignKey(Invitations, on_delete=models.CASCADE, related_name="messages")

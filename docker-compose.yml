@@ -65,38 +65,38 @@ services:
         ports:
           - "443:443"
    
-    logstash:
-        container_name: logstash
-        image: docker.elastic.co/logstash/logstash:8.17.0
-        restart: unless-stopped
-        volumes:
-          - ./Deployment/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-          - logs:/var/log/nginx/
-        group_add:
-          - adm 
-        depends_on:
-          - elasticsearch
-          - nginx
+    # logstash:
+    #     container_name: logstash
+    #     image: docker.elastic.co/logstash/logstash:8.17.0
+    #     restart: unless-stopped
+    #     volumes:
+    #       - ./Deployment/conf/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    #       - logs:/var/log/nginx/
+    #     group_add:
+    #       - adm 
+    #     depends_on:
+    #       - elasticsearch
+    #       - nginx
 
-    elasticsearch:
-        container_name: elasticsearch
-        image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
-        volumes:
-          - elastic:/usr/share/elasticsearch/data
-          - ./Deployment/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-        restart: unless-stopped
+    # elasticsearch:
+    #     container_name: elasticsearch
+    #     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+    #     volumes:
+    #       - elastic:/usr/share/elasticsearch/data
+    #       - ./Deployment/conf/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+    #     restart: unless-stopped
 
-    kibana:
-        image: docker.elastic.co/kibana/kibana:8.17.0
-        container_name: kibana
-        env_file:
-          - .env
-        volumes:
-          - ./Deployment/export.ndjson:/dashboard.ndjson
-          - ./Deployment/kibana.sh:/kibana.sh
-        ports:
-          - "5601:5601"
-        depends_on:
-          - elasticsearch
-        restart: unless-stopped
-        entrypoint: ["/bin/bash", "/kibana.sh"]
+    # kibana:
+    #     image: docker.elastic.co/kibana/kibana:8.17.0
+    #     container_name: kibana
+    #     env_file:
+    #       - .env
+    #     volumes:
+    #       - ./Deployment/export.ndjson:/dashboard.ndjson
+    #       - ./Deployment/kibana.sh:/kibana.sh
+    #     ports:
+    #       - "5601:5601"
+    #     depends_on:
+    #       - elasticsearch
+    #     restart: unless-stopped
+    #     entrypoint: ["/bin/bash", "/kibana.sh"]

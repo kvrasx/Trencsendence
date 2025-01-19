@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 from .serializer import ChatsSerializer, MessageSerializer,GlobalFriendSerializer,InviteFriendSerializer, NotifCount, NotificationSerializer
 from .models import Message,Invitations,NotifCountmodel
-from django.db.models import Q
+from django.db.models import Q,Max
 from rest_framework.permissions import IsAuthenticated
 from user_management.models import User
 from asgiref.sync import async_to_sync, sync_to_async
@@ -207,7 +207,9 @@ def deblockFriend(request):
 def getChats(request):
     user: User = request.user
     user_id = user.id
-    chats: Invitations = Invitations.objects.filter((Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="friend"))
+    chats: Invitations = Invitations.objects.filter((Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="friend")).annotate(latest_msg_time=Max('messages__sent_at')).order_by('-latest_msg_time')
+    for chat in chats:
+        print(chat.friendship_id, chat.latest_msg_time)
     serializer = ChatsSerializer(chats, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
