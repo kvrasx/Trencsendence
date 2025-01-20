@@ -24,7 +24,6 @@ urlpatterns = [
 
 
     # Match table endpoints
-    path('match/create', MatchTableViewSet.createMatchEntry),
     path('match/get-all', MatchTableViewSet.getAllMatchEntries),
     path('match/delete', MatchTableViewSet.deleteMatchEntry),
 ]
