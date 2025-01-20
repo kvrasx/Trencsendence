@@ -215,7 +215,7 @@ class GameClient(AsyncWebsocketConsumer):
         if invite.status == "pending":
             await database_sync_to_async(self.check_tournamnet)()
 
-        self.group_name = f"xo_{inviteId}"
+        self.group_name = f"pong-pong_{inviteId}"
         
         if self.group_name in self.invite_matches:
             self.invite_matches[ self.group_name ].append( self.player )
@@ -234,7 +234,6 @@ class GameClient(AsyncWebsocketConsumer):
             self.new_match = Match(invitedPlayers[0]['p'], invitedPlayers[1]['p'], self.group_name)
             invitedPlayers[0]['match'] = self.new_match
             invitedPlayers[1]['match'] = self.new_match
-            # self.active_matches.append(self.new_match)
             await self.channel_layer.group_send(
                 self.group_name,
                 {
@@ -286,9 +285,9 @@ class GameClient(AsyncWebsocketConsumer):
                 
                 
     def _move_paddle(self, paddle, direction):
-        if direction == 'up' and paddle.paddleY > 10:
+        if direction == 'up' and paddle.paddleY > 20:
             paddle.paddleY -= 10
-        elif direction == 'down' and paddle.paddleY < (paddle.canvasHeight - paddle.paddleHeight) - 10:
+        elif direction == 'down' and paddle.paddleY < (paddle.canvasHeight - paddle.paddleHeight) - 20:
             paddle.paddleY += 10
                 
     
@@ -325,7 +324,7 @@ class GameClient(AsyncWebsocketConsumer):
                     self.group_name,
                     {
                         "type" : "game_finished",
-                        "winner": self.new_match.player2 if self.new_match.ball.scoreRight == 5 else self.new_match.player1,
+                        "winner": self.new_match.player1 if self.new_match.ball.scoreRight == 5 else self.new_match.player2,
                         "score":  score
                     }
                 )
@@ -432,5 +431,4 @@ class GameClient(AsyncWebsocketConsumer):
 
     async def close_game(self, event):
         message = event['message']
-        print("Closing game: ", message)
         await self.close()
