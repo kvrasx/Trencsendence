@@ -7,7 +7,7 @@ from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
 from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
-from tic_tac_toe.consumers import current_players
+from tic_tac_toe.consumers import current_players, current_players_lock
 import math
 from .models import Tournament
 from user_management.serializers import UserSerializer
@@ -123,10 +123,14 @@ class GameClient(AsyncWebsocketConsumer):
             await self.close(code=4008)
             return
         print(self.user)
-        if self.user.id in current_players:
-            await self.accept()
-            await self.close(code=4009)
-            return
+
+        async with current_players_lock:
+            if self.user.id in current_players:
+                await self.accept()
+                await self.close(code=4009)
+                return
+            current_players.add(self.user.id)
+            print(current_players)
     
         self.player = {
             "p": {
@@ -150,8 +154,6 @@ class GameClient(AsyncWebsocketConsumer):
                 await self.close(code=4007)
                 return   
                 
-        current_players.add(self.user.id)
-        print(current_players)
         await self.accept()
 
 
@@ -159,8 +161,8 @@ class GameClient(AsyncWebsocketConsumer):
         if close_code == 4009:
             return
         # self.safe_operation("current_players.remove(self.user.id)")
-        if self.user.id in current_players:
-            current_players.remove(self.user.id)
+        async with current_players_lock:
+            current_players.discard(self.user.id)
         if hasattr(self, 'group_name'):
             self.safe_operation("self.connected_sockets.remove(self.player)")
             if hasattr(self, "new_match"):
