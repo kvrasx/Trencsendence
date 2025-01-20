@@ -7,7 +7,7 @@ from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
 from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
-from tic_tac_toe.consumers import current_players, current_players_lock
+from .players_manager import player_manager
 import math
 from .models import Tournament
 from user_management.serializers import UserSerializer
@@ -122,15 +122,13 @@ class GameClient(AsyncWebsocketConsumer):
             await self.accept()
             await self.close(code=4008)
             return
-        print(self.user)
+        print("user:", self.user)
 
-        async with current_players_lock:
-            if self.user.id in current_players:
-                await self.accept()
-                await self.close(code=4009)
-                return
-            current_players.add(self.user.id)
-            print(current_players)
+        is_added = await player_manager.add_player(self.user.id)
+        if not is_added:
+            await self.accept()
+            await self.close(code=4009)
+            return
     
         self.player = {
             "p": {
@@ -150,6 +148,7 @@ class GameClient(AsyncWebsocketConsumer):
                 await self.invite_mode()
             except Exception as e:
                 print(e)
+                await player_manager.remove_player(self.user.id)
                 await self.accept()
                 await self.close(code=4007)
                 return   
@@ -158,11 +157,11 @@ class GameClient(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        if close_code == 4009:
+        if close_code == 4009 or close_code == 4008:
             return
-        # self.safe_operation("current_players.remove(self.user.id)")
-        async with current_players_lock:
-            current_players.discard(self.user.id)
+        
+        await player_manager.remove_player(self.user.id)
+
         if hasattr(self, 'group_name'):
             self.safe_operation("self.connected_sockets.remove(self.player)")
             if hasattr(self, "new_match"):

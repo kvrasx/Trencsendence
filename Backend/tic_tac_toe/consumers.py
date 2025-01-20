@@ -8,6 +8,7 @@ from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
 from django.shortcuts import get_object_or_404
 from user_management.serializers import UserSerializer
+from ping_pong.players_manager import player_manager
 
 import asyncio
 
@@ -34,9 +35,6 @@ class MatchXO:
         self.board = {}
         self.finished = False
         
-
-current_players = set() # I used set to prevent duplicate user ids
-current_players_lock = asyncio.Lock()
 
 class GameConsumer(AsyncWebsocketConsumer):
     connected_users = []
@@ -72,13 +70,11 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.close(code=4008)
             return
         
-        async with current_players_lock:
-            if self.user.id in current_players:
-                await self.accept()
-                await self.close(code=4009)
-                return
-            current_players.add(self.user.id)
-            print(current_players)
+        is_added = await player_manager.add_player(self.user.id)
+        if not is_added:
+            await self.accept()
+            await self.close(code=4009)
+            return
 
         if self.scope['url_route']['kwargs']['room_name'] == 'random':
             await self.add_player_to_lobby()
@@ -155,11 +151,10 @@ class GameConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, close_code):
-        if close_code == 4008 or close_code == 4009 or close_code == 4007:
+        if close_code == 4008 or close_code == 4009:
             return
 
-        async with current_players_lock:
-            current_players.discard(self.user.id)
+        await player_manager.remove_player(self.user.id)
 
         if self.match:
             await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
