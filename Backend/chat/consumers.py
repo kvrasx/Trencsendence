@@ -46,7 +46,8 @@ class ChatConsumer(WebsocketConsumer):
             }
             serializer = MessageSerializer(data=full_data)
             # print(message)
-            if serializer.is_valid():
+            o = Invitations.objects.filter(friendship_id=self.room_group_name,status="accepted")
+            if serializer.is_valid() and o.exists():
                 serializer.save()
             else:
                 return

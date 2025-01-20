@@ -31,7 +31,7 @@ class UserTableViewSet:
         if search_query:
             allUsers = User.objects.filter(username__icontains=search_query)
         else:
-            allUsers = User.objects.all()
+            allUsers = User.objects.exclude(username="bot")
         serializer = UserSerializer(instance=allUsers, many=True)
         return Response(serializer.data)
 
