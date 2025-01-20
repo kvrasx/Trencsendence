@@ -26,6 +26,7 @@ export const Layout = ({ children }) => {
     return () => {
       if (socket) {
         socket.close();
+        onlineStatusSocket.close();
       }
     };
   }, []);
