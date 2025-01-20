@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         if 'username' in validated_data:
             raise serializers.ValidationError({"username": "Username cannot be changed"})
         
-        if instance.password is None:
+        if 'password' in validated_data and instance.password is None:
             raise serializers.ValidationError({"password": ["Password cannot be changed for OAuth users"]})
         
         for attr, value in validated_data.items():
