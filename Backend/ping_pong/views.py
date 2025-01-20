@@ -136,7 +136,9 @@ class tournamentControl:
         if len(self.matchInvites) == 0 and self.tournament.current_round == 2:
             self.matchInvites.append(Invitations.objects.create(user1=self.tournament.position5.id, user2=self.tournament.position6.id, type="join", status="pending"))
             sendTournamentWarning(self.bot.id, self.tournament.position6.id, f"<a href=\"https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}\" > Tournament: Click to play your second round </a>")
+            sendTournamentWarning(self.bot.id, self.tournament.position5.id, f"<a href=\"https://{os.environ.get('VITE_HOST')}/ping-pong/{self.matchInvites[0].friendship_id}/{self.tournament.id}\" > Tournament: Click to play your second round </a>")
         
+
         else:
             for invite in self.matchInvites:
                 self.tournament.refresh_from_db()
@@ -159,7 +161,7 @@ class tournamentControl:
                         try:
                             winner = User.objects.get(id=winner)
                         except:
-                            print("User not found exception")
+                            print("someChecks: User not found exception")
                             return
                         invite.delete()
                         if self.tournament.current_round == 1 and self.tournament.position5 == None:
