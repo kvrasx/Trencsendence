@@ -8,7 +8,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
-
+from django.db import IntegrityError
 
 
 # for User table
@@ -31,7 +31,7 @@ class UserTableViewSet:
         if search_query:
             allUsers = User.objects.filter(username__icontains=search_query)
         else:
-            allUsers = User.objects.all()
+            allUsers = User.objects.exclude(username="bot")
         serializer = UserSerializer(instance=allUsers, many=True)
         return Response(serializer.data)
 
@@ -46,7 +46,11 @@ class UserTableViewSet:
         for field in request.data:
             if field not in serializer.fields:
                 return Response({'error': "User have no such field."}, status=400)
-        serializer.save()
+        try:
+            serializer.save()
+        except IntegrityError as e:
+            return Response({'error': str(e)}, status=400)
+
         return Response({'user': serializer.data})
     
     ########################

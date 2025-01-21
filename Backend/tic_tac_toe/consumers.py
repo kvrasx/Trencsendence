@@ -8,6 +8,9 @@ from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
 from django.shortcuts import get_object_or_404
 from user_management.serializers import UserSerializer
+from ping_pong.players_manager import player_manager
+
+import asyncio
 
 winningCombinations = [
     [0, 1, 2],
@@ -32,8 +35,6 @@ class MatchXO:
         self.board = {}
         self.finished = False
         
-
-current_players = set() # I used set to prevent duplicate user ids
 
 class GameConsumer(AsyncWebsocketConsumer):
     connected_users = []
@@ -69,7 +70,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.close(code=4008)
             return
         
-        if self.user.id in current_players:
+        is_added = await player_manager.add_player(self.user.id)
+        if not is_added:
             await self.accept()
             await self.close(code=4009)
             return
@@ -81,8 +83,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.close(code=4007)
             return
 
-        current_players.add(self.user.id)
-        print(current_players)
         await self.accept()
         
 
@@ -151,8 +151,10 @@ class GameConsumer(AsyncWebsocketConsumer):
         
 
     async def disconnect(self, close_code):
-        if close_code == 4008 or close_code == 4009 or close_code == 4007:
+        if close_code == 4008 or close_code == 4009:
             return
+
+        await player_manager.remove_player(self.user.id)
 
         if self.match:
             await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
@@ -173,10 +175,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     }
                 }
             )
-        try:
-            current_players.remove(self.user.id)
-        except:
-            pass
+            
 
         # remove the user from connected users if present
         if self.user and self.user in self.connected_users:
