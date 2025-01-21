@@ -110,7 +110,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     }
                 }
             )
-            if self.check_winner():
+            if self.check_winner() and not self.match.finished:
                 self.match.finished = True
                 await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                     "game_type": 2,
@@ -157,12 +157,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         await player_manager.remove_player(self.user.id)
 
         if self.match:
-            await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
-                    "game_type": 2,
-                    "winner": self.match.player1.id if self.match.player2.id == self.user.id else self.match.player2.id,
-                    "loser": self.user.id,
-                    "score": "01:00"
-                })
+            # await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
+            #         "game_type": 2,
+            #         "winner": self.match.player1.id if self.match.player2.id == self.user.id else self.match.player2.id,
+            #         "loser": self.user.id,
+            #         "score": "01:00"
+            #     })
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -223,6 +223,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             "symbol": self.match.roles[str(self.user.id)],
             "opponent": UserSerializer(instance=self.match.player1).data if self.match.player1.id != self.user.id else UserSerializer(instance=self.match.player2).data
         }))
+
+    async def close_socket(self, event):
+        await self.close()
 
 
                 
