@@ -110,7 +110,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     }
                 }
             )
-            if self.check_winner() and self.match.finished:
+            if self.check_winner() and not self.match.finished:
                 self.match.finished = True
                 await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                     "game_type": 2,

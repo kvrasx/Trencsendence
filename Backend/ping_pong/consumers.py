@@ -123,37 +123,42 @@ class GameClient(AsyncWebsocketConsumer):
             await self.close(code=4008)
             return
         print("user:", self.user)
-
-        is_added = await player_manager.add_player(self.user.id)
-        if not is_added:
-            await self.accept()
-            await self.close(code=4009)
-            return
-    
-        self.player = {
-            "p": {
-                'player_name': self.channel_name,
-                'player_number': '',
-                'player_username': self.user.username,
-                'user_id': self.user.id,
-                'user': UserSerializer(self.user).data
-            },
-            "match": None
-        }
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        if self.room_name == 'random':
-            await self.random_mode()
-        else:
-            try:
-                await self.invite_mode()
-            except Exception as e:
-                print(e)
-                await player_manager.remove_player(self.user.id)
+        
+        try:        
+            is_added = await player_manager.add_player(self.user.id)
+            if not is_added:
                 await self.accept()
-                await self.close(code=4007)
-                return   
-                
-        await self.accept()
+                await self.close(code=4009)
+                return
+        
+            self.player = {
+                "p": {
+                    'player_name': self.channel_name,
+                    'player_number': '',
+                    'player_username': self.user.username,
+                    'user_id': self.user.id,
+                    'user': UserSerializer(self.user).data
+                },
+                "match": None
+            }
+            self.room_name = self.scope['url_route']['kwargs']['room_name']
+            if self.room_name == 'random':
+                await self.random_mode()
+            else:
+                try:
+                    await self.invite_mode()
+                except Exception as e:
+                    print(e)
+                    await player_manager.remove_player(self.user.id)
+                    await self.accept()
+                    await self.close(code=4007)
+                    return   
+                    
+            await self.accept()
+        except Exception as e:
+            print(e)
+            await player_manager.remove_player(self.user.id)
+            await self.close(code=4020)
 
 
     async def disconnect(self, close_code):
@@ -311,26 +316,34 @@ class GameClient(AsyncWebsocketConsumer):
                 await self._reset_ball(self.new_match.paddleLeft, "Left")
 
             if (self.new_match.ball.scoreRight == 5 or self.new_match.ball.scoreLeft == 5):
-                print("d5lat hna")
-                self.new_match.is_active = False
-                score = f"0{self.new_match.ball.scoreRight}:0{self.new_match.ball.scoreLeft}"
-                matchEntry = await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
-                    "game_type": 1,
-                    "winner": self.new_match.player2["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player1["user_id"],
-                    "loser": self.new_match.player1["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player2["user_id"],
-                    "score": score
-                })
-                if hasattr(self, 'tournament_id'):
-                    await database_sync_to_async(advanceTournament)(self.tournament_id, matchEntry)
-                await self.channel_layer.group_send(
-                    self.group_name,
-                    {
-                        "type" : "game_finished",
-                        "winner": self.new_match.player2 if self.new_match.ball.scoreRight == 5 else self.new_match.player1,
-                        "score":  score
-                    }
-                )
-                return 
+                try:
+                    self.new_match.is_active = False
+                    score = f"0{self.new_match.ball.scoreRight}:0{self.new_match.ball.scoreLeft}"
+                    matchEntry = await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
+                        "game_type": 1,
+                        "winner": self.new_match.player2["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player1["user_id"],
+                        "loser": self.new_match.player1["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player2["user_id"],
+                        "score": score
+                    })
+                    if hasattr(self, 'tournament_id'):
+                        await database_sync_to_async(advanceTournament)(self.tournament_id, matchEntry)
+                    await self.channel_layer.group_send(
+                        self.group_name,
+                        {
+                            "type" : "game_finished",
+                            "winner": self.new_match.player2 if self.new_match.ball.scoreRight == 5 else self.new_match.player1,
+                            "score":  score
+                        }
+                    )
+                except:
+                    await self.channel_layer.group_send(
+                        self.group_name,
+                        {
+                            "type": "close_game",
+                            "message": "closeing game after storing result after match end."
+                        }
+                    )
+                return
             
             await self.channel_layer.group_send(
                 self.group_name,
@@ -434,4 +447,5 @@ class GameClient(AsyncWebsocketConsumer):
     async def close_game(self, event):
         message = event['message']
         print("Closing game: ", message)
+        await player_manager.remove_player(self.user.id)
         await self.close()
