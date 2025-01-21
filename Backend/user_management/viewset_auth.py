@@ -75,7 +75,7 @@ class authViewSet:
         res = requests.post(url=TOKEN_URL, data=reqBody)
         clientToken = res.json().get('access_token')
         if res.status_code != 200 or not clientToken:
-            return Response({'error': 'Failed to fetch client access token from 42.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': 'Failed to fetch client access token from 42.'}, status=status.HTTP_400_BAD_REQUEST)
     
         res = requests.get(
             url=USER_INFO_URL,
@@ -86,7 +86,7 @@ class authViewSet:
         clientInfo = res.json()
         # print(clientInfo)
         if res.status_code != 200:
-            return Response({'error': 'Failed to fetch client data from 42.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'error': 'Failed to fetch client data from 42.'}, status=status.HTTP_400_BAD_REQUEST)
 
         login = clientInfo.get('login')
         email = clientInfo.get('email')
