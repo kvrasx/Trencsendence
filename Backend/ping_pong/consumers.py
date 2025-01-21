@@ -91,6 +91,7 @@ class Paddle:
         self.paddleSpeed = 10
         self.paddleBord = 10
         self.paddleScore = 0
+        # self.user_id = None
         if paddle == "right":
             self.paddleX = 1300 * 0.98
         else:
@@ -187,8 +188,10 @@ class GameClient(AsyncWebsocketConsumer):
             self.player["p"]['player_number'] = '1'
         self.connected_sockets.append(self.player)
         if len(self.connected_sockets) == 2: # Running only by second player
-            player1 = self.connected_sockets.pop(0)
-            player2 = self.connected_sockets.pop(0)
+            player2 = self.connected_sockets.pop()
+            # player2['p']['player_number'] = '2'
+            player1 = self.connected_sockets.pop()
+            # player1['p']['player_number'] = '1'
             self.group_name = f'group_{player1["p"]["player_username"]}'
             self.new_match = Match(player1['p'], player2['p'], self.group_name)
             player1["match"] = self.new_match
@@ -310,13 +313,12 @@ class GameClient(AsyncWebsocketConsumer):
                 await self._reset_ball(self.new_match.paddleLeft, "Left")
 
             if (self.new_match.ball.scoreRight == 5 or self.new_match.ball.scoreLeft == 5):
-                print("d5lat hna")
                 self.new_match.is_active = False
                 score = f"0{self.new_match.ball.scoreRight}:0{self.new_match.ball.scoreLeft}"
                 matchEntry = await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                     "game_type": 1,
-                    "winner": self.new_match.player2["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player1["user_id"],
-                    "loser": self.new_match.player1["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player2["user_id"],
+                    "winner": self.new_match.player1["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player2["user_id"],
+                    "loser": self.new_match.player2["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player1["user_id"],
                     "score": score
                 })
                 if hasattr(self, 'tournament_id'):
