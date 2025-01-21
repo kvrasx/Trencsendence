@@ -110,7 +110,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     }
                 }
             )
-            if self.check_winner() and self.match.finished:
+            if self.check_winner() and not self.match.finished:
                 self.match.finished = True
                 await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                     "game_type": 2,
@@ -223,6 +223,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             "symbol": self.match.roles[str(self.user.id)],
             "opponent": UserSerializer(instance=self.match.player1).data if self.match.player1.id != self.user.id else UserSerializer(instance=self.match.player2).data
         }))
+
+    async def close_socket(self, event):
+        await self.close()
 
 
                 

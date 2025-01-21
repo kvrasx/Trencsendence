@@ -390,6 +390,7 @@ class GameClient(AsyncWebsocketConsumer):
         self.new_match.ball.x = self.new_match.ball.canvas_width // 2
         self.new_match.ball.y = self.new_match.ball.canvas_height // 2
         self.new_match.ball.speedX *= -1  # Reverse the horizontal direction
+        self.new_match.ball.speedY = 0
         if lorr == "Left":
             self.new_match.ball.scoreRight += 1
         if lorr == "Right":
