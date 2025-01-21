@@ -224,5 +224,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             "opponent": UserSerializer(instance=self.match.player1).data if self.match.player1.id != self.user.id else UserSerializer(instance=self.match.player2).data
         }))
 
+    async def close_socket(self, event):
+        await self.close()
+
 
                 

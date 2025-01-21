@@ -120,17 +120,6 @@ function PingPongGame({ websocket, setWinner, gameStartData, setScore, setOppone
     setPlayerName(gameStartData['information']['player_name'])
     canvasH = gameStartData.paddleLeft.canvasHeight
     canvasW = gameStartData.paddleRight.canvasWidth
-    if (gameStartData.information.player_number === '1') {
-
-      setGameData((prev) => ({
-        ...prev,
-        rightPaddle: gameStartData.paddleRight,
-        leftPaddle: gameStartData.paddleLeft,
-        ball: gameStartData.ball,
-      }))
-
-    }
-    else {
       setGameData((prev) => ({
         ...prev,
         leftPaddle: gameStartData.paddleLeft,
@@ -138,8 +127,6 @@ function PingPongGame({ websocket, setWinner, gameStartData, setScore, setOppone
         ball: gameStartData.ball,
       }))
 
-
-    }
     setGame(gameStartData.game_group)
 
 

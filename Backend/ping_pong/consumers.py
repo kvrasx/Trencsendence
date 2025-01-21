@@ -91,6 +91,7 @@ class Paddle:
         self.paddleSpeed = 10
         self.paddleBord = 10
         self.paddleScore = 0
+        # self.user_id = None
         if paddle == "right":
             self.paddleX = 1300 * 0.98
         else:
@@ -192,8 +193,10 @@ class GameClient(AsyncWebsocketConsumer):
             self.player["p"]['player_number'] = '1'
         self.connected_sockets.append(self.player)
         if len(self.connected_sockets) == 2: # Running only by second player
-            player1 = self.connected_sockets.pop(0)
-            player2 = self.connected_sockets.pop(0)
+            player2 = self.connected_sockets.pop()
+            # player2['p']['player_number'] = '2'
+            player1 = self.connected_sockets.pop()
+            # player1['p']['player_number'] = '1'
             self.group_name = f'group_{player1["p"]["player_username"]}'
             self.new_match = Match(player1['p'], player2['p'], self.group_name)
             player1["match"] = self.new_match
@@ -221,7 +224,7 @@ class GameClient(AsyncWebsocketConsumer):
         if invite.status == "pending":
             await database_sync_to_async(self.check_tournamnet)()
 
-        self.group_name = f"xo_{inviteId}"
+        self.group_name = f"pong-pong_{inviteId}"
         
         if self.group_name in self.invite_matches:
             self.invite_matches[ self.group_name ].append( self.player )
@@ -240,7 +243,6 @@ class GameClient(AsyncWebsocketConsumer):
             self.new_match = Match(invitedPlayers[0]['p'], invitedPlayers[1]['p'], self.group_name)
             invitedPlayers[0]['match'] = self.new_match
             invitedPlayers[1]['match'] = self.new_match
-            # self.active_matches.append(self.new_match)
             await self.channel_layer.group_send(
                 self.group_name,
                 {
@@ -321,8 +323,8 @@ class GameClient(AsyncWebsocketConsumer):
                     score = f"0{self.new_match.ball.scoreRight}:0{self.new_match.ball.scoreLeft}"
                     matchEntry = await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                         "game_type": 1,
-                        "winner": self.new_match.player2["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player1["user_id"],
-                        "loser": self.new_match.player1["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player2["user_id"],
+                        "winner": self.new_match.player1["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player2["user_id"],
+                        "loser": self.new_match.player2["user_id"] if  self.new_match.ball.scoreRight == 5 else self.new_match.player1["user_id"],
                         "score": score
                     })
                     if hasattr(self, 'tournament_id'):
@@ -331,7 +333,7 @@ class GameClient(AsyncWebsocketConsumer):
                         self.group_name,
                         {
                             "type" : "game_finished",
-                            "winner": self.new_match.player2 if self.new_match.ball.scoreRight == 5 else self.new_match.player1,
+                            "winner": self.new_match.player1 if self.new_match.ball.scoreRight == 5 else self.new_match.player2,
                             "score":  score
                         }
                     )
@@ -402,6 +404,7 @@ class GameClient(AsyncWebsocketConsumer):
         self.new_match.ball.x = self.new_match.ball.canvas_width // 2
         self.new_match.ball.y = self.new_match.ball.canvas_height // 2
         self.new_match.ball.speedX *= -1  # Reverse the horizontal direction
+        self.new_match.ball.speedY = 0
         if lorr == "Left":
             self.new_match.ball.scoreRight += 1
         if lorr == "Right":
@@ -447,5 +450,4 @@ class GameClient(AsyncWebsocketConsumer):
     async def close_game(self, event):
         message = event['message']
         print("Closing game: ", message)
-        await player_manager.remove_player(self.user.id)
         await self.close()
