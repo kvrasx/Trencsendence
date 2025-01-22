@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { get, post } from '@/lib/ft_axios';
 import { Swords, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
+import { UserContext } from "@/contexts";  
 
 export default function InviteButton({ user_id, type, defaultStatus, ...props }) {
 
@@ -10,6 +11,7 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
     
     const [status, setStatus] = useState(defaultStatus);
     const [disabled, setDisabled] = useState(false);
+    const user = useContext(UserContext);
 
 
     useEffect(() => {
@@ -39,7 +41,11 @@ export default function InviteButton({ user_id, type, defaultStatus, ...props })
                 const response = await get(`/invitation-status/${type}/${user_id}`);
                 console.log("invite button", response);
                 if (response.status === "blocked") {
-                    setStatus("Unblock User");
+                    if (response.user1 === user.id) {
+                        setStatus("Unblock User");
+                    } else {
+                        setStatus("User has blocked you");
+                    }
                 } else {
                     setStatus(`${type} Invite ${response.status}`);
                 }

@@ -162,6 +162,7 @@ def blockFriend(request):
     serializer = GlobalFriendSerializer(data=request.data)
     if (serializer.is_valid()):
         validated_data = serializer.validated_data
+        print(validated_data)
         user1 = request.user.id
         user2 = validated_data.get('user1')
     else:
@@ -174,6 +175,8 @@ def blockFriend(request):
         if o.exists():
             raise Exception("error")
         query = Invitations.objects.get((Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)) & Q(status='accepted') & Q(type='friend'))
+        query.user1 = request.user.id
+        query.user2 = validated_data.get('user1')
         query.status="blocked"
         query.save()
     except:
