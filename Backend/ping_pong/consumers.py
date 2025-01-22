@@ -7,7 +7,7 @@ from channels.db import database_sync_to_async
 from django.shortcuts import get_object_or_404
 from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
-from .players_manager import player_manager
+from .players_manager import PlayerManager
 import math
 from .models import Tournament
 from user_management.serializers import UserSerializer
@@ -115,6 +115,7 @@ class GameClient(AsyncWebsocketConsumer):
 
     connected_sockets = []
     invite_matches = {}
+    player_manager = PlayerManager()
     
     
     async def connect(self):
@@ -126,7 +127,7 @@ class GameClient(AsyncWebsocketConsumer):
         print("user:", self.user)
         
         try:        
-            is_added = await player_manager.add_player(self.user.id)
+            is_added = await self.player_manager.add_player(self.user.id)
             if not is_added:
                 await self.accept()
                 await self.close(code=4009)
@@ -150,7 +151,7 @@ class GameClient(AsyncWebsocketConsumer):
                     await self.invite_mode()
                 except Exception as e:
                     print(e)
-                    await player_manager.remove_player(self.user.id)
+                    await self.player_manager.remove_player(self.user.id)
                     await self.accept()
                     await self.close(code=4007)
                     return   
@@ -158,7 +159,7 @@ class GameClient(AsyncWebsocketConsumer):
             await self.accept()
         except Exception as e:
             print(e)
-            await player_manager.remove_player(self.user.id)
+            await self.player_manager.remove_player(self.user.id)
             await self.close(code=4020)
 
 
@@ -166,7 +167,7 @@ class GameClient(AsyncWebsocketConsumer):
         if close_code == 4009 or close_code == 4008:
             return
         
-        await player_manager.remove_player(self.user.id)
+        await self.player_manager.remove_player(self.user.id)
 
         if hasattr(self, 'group_name'):
             self.safe_operation("self.connected_sockets.remove(self.player)")

@@ -8,7 +8,7 @@ from chat.models import Invitations
 from user_management.viewset_match import MatchTableViewSet
 from django.shortcuts import get_object_or_404
 from user_management.serializers import UserSerializer
-from ping_pong.players_manager import player_manager
+from ping_pong.players_manager import PlayerManager
 
 import asyncio
 
@@ -39,6 +39,7 @@ class MatchXO:
 class GameConsumer(AsyncWebsocketConsumer):
     connected_users = []
     matchs = {}
+    player_manager = PlayerManager()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -70,7 +71,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.close(code=4008)
             return
         
-        is_added = await player_manager.add_player(self.user.id)
+        is_added = await self.player_manager.add_player(self.user.id)
         if not is_added:
             await self.accept()
             await self.close(code=4009)
@@ -154,7 +155,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         if close_code == 4008 or close_code == 4009:
             return
 
-        await player_manager.remove_player(self.user.id)
+        await self.player_manager.remove_player(self.user.id)
 
         if self.match:
             # await database_sync_to_async(MatchTableViewSet.createMatchEntry)({

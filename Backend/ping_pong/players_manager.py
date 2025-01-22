@@ -28,4 +28,4 @@ class PlayerManager:
             return self._players.copy()
 
 # a global instance
-player_manager = PlayerManager()
+# player_manager = PlayerManager()
