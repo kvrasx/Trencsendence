@@ -43,14 +43,14 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
         if (!waiting) {
             if (socket) {
                 socket.close();
-                setSocket(null);
             }
+            setSocket(null);
         }
 
         if (!waiting || started === "local")
             return;
 
-        const websocket = connect_websocket(websocketUrl, () => {
+        const [websocket, websocketCleanup] = connect_websocket(websocketUrl, () => {
             setWaiting(false);
             setStarted(null);
             setSocket(null);
@@ -59,7 +59,6 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
 
         websocket.onopen = (event) => {
             console.log("connected to websocket");
-
             setSocket(websocket)
         }
 
@@ -82,7 +81,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
         }
         
         return () => {
-            websocket.close();
+            websocketCleanup();
             setSocket(null);
             setStarted(false);
         };

@@ -8,26 +8,26 @@ import connect_websocket from "@/lib/connect_websocket";
 
 export const Layout = ({ children }) => {
   const [count, setCount] = useState(0);
+  const [socket, setSocket] = useState(null);
   
-  const socket = connect_websocket(`wss://${import.meta.env.VITE_HOST}/ws/`);
-  const onlineStatusSocket = connect_websocket(`wss://${import.meta.env.VITE_HOST}/ws/online/`);
   useEffect(() => {
-
-    socket.onopen = () => {
+    const [sock, sockCleanup] = connect_websocket(`wss://${import.meta.env.VITE_HOST}/ws/`);
+    const [onlineStatusSocket, onlineStatusSocketCleanup] = connect_websocket(`wss://${import.meta.env.VITE_HOST}/ws/online/`);
+    setSocket(sock);
+    sock.onopen = () => {
       console.log('Connected to WebSocket server notifs');
     };
 
-    socket.onmessage = (event) => {
+    sock.onmessage = (event) => {
       const data = JSON.parse(event.data);
         console.log("--------->", data);
         setCount(data.count);
     };
 
     return () => {
-      if (socket) {
-        socket.close();
-        onlineStatusSocket.close();
-      }
+      sockCleanup();
+      onlineStatusSocketCleanup();
+      
     };
   }, []);
   return (
