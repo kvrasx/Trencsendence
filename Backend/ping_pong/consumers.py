@@ -260,8 +260,8 @@ class GameClient(AsyncWebsocketConsumer):
             self.new_match = Match(invitedPlayers[0]['p'], invitedPlayers[1]['p'], self.group_name)
             invitedPlayers[0]['match'] = self.new_match
             invitedPlayers[1]['match'] = self.new_match
-            invitedPlayers[0]['p']['position'] = 'left'
-            invitedPlayers[1]['p']['position'] = 'right'
+            self.new_match.player1['position'] = 'right'
+            self.new_match.player2['position'] = 'left'
             await self.channel_layer.group_send(
                 self.group_name,
                 {
@@ -442,7 +442,6 @@ class GameClient(AsyncWebsocketConsumer):
             self.new_match.ball.scoreLeft += 1
             li_marka = self.new_match.player1 if self.new_match.player1['position'] == 'left' else self.new_match.player2
             li_marka['score'] += 1
-        print("Score: ", self.new_match.player1['score'], 'player2:', self.new_match.player2['score'])
 
 
     async def paddleMoved(self, event):

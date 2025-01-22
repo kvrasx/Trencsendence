@@ -190,7 +190,7 @@ export function Game({ websocketUrl, RemoteGameComponent, LocalGameComponent, wa
                     <div className="flex flex-col items-center justify-center space-y-10">
                         <div className="text-5xl font-bold text-center mb-4 text-gray-300 animate-bounce ">Game Over!</div>
                         <div className="text-4xl font-bold text-center mb-4 text-gray-300">Winner is {winner}</div>
-                        {score && <div className="text-4xl font-bold text-center mb-4 text-gray-300">Score is {score}</div>}
+                        {/* {score && <div className="text-4xl font-bold text-center mb-4 text-gray-300">Score is {score}</div>} */}
                         <Button variant="outline" className="w-60 hover:bg-secondary h-20 text-2xl" onClick={() => { setWinner(null); setWaiting(false); setStarted(false); socket && socket.close(); (id && navigate('/' + k, {replace: true})); }}>
                             New Game
                         </Button>
