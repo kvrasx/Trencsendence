@@ -10,7 +10,7 @@ from user_management.viewset_match import MatchTableViewSet
 import math
 from .models import Tournament
 from user_management.serializers import UserSerializer
-from ping_pong.players_manager import PlayerManager
+# from ping_pong.players_manager import PlayerManager
 
 def advanceTournament(tournamentId, matchEntry):
     try:
@@ -123,7 +123,7 @@ class GameClient(AsyncWebsocketConsumer):
 
     connected_sockets = []
     invite_matches = {}
-    player_manager = PlayerManager()
+    # player_manager = PlayerManager()
     
     
     async def connect(self):
@@ -135,11 +135,7 @@ class GameClient(AsyncWebsocketConsumer):
         print("user:", self.user)
         
         try:        
-            is_added = await self.player_manager.add_player(self.user.id)
-            if not is_added:
-                await self.accept()
-                await self.close(code=4009)
-                return
+            # is_added = await self.player_manager.add_player(self.user.id)
         
             self.player = {
                 "p": {
@@ -147,10 +143,16 @@ class GameClient(AsyncWebsocketConsumer):
                     'player_number': '',
                     'player_username': self.user.username,
                     'user_id': self.user.id,
-                    'user': UserSerializer(self.user).data
+                    'user': UserSerializer(self.user).data,
+                    'score': 0,
+                    'position': None
                 },
                 "match": None
             }
+            if self.player in self.connected_sockets:
+                await self.accept()
+                await self.close(code=4009)
+                return
             self.room_name = self.scope['url_route']['kwargs']['room_name']
             if self.room_name == 'random':
                 await self.random_mode()
@@ -159,7 +161,7 @@ class GameClient(AsyncWebsocketConsumer):
                     await self.invite_mode()
                 except Exception as e:
                     print(e)
-                    await self.player_manager.remove_player(self.user.id)
+                    # await self.player_manager.remove_player(self.user.id)
                     await self.accept()
                     await self.close(code=4007)
                     return   
@@ -167,7 +169,7 @@ class GameClient(AsyncWebsocketConsumer):
             await self.accept()
         except Exception as e:
             print(e)
-            await self.player_manager.remove_player(self.user.id)
+            # await self.player_manager.remove_player(self.user.id)
             await self.close(code=4020)
 
 
@@ -175,7 +177,7 @@ class GameClient(AsyncWebsocketConsumer):
         if close_code == 4009 or close_code == 4008:
             return
         
-        await self.player_manager.remove_player(self.user.id)
+        # await self.player_manager.remove_player(self.user.id)
 
         if hasattr(self, 'group_name'):
             self.safe_operation("self.connected_sockets.remove(self.player)")
@@ -209,6 +211,8 @@ class GameClient(AsyncWebsocketConsumer):
             self.new_match = Match(player1['p'], player2['p'], self.group_name)
             player1["match"] = self.new_match
             player2["match"] = self.new_match
+            player1["p"]['position'] = 'left'
+            player2["p"]['position'] = 'right'
             await self.channel_layer.group_add(self.new_match.group_name, player1['p']['player_name'])
             await self.channel_layer.group_add(self.new_match.group_name, player2['p']['player_name'])
             await self.channel_layer.group_send(
@@ -321,18 +325,23 @@ class GameClient(AsyncWebsocketConsumer):
             await self._check_paddle_collision(self.new_match.paddleRight, "Right")
 
             if self.new_match.ball.x - self.new_match.ball.radius <= 0:
-                await self._reset_ball(self.new_match.paddleRight, "Right")  # Reset the ball to the center 
-            if self.new_match.ball.x + self.new_match.ball.radius >= self.new_match.ball.canvas_width:
                 await self._reset_ball(self.new_match.paddleLeft, "Left")
+            if self.new_match.ball.x + self.new_match.ball.radius >= self.new_match.ball.canvas_width:
+                await self._reset_ball(self.new_match.paddleRight, "Right")  # Reset the ball to the center 
 
-            if (self.new_match.ball.scoreRight == 5 or self.new_match.ball.scoreLeft == 5):
+            # if (self.new_match.ball.scoreRight == 5 or self.new_match.ball.scoreLeft == 5):
+            if (self.new_match.player1['score'] == 5 or self.new_match.player2['score'] == 5):
                 try:
                     self.new_match.is_active = False
-                    score = f"0{self.new_match.ball.scoreRight}:0{self.new_match.ball.scoreLeft}"
+                    score_lisr = self.new_match.player1['score'] if self.new_match.player1['position'] == 'left' else self.new_match.player2['score']
+                    score_limn = self.new_match.player1['score'] if self.new_match.player1['position'] == 'right' else self.new_match.player2['score']
+                    self.new_match.ball.scoreRight = score_limn
+                    self.new_match.ball.scoreLeft = score_lisr
+                    score = f"0{score_lisr}:0{score_limn}"
                     matchEntry = await database_sync_to_async(MatchTableViewSet.createMatchEntry)({
                         "game_type": 1,
-                        "winner": self.new_match.paddleRight.user['user_id'] if self.new_match.ball.scoreRight == 5 and self.new_match.ball.scoreRight_user['user_id'] == self.new_match.paddleRight.user['user_id'] else self.new_match.paddleLeft.user['user_id'],
-                        "loser": self.new_match.paddleLeft.user['user_id'] if self.new_match.ball.scoreRight == 5 and self.new_match.ball.scoreRight_user['user_id'] == self.new_match.paddleRight.user['user_id'] else self.new_match.paddleRight.user['user_id'],
+                        "winner": self.new_match.player1['user_id'] if self.new_match.player1['score'] == 5 else self.new_match.player2['user_id'],
+                        "loser": self.new_match.player2['user_id'] if self.new_match.player1['score'] == 5 else self.new_match.player1['user_id'],
                         "score": score
                     })
                     if hasattr(self, 'tournament_id'):
@@ -341,7 +350,7 @@ class GameClient(AsyncWebsocketConsumer):
                         self.group_name,
                         {
                             "type" : "game_finished",
-                            "winner": self.new_match.paddleRight.user if self.new_match.ball.scoreRight == 5 and self.new_match.ball.scoreRight_user['user_id'] == self.new_match.paddleRight.user['user_id'] else self.new_match.paddleLeft.user,
+                            "winner": self.new_match.player1 if self.new_match.player1['score'] == 5 else self.new_match.player2,
                             "score":  score
                         }
                     )
@@ -415,8 +424,12 @@ class GameClient(AsyncWebsocketConsumer):
         self.new_match.ball.speedY = 0
         if lorr == "Left":
             self.new_match.ball.scoreRight += 1
-        if lorr == "Right":
+            li_marka = self.new_match.player1 if self.new_match.player1['position'] == 'right' else self.new_match.player2
+            li_marka['score'] += 1
+        elif lorr == "Right":
             self.new_match.ball.scoreLeft += 1
+            li_marka = self.new_match.player1 if self.new_match.player1['position'] == 'left' else self.new_match.player2
+            li_marka['score'] += 1
 
 
     async def paddleMoved(self, event):

@@ -82,8 +82,8 @@ const Canvas = ({ playerNumber, playerName, gameG, canvasW, canvasH, ballX, ball
     p5.ellipse(ballX, ballY, 20 * 2);
     show(p5, leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height, 10);
     show(p5, rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height, 10);
-    p5.text(scoreR, canvasW * 0.25, canvasH * 0.2); // Left score at 25% width
-    p5.text(scoreL, canvasW * 0.75, canvasH * 0.2);
+    p5.text(scoreL, canvasW * 0.25, canvasH * 0.2); // Left score at 25% width
+    p5.text(scoreR, canvasW * 0.75, canvasH * 0.2);
   };
 
 
