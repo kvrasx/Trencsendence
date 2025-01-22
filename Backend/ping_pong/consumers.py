@@ -149,10 +149,6 @@ class GameClient(AsyncWebsocketConsumer):
                 },
                 "match": None
             }
-            if self.player in self.connected_sockets:
-                await self.accept()
-                await self.close(code=4009)
-                return
             self.room_name = self.scope['url_route']['kwargs']['room_name']
             if self.room_name == 'random':
                 await self.random_mode()
@@ -206,6 +202,11 @@ class GameClient(AsyncWebsocketConsumer):
         if len(self.connected_sockets) == 2: # Running only by second player
             player2 = self.connected_sockets.pop()
             player1 = self.connected_sockets.pop()
+            
+            #hadi hya lcondition li kathandli random
+            if player1["p"]['user_id'] == player2["p"]['user_id']:
+                self.connected_sockets.append(player2)
+                raise Exception("User already waiting for random")
 
             self.group_name = f'group_{player1["p"]["player_username"]}'
             self.new_match = Match(player1['p'], player2['p'], self.group_name)
@@ -239,7 +240,11 @@ class GameClient(AsyncWebsocketConsumer):
         self.group_name = f"pong-pong_{inviteId}"
         
         if self.group_name in self.invite_matches:
-            self.invite_matches[ self.group_name ].append( self.player )
+            tmp = self.invite_matches[ self.group_name ]
+            ### Hadi hya lcondition dyal check invite
+            if self.player['p']['user_id'] == tmp[0]['p']['user_id']:
+                raise Exception("User already waiting for invite")
+            tmp.append( self.player )
         else:
             self.invite_matches[ self.group_name ] = [ self.player ]
 
@@ -255,6 +260,8 @@ class GameClient(AsyncWebsocketConsumer):
             self.new_match = Match(invitedPlayers[0]['p'], invitedPlayers[1]['p'], self.group_name)
             invitedPlayers[0]['match'] = self.new_match
             invitedPlayers[1]['match'] = self.new_match
+            invitedPlayers[0]['p']['position'] = 'left'
+            invitedPlayers[1]['p']['position'] = 'right'
             await self.channel_layer.group_send(
                 self.group_name,
                 {
@@ -328,6 +335,11 @@ class GameClient(AsyncWebsocketConsumer):
                 await self._reset_ball(self.new_match.paddleLeft, "Left")
             if self.new_match.ball.x + self.new_match.ball.radius >= self.new_match.ball.canvas_width:
                 await self._reset_ball(self.new_match.paddleRight, "Right")  # Reset the ball to the center 
+            
+            score_lisr = self.new_match.player1['score'] if self.new_match.player1['position'] == 'left' else self.new_match.player2['score']
+            score_limn = self.new_match.player1['score'] if self.new_match.player1['position'] == 'right' else self.new_match.player2['score']
+            self.new_match.ball.scoreRight = score_limn
+            self.new_match.ball.scoreLeft = score_lisr
 
             # if (self.new_match.ball.scoreRight == 5 or self.new_match.ball.scoreLeft == 5):
             if (self.new_match.player1['score'] == 5 or self.new_match.player2['score'] == 5):
@@ -426,10 +438,11 @@ class GameClient(AsyncWebsocketConsumer):
             self.new_match.ball.scoreRight += 1
             li_marka = self.new_match.player1 if self.new_match.player1['position'] == 'right' else self.new_match.player2
             li_marka['score'] += 1
-        elif lorr == "Right":
+        if lorr == "Right":
             self.new_match.ball.scoreLeft += 1
             li_marka = self.new_match.player1 if self.new_match.player1['position'] == 'left' else self.new_match.player2
             li_marka['score'] += 1
+        print("Score: ", self.new_match.player1['score'], 'player2:', self.new_match.player2['score'])
 
 
     async def paddleMoved(self, event):
