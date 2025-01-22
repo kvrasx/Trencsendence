@@ -198,7 +198,7 @@ def deblockFriend(request):
     if (user1 == user2):
         return Response("Detail: Cant Deblock", status=status.HTTP_400_BAD_REQUEST)
     try:
-        query = Invitations.objects.get((Q(user1=user1, user2=user2) | Q(user1=user2, user2=user1)) & Q(status='blocked'))
+        query = Invitations.objects.get(Q(user1=user1, user2=user2) & Q(status='blocked'))
         query.status="accepted"
         query.save()
     except:
@@ -212,7 +212,7 @@ def getChats(request):
     user_id = user.id
     chats: Invitations = Invitations.objects.filter((Q(user1=user_id) | Q(user2=user_id)) & Q(status="accepted") & Q(type="friend")).annotate(latest_msg_time=Max('messages__sent_at')).order_by('-latest_msg_time')
     for chat in chats:
-        print(chat.friendship_id, chat.latest_msg_time)
+        print("chat.friendship_id, chat.latest_msg_time")
     serializer = ChatsSerializer(chats, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
