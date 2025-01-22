@@ -72,6 +72,7 @@ export default function Profile({ user, setUser }) {
                 setUser(res.user);
             }
         } catch (e) {
+            console.log(e);
             toast.error("Failed to update profile. Please try again.")
         }
     }

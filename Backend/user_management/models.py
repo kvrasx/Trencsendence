@@ -20,7 +20,7 @@ class User(AbstractUser):
         max_length=14, 
         null=True, 
         unique=True, 
-        blank=True, 
+        # blank=True, 
         validators=[RegexValidator(
             regex=r'^.{5,}$', 
             message='Display name must be at least 5 characters long'

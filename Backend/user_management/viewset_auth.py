@@ -13,6 +13,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer
 
+
+from django.db import IntegrityError
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 import os
 
@@ -91,8 +93,16 @@ class authViewSet:
         login = clientInfo.get('login')
         email = clientInfo.get('email')
         avatar = clientInfo.get('image').get('link')
-        # print(avatar)
-        user, isCreated = User.objects.get_or_create(username=login, email=email, password=None)
+
+        try:
+            user, isCreated = User.objects.get_or_create(username=login, email=email, password=None)
+        except IntegrityError as e:
+            print(e)
+            r = Response()
+            r.status_code = 302
+            r['Location'] = f'https://{os.getenv("VITE_HOST")}/'
+            return r
+
         if isCreated and avatar:
             user.avatar = avatar
             user.save()

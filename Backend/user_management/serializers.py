@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         
         if 'password' in validated_data and instance.password is None:
             raise serializers.ValidationError({"password": ["Password cannot be changed for OAuth users"]})
-        
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
