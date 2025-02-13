@@ -7,7 +7,6 @@
 4. [Prerequisites](#prerequisites)
 5. [Installation](#installation)
 6. [Usage](#usage)
-7. [License](#license)
 
 ## Overview
 
