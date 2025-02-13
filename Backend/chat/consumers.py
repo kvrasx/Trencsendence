@@ -147,6 +147,7 @@ class onlineStatus(WebsocketConsumer):
         # print(self.online_users[self.user.id])
         if len(self.online_users[self.user.id]) == 0:
             del self.online_users[self.user.id]
+            self.user.refresh_from_db()
             self.user.online = False
             self.user.save()
 
